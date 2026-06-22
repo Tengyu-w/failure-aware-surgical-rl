@@ -1,0 +1,6 @@
+failure,controller,episodes,seeds,success_mean,unsafe_abort_rate,unsafe_warning_events_mean,min_danger_distance_mean,monitor_triggers_mean,final_distance_mean,steps_mean
+near_target_drift,clean,20,20,1.0,0.0,2.5,0.06124277671014795,0.0,0.019448790508486503,40.75
+near_target_drift,monitor_corrected,20,20,0.55,0.45,2.5,0.05252504812228061,1.45,0.04393542436403898,39.15
+near_target_drift,perturbed,20,20,0.0,0.0,4.65,0.03635297568664145,0.0,0.11074594001546752,160.0
+none,clean,20,20,1.0,0.0,2.5,0.06124277671014795,0.0,0.019448790508486503,40.75
+none,monitor_corrected,20,20,0.85,0.15,2.1,0.06175880138252258,0.15,0.026418771880331336,40.35

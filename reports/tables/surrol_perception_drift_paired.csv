@@ -1,0 +1,7 @@
+task,failure,seeds,clean_success,perturbed_success,monitor_success,perturbed_final_distance,monitor_final_distance,mean_triggers,override_rate
+GauzeRetrieve,depth_scale_error,5,1.0,0.0,0.0,0.2645450167650504,0.2645450167650504,0.0,0.0
+NeedlePick,depth_scale_error,5,1.0,0.0,0.0,0.218395370927013,0.2332736165998651,1.6,0.14111111111111113
+GauzeRetrieve,near_target_drift,5,1.0,0.0,1.0,0.04554713630979006,0.011356316250404019,1.0,0.057835497835497796
+NeedlePick,near_target_drift,5,1.0,0.2,1.0,0.09559785809757501,0.01880614528618026,1.0,0.07521205082180688
+GauzeRetrieve,perception_bias,5,1.0,0.0,0.0,0.26451362332775097,0.26451362332775097,0.0,0.0
+NeedlePick,perception_bias,5,1.0,0.0,0.0,0.22600370521652327,0.2263655642224026,1.6,0.1388888888888889

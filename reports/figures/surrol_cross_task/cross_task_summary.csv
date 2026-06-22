@@ -1,0 +1,13 @@
+task,failure,controller,success,phase_replans
+GauzeRetrieve,action_dropout,monitor_corrected,1.0,0.0
+GauzeRetrieve,action_dropout,perturbed,0.0,0.0
+GauzeRetrieve,action_noise,monitor_corrected,1.0,0.0
+GauzeRetrieve,action_noise,perturbed,0.0,0.0
+GauzeRetrieve,execution_slip,monitor_corrected,1.0,0.0
+GauzeRetrieve,execution_slip,perturbed,0.0,0.0
+NeedlePick,action_dropout,monitor_corrected,1.0,0.8
+NeedlePick,action_dropout,perturbed,0.0,0.0
+NeedlePick,action_noise,monitor_corrected,1.0,0.0
+NeedlePick,action_noise,perturbed,0.0,0.0
+NeedlePick,execution_slip,monitor_corrected,1.0,0.4
+NeedlePick,execution_slip,perturbed,0.0,0.0

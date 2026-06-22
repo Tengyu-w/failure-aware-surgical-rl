@@ -1,0 +1,14 @@
+.conda/
+.conda_pkgs/
+.pip_cache/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+runs/
+*.zip
+reports/*.docx
+reports/*.pdf
+reports/**/*.docx
+reports/**/*.pdf
+reports/render_*/
+reports/docx_audit_paths.txt

@@ -1,0 +1,2 @@
+test_episodes,accuracy,macro_f1,missed_review_or_abort_rate,false_review_or_abort_rate,mean_confidence,human_review_support,abort_candidate_support
+460.0,0.8456521739130435,0.8276104517038158,0.0,0.16231884057971013,0.8206145903461047,108.0,7.0

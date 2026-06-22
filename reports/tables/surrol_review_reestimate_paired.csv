@@ -1,0 +1,5 @@
+task,failure,seeds,perturbed_success,blind_monitor_success,reestimate_success,blind_monitor_distance,reestimate_distance,reestimate_triggers,reestimate_steps
+GauzeRetrieve,perception_bias,5,0.0,0.0,1.0,0.26451362332775097,0.01251812428274934,1.0,34.6
+GauzeRetrieve,depth_scale_error,5,0.0,0.0,1.0,0.2645450167650504,0.01251812428274934,1.0,34.6
+NeedlePick,perception_bias,5,0.0,0.0,1.0,0.2263655642224026,0.019603309080838897,1.0,40.0
+NeedlePick,depth_scale_error,5,0.0,0.0,1.0,0.2332736165998651,0.019603309080838897,1.0,40.0

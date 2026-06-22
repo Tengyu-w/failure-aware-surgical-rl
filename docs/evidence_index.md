@@ -1,0 +1,70 @@
+# Evidence Index
+
+This page indexes the most important evidence files for a GitHub reader or
+potential PhD supervisor. It is organized by claim so that each statement in the
+README has a traceable report, table, figure, or media file.
+
+## Visual SurRoL Migration Evidence
+
+| Claim | Evidence |
+|---|---|
+| The project moved beyond the custom proxy into SurRoL/PyBullet simulation. | [NeedleReach GIF](../reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif), [NeedlePick GIF](../reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif), [GauzeRetrieve GIF](../reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) |
+| Rendered rollouts have step traces, not only screenshots. | [NeedleReach trace](../reports/media/surrol_render_evidence/needlereach/rollout_trace.csv), [NeedlePick trace](../reports/media/surrol_render_evidence/needlepick/rollout_trace.csv), [GauzeRetrieve trace](../reports/media/surrol_render_evidence/gauzeretrieve/rollout_trace.csv) |
+| Recovery behavior is visualized. | [phase-aware success figure](../reports/figures/surrol_phase_aware/success_rate_by_failure.png), [distance curves](../reports/figures/surrol_phase_aware/representative_distance_curves.png), [observable jaw-stuck recovery](../reports/figures/surrol_cross_task_observable_jaw_stuck_10seed/cross_task_jaw_stuck_recovery.png) |
+
+## Four-Step Research Upgrade
+
+| Step | Purpose | Main Files |
+|---|---|---|
+| Step 1 | Upgrade key experiments to 10 seeds | [master paired results](../reports/tables/surrol_master_paired_results.csv), [master report](../reports/surrol_master_results_round13_zh.md) |
+| Step 2 | Formalize fault taxonomy | [taxonomy table](../reports/tables/surrol_fault_taxonomy.csv), [taxonomy report](../reports/surrol_fault_taxonomy_step2.md) |
+| Step 3 | Learn route/risk classifier | [metrics](../reports/tables/surrol_learned_route_classifier_metrics.csv), [report](../reports/surrol_learned_route_classifier_step3.md) |
+| Step 4 | Reduce privileged simulator-state dependence | [signal audit](../reports/tables/surrol_observable_signal_audit.csv), [observable supervisor report](../reports/surrol_observable_supervisor_step4.md) |
+
+## Key Result Tables
+
+| Table | Description |
+|---|---|
+| [surrol_master_episode_rows.csv](../reports/tables/surrol_master_episode_rows.csv) | episode-level source rows from the SurRoL reliability suites |
+| [surrol_master_paired_results.csv](../reports/tables/surrol_master_paired_results.csv) | clean, perturbed, and recovered paired summary |
+| [surrol_fault_taxonomy.csv](../reports/tables/surrol_fault_taxonomy.csv) | task/failure/family/route taxonomy with seed counts |
+| [surrol_learned_route_classifier_summary.csv](../reports/tables/surrol_learned_route_classifier_summary.csv) | held-out summary for the learned route classifier |
+| [surrol_observable_vs_privileged_jaw_stuck.csv](../reports/tables/surrol_observable_vs_privileged_jaw_stuck.csv) | internal phase-aware versus observable proxy recovery comparison |
+| [observable_proxy_threshold_sweep_10seed.csv](../reports/tables/observable_proxy_threshold_sweep_10seed.csv) | threshold sweep for observable risk scoring |
+
+## Important Reports
+
+| Report | Why It Matters |
+|---|---|
+| [surrol_master_results_round13_zh.md](../reports/surrol_master_results_round13_zh.md) | overview of paired SurRoL recovery evidence |
+| [surrol_fault_taxonomy_step2.md](../reports/surrol_fault_taxonomy_step2.md) | formalizes failure families and intervention routes |
+| [surrol_learned_route_classifier_step3.md](../reports/surrol_learned_route_classifier_step3.md) | shows learned route-classifier metrics and boundary errors |
+| [surrol_observable_supervisor_step4.md](../reports/surrol_observable_supervisor_step4.md) | separates observable supervisor decisions from privileged simulator state |
+| [claims_limitations_round46.md](../reports/claims_limitations_round46.md) | conservative claim and limitation framing from earlier synthesis |
+| [surrol_wsl_deployment_notes_zh.md](../reports/surrol_wsl_deployment_notes_zh.md) | documents the local SurRoL/WSL environment used for experiments |
+
+## Reproducibility Commands
+
+Rebuild the main result summaries from stored CSV logs:
+
+```powershell
+python scripts\build_surrol_master_results.py
+python scripts\build_surrol_fault_taxonomy.py
+python scripts\train_surrol_route_classifier.py
+python scripts\analyze_observable_proxy_risk.py
+python scripts\build_surrol_observable_supervisor_step4.py
+python scripts\audit_surrol_upgrade_status.py
+```
+
+Run lightweight tests:
+
+```powershell
+$env:PYTHONPATH="E:\RL_projects\constraint_surgical_rl\src"
+python -m pytest tests\test_tool_navigation.py tests\test_surrol_ppo_reward_and_vision.py
+```
+
+## Claim Boundaries
+
+The evidence supports a simulation research prototype for reliability
+supervision. It does not support claims of clinical validation, real-robot
+deployment, or a complete end-to-end learned surgical autonomy system.

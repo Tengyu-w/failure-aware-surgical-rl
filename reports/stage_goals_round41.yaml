@@ -1,0 +1,129 @@
+project_state: round41_baseline_locked
+date: 2026-06-20
+
+baseline:
+  policy: runs/surrol_visual_dagger_round31_seed50710/model_dagger_round2.zip
+  risk_head_primary: runs/surrol_visual_dagger_round31_seed50710/visual_action_risk_head/visual_action_risk_head.npz
+  recovery_memory_primary: runs/surrol_visual_dagger_round33_ood20_seed51000/visual_recovery_memory_augmented/visual_recovery_memory.npz
+  stagnation_head_candidate: runs/surrol_visual_temporal_stagnation_round35/temporal_stagnation_head.npz
+  visual_adapter_candidate: runs/surrol_visual_denoising_adapter_round40_strict_split/visual_denoising_adapter.npz
+
+adoption_status:
+  adopt:
+    - old_visual_action_risk_head
+    - old_augmented_visual_recovery_memory
+    - risk_aware_routing
+    - temporal_stagnation_as_candidate_guard
+    - strict_split_visual_adapter_as_candidate_preprocessor
+  do_not_adopt:
+    - adapter_space_recovery_memory_round40
+    - online_adapter_knn_recovery_memory_round43_as_replacement
+    - adapter_specific_stagnation_head_round39
+    - unstable_ppo_finetuning_as_main_result
+  blocked:
+    - pick_and_place_formal_multiseed
+    - needle_regrasp_formal_multiseed
+
+stages:
+  - id: stage_1
+    name: Lock current baseline
+    status: completed
+    deliverables:
+      - reports/current_baseline_summary_round41_zh.md
+      - reports/stage_goals_round41.yaml
+    completion_criteria:
+      - Baseline, candidates, withdrawn modules, and next data protocol are explicitly separated.
+
+  - id: stage_2
+    name: Collect real online adapter-space trajectories
+    status: completed
+    goal: Replace offline-mapped adapter data with true online adapter observations.
+    required_outputs:
+      - clean_all_steps_adapter_dataset
+      - mixed_all_steps_adapter_dataset
+      - seed_split_manifest
+      - high_action_gap_sample_count_report
+    minimum_checks:
+      - observations_shape_is_208
+      - same_episode_windows_do_not_cross_splits
+      - high_action_gap_samples_are_sufficient_for_train_validation_test
+    deliverables:
+      - reports/surrol_adapter_online_collection_round42_zh.md
+      - runs/surrol_visual_adapter_online_mixed20_seed53100
+      - runs/surrol_visual_adapter_online_clean20_seed53200
+
+  - id: stage_3
+    name: Retrain online recovery memory
+    status: completed_negative
+    goal: Train recovery memory only from true online high action-gap adapter states.
+    required_outputs:
+      - online_adapter_recovery_memory
+      - offline_action_error_report
+      - closed_loop_smoke_report
+      - fixed_seed_20_or_50_episode_validation
+    adoption_rule:
+      - Must improve closed-loop selected success or reduce auto failures versus old recovery memory.
+      - Offline action L2 alone is insufficient.
+    deliverables:
+      - reports/surrol_online_adapter_recovery_memory_round43_zh.md
+      - scripts/train_surrol_online_adapter_recovery_memory.py
+      - runs/surrol_visual_online_adapter_recovery_memory_round43_combined_pca64
+      - runs/surrol_visual_round43_online_memory_20seed_mixed_seed52500
+
+  - id: stage_4
+    name: Conservative risk routing upgrade
+    status: completed
+    goal: Combine risk head, OOD gate, recovery budget, and temporal stagnation.
+    required_outputs:
+      - coverage_risk_table
+      - old_vs_new_risk_head_pairing
+      - recovery_budget_ablation
+      - final_routing_policy_candidate
+    adoption_rule:
+      - Must report auto coverage, selected success, and auto failures together.
+    selected_candidate:
+      - old_visual_action_risk_head
+      - old_augmented_visual_recovery_memory
+      - strict_split_visual_adapter
+      - selective_memory_guarded
+      - review_risk_threshold_0p6
+      - recovery_budget_10
+    deliverables:
+      - reports/surrol_conservative_routing_round44_zh.md
+      - runs/surrol_visual_round44_conservative_routing_summary.csv
+
+  - id: stage_5
+    name: Cross-task breadth
+    status: completed_limited
+    goal: Verify which supervisor components transfer beyond NeedleReach.
+    priority_tasks:
+      - NeedlePick
+      - GauzeRetrieve
+      - NeedleReach
+      - NeedleRegrasp_or_PickAndPlace_as_blocked_or_smoke_only
+    adoption_rule:
+      - Do not promote a task unless clean oracle and baseline rollout are stable.
+    outcome:
+      - NeedlePickRL and GauzeRetrieveRL pass 208D visual wrapper smoke.
+      - Direct NeedleReach learned visual routing transfer gives 0/5 success and 5/5 review on both tasks.
+      - Rule/phase-aware monitor evidence remains the valid cross-task positive result.
+      - Formal learned visual cross-task routing requires task-specific policy, risk head, and memory.
+    deliverables:
+      - reports/surrol_cross_task_breadth_round45_zh.md
+      - runs/surrol_stage5_needlepick_transfer_probe_budget10_seed54100
+      - runs/surrol_stage5_gauzeretrieve_transfer_probe_budget10_seed54100
+
+  - id: stage_6
+    name: Doctoral research positioning
+    status: completed
+    goal: Convert engineering evidence into a credible PhD topic seed.
+    required_outputs:
+      - Chinese supervisor-facing summary
+      - English proposal seed
+      - system diagram
+      - claims_and_limitations_table
+    deliverables:
+      - reports/phd_supervisor_summary_round46_zh.md
+      - reports/phd_proposal_seed_round46_en.md
+      - reports/system_diagram_round46.md
+      - reports/claims_limitations_round46.md

@@ -1,0 +1,9 @@
+module,decision_or_signal,source,observable_status,used_in_step4_path,research_role
+internal_phase_replan,active waypoint index,SurRoL internal _waypoints,privileged,no,upper-bound baseline for phase-aware recovery
+internal_phase_replan,activation/contact state,SurRoL internal _activated/_contact_constraint,privileged,no,upper-bound baseline; not a deployable monitor signal
+observable_phase_replan,jaw close command count,oracle/controller command history,observable_proxy,yes,detects attempted grasp without reading simulator contact labels
+observable_phase_replan,goal-distance stagnation,achieved/desired goal distance trace,observable_proxy,yes,detects lack of progress after repeated close commands
+observable_phase_replan,minimum-distance improvement,distance trace over the episode,observable_proxy,yes,separates normal approach from failed grasp retry candidates
+observable risk sweep,risk_score threshold,close_count + stall + far + no-improvement features,observable_proxy,yes,calibrates sensitivity/specificity of offline observable detection
+learned_route_classifier,review/abort routing probability,episode-level rollout features,partly_observable,analysis_only,"supports future online learned risk routing, but still includes post-episode features"
+recovery primitive,waypoint regeneration after observable trigger,SurRoL scripted primitive,privileged_primitive,yes,"remaining limitation: decision is observable, execution primitive is still simulator/scripted"

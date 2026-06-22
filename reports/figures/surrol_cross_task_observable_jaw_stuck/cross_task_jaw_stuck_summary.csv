@@ -1,0 +1,7 @@
+task,controller,success,triggers,phase_replans,steps,final_distance
+GauzeRetrieve,clean,1.0,0.0,0.0,34.6,0.01256477131133138
+GauzeRetrieve,monitor_corrected,1.0,3.0,2.0,102.0,0.01303700090472928
+GauzeRetrieve,perturbed,0.0,0.0,0.0,220.0,0.26468625329151374
+NeedlePick,clean,1.0,0.0,0.0,40.0,0.01960339572371838
+NeedlePick,monitor_corrected,1.0,3.0,1.8,102.4,0.01961113180523752
+NeedlePick,perturbed,0.0,0.0,0.0,220.0,0.21828539330759944
