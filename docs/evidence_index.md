@@ -36,12 +36,14 @@ README has a traceable report, table, figure, or media file.
 
 | Report | Why It Matters |
 |---|---|
+| [research_sequence.md](research_sequence.md) | recommended reading order for the whole project |
 | [surrol_master_results_round13_zh.md](../reports/surrol_master_results_round13_zh.md) | overview of paired SurRoL recovery evidence |
 | [surrol_fault_taxonomy_step2.md](../reports/surrol_fault_taxonomy_step2.md) | formalizes failure families and intervention routes |
 | [surrol_learned_route_classifier_step3.md](../reports/surrol_learned_route_classifier_step3.md) | shows learned route-classifier metrics and boundary errors |
 | [surrol_observable_supervisor_step4.md](../reports/surrol_observable_supervisor_step4.md) | separates observable supervisor decisions from privileged simulator state |
 | [claims_limitations_round46.md](../reports/claims_limitations_round46.md) | conservative claim and limitation framing from earlier synthesis |
 | [surrol_wsl_deployment_notes_zh.md](../reports/surrol_wsl_deployment_notes_zh.md) | documents the local SurRoL/WSL environment used for experiments |
+| [legacy round reports](../reports/archive/legacy_round_reports/) | preserved intermediate experiment notes, not the main reading path |
 
 ## Reproducibility Commands
 

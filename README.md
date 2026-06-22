@@ -46,6 +46,22 @@ The current supervisor studies four intervention routes:
 6. Observable-supervisor audit that reduces the jaw-stuck replan decision's
    dependence on privileged SurRoL phase/contact state.
 
+## Recommended Reading Order
+
+For a quick review, do not browse the full `reports/` folder first. Read the
+project in this order:
+
+1. [Research sequence](docs/research_sequence.md)
+2. [PhD application project brief](docs/phd_application_project_brief.md)
+3. [Evidence index](docs/evidence_index.md)
+4. [SurRoL master results](reports/surrol_master_results_round13_zh.md)
+5. [Learned route classifier](reports/surrol_learned_route_classifier_step3.md)
+6. [Observable supervisor](reports/surrol_observable_supervisor_step4.md)
+
+Intermediate round notes are preserved under
+`reports/archive/legacy_round_reports/` for provenance, but they are not the
+main reading path.
+
 ## Key Results
 
 ### 10-Seed SurRoL Recovery Evidence
@@ -194,9 +210,9 @@ Regenerate rendered SurRoL media:
 
 For a concise PhD-application style description, see:
 
+- [Research sequence](docs/research_sequence.md)
 - [Project brief](docs/phd_application_project_brief.md)
 - [Evidence index](docs/evidence_index.md)
-- [GitHub upload guide in Chinese](docs/github_upload_guide_zh.md)
 
 ## Limitations
 
