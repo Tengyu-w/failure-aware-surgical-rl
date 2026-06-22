@@ -148,7 +148,7 @@ tests/                       lightweight unit and regression tests
 reports/                     research reports, figures, media, and result tables
 reports/tables/              CSV summaries for SurRoL reliability experiments
 reports/media/               rendered SurRoL rollout evidence
-docs/                        application-facing project notes and upload guide
+docs/                        ordered research sequence and application-facing notes
 ```
 
 Local training outputs and checkpoints are intentionally not committed:
