@@ -14,6 +14,7 @@ reports/render_*/
 reports/docx_audit_paths.txt
 outputs/risk_dataset/
 outputs/risk_model/risk_score_predictions.csv
+outputs/*_run*.log
 outputs/risk_gated_tangent/episodes*.csv
 outputs/risk_gated_tangent/online_summary*.csv
 outputs/risk_gated_tangent_final/
@@ -25,3 +26,6 @@ outputs/embedding_risk_training_pilot*/
 !outputs/embedding_risk_training_pilot_comparison.csv
 outputs/embedding_risk_curriculum*_pilot*/
 !outputs/embedding_risk_curriculum_finetune_pilot_summary.csv
+outputs/embedding_risk_multiseed_curriculum/*
+!outputs/embedding_risk_multiseed_curriculum_seed_summary.csv
+!outputs/embedding_risk_multiseed_curriculum_aggregate_summary.csv

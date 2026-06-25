@@ -191,20 +191,21 @@ Report and tables:
 The embedding/KNN instability signal is now tested inside the PPO training
 loop in two ways: risk-aware reward shaping and hard-negative curriculum reset
 sampling. This is a pilot training-loop result in the custom proxy environment,
-not yet a formal multi-seed model-improvement claim.
+not yet a formal model-improvement claim.
 
-The latest two-stage curriculum fine-tune improves the prototype pilot relative
-to baseline: success rises from 0.025 to 0.050, budget exhaustion falls from
-0.975 to 0.950, mean return improves from -41.783 to -27.116, and final
-distance improves from 0.650 to 0.630. The strict preset does not yet show a
-stable safety improvement, so the honest claim is that embedding risk can be
-used as a training signal and can produce partial improvement, not that it
-reliably improves the final policy across all settings.
+A three-seed follow-up shows the important limitation. Curriculum fine-tuning
+improves mean return on both prototype and strict and improves strict final
+distance, but it does not reliably improve success rate or safety-budget
+exhaustion. The honest claim is therefore that embedding risk can be used as a
+training signal and changes the learned policy, while robust success/safety
+improvement remains future work.
 
 - [Embedding-risk training pilot report](reports/embedding_risk_training_pilot.md)
 - [Pilot comparison CSV](outputs/embedding_risk_training_pilot_comparison.csv)
 - [Curriculum fine-tune summary CSV](outputs/embedding_risk_curriculum_finetune_pilot_summary.csv)
+- [Multi-seed curriculum aggregate CSV](outputs/embedding_risk_multiseed_curriculum_aggregate_summary.csv)
 - [Curriculum pilot figure](reports/figures/embedding_risk_training_pilot/curriculum_finetune_metrics.png)
+- [Multi-seed curriculum figure](reports/figures/embedding_risk_training_pilot/multiseed_curriculum_metrics.png)
 
 ## Visual Evidence
 
