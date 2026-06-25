@@ -1,0 +1,17 @@
+{
+  "predictions": "E:\\RL_projects\\constraint_surgical_rl\\outputs\\risk_model\\risk_score_predictions.csv",
+  "score_column": "risk_prob_logistic",
+  "best_threshold_by_low_missed_risk_then_low_intervention": {
+    "threshold": 0.3,
+    "risk_coverage": 0.8949618320610687,
+    "missed_risk_rate": 0.1050381679389313,
+    "intervention_rate": 0.8448227349465391,
+    "unnecessary_intervention_rate": 0.25627240143369173,
+    "activation_reduction_vs_always_gate": 0.15517726505346086,
+    "covered_risk_steps": 5862.0,
+    "missed_risk_steps": 688.0,
+    "unnecessary_intervention_steps": 143.0,
+    "total_steps": 7108.0
+  },
+  "interpretation": "Offline gating is useful when it covers most weak-label risk states while reducing activation relative to an always-on gate. This is a proxy analysis, not a guarantee that online intervention will preserve success."
+}

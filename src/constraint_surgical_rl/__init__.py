@@ -4,6 +4,7 @@ from constraint_surgical_rl.envs.tool_navigation import ConstrainedToolNavigatio
 from constraint_surgical_rl.envs.tool_manipulation import ConstrainedToolManipulationEnv
 from constraint_surgical_rl.envs.wrappers import (
     DropObservationIndices,
+    RiskGatedTangentSafetyShieldAction,
     SafetyShieldAction,
     TangentSafetyShieldAction,
     make_tool_manipulation_env,
@@ -14,6 +15,7 @@ __all__ = [
     "ConstrainedToolNavigationEnv",
     "ConstrainedToolManipulationEnv",
     "DropObservationIndices",
+    "RiskGatedTangentSafetyShieldAction",
     "SafetyShieldAction",
     "TangentSafetyShieldAction",
     "make_tool_manipulation_env",

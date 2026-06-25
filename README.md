@@ -10,6 +10,12 @@ is narrower and research-oriented: evaluate when a surgical RL or scripted
 controller should continue autonomously, recover automatically, request human
 review, or stop because recovery may be unsafe.
 
+The current main upgrade is an action-level risk-gated tangent backup
+supervisor. Instead of allowing the tangent backup controller to supervise every
+timestep, an interpretable risk gate first checks whether the proposed
+state/action is unsafe. Reliability analysis therefore becomes a runtime
+decision signal, not only a post-hoc explanation.
+
 ![SurRoL NeedlePick rendered rollout](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_040.png)
 
 ## Research Question
@@ -33,36 +39,68 @@ The current supervisor studies four intervention routes:
 1. Custom constrained surgical proxy environment for fast method development:
    3D tool navigation, forbidden-region costs, safety budgets, and recovery
    monitors.
-2. SurRoL migration evidence across `NeedleReach`, `NeedlePick`, and
+2. Risk-gated tangent backup: an action-level reliability supervisor that keeps
+   always-tangent budget safety while reducing always-on supervisor activation.
+3. SurRoL migration evidence across `NeedleReach`, `NeedlePick`, and
    `GauzeRetrieve`, including rendered RGB rollouts, traces, figures, and CSV
    summaries.
-3. Formal fault taxonomy covering nominal execution, reversible execution
+4. Formal fault taxonomy covering nominal execution, reversible execution
    drift, grasp/contact uncertainty, visual-state error, and near-target
    recovery risk.
-4. Multi-seed recovery experiments showing that runtime supervision can recover
+5. Multi-seed recovery experiments showing that runtime supervision can recover
    corrupted SurRoL rollouts in simulation.
-5. Learned route classifier that predicts whether an episode should be routed
+6. Learned route classifier that predicts whether an episode should be routed
    to `auto_execute`, `auto_recovery`, `human_review`, or `abort_candidate`.
-6. Observable-supervisor audit that reduces the jaw-stuck replan decision's
+7. Observable-supervisor audit that reduces the jaw-stuck replan decision's
    dependence on privileged SurRoL phase/contact state.
 
 ## Recommended Reading Order
 
 For a quick review, do not browse the full `reports/` folder first. Read the
-project in this order:
+application-facing path in this order:
 
-1. [Research sequence](docs/research_sequence.md)
+1. [Application index](docs/APPLICATION_INDEX.md)
 2. [PhD application project brief](docs/phd_application_project_brief.md)
 3. [Evidence index](docs/evidence_index.md)
-4. [SurRoL master results](reports/surrol_master_results_round13_zh.md)
-5. [Learned route classifier](reports/surrol_learned_route_classifier_step3.md)
-6. [Observable supervisor](reports/surrol_observable_supervisor_step4.md)
+4. [Research sequence](docs/research_sequence.md)
+5. [SurRoL master results](reports/surrol_master_results_round13_zh.md)
+6. [Learned route classifier](reports/surrol_learned_route_classifier_step3.md)
+7. [Observable supervisor](reports/surrol_observable_supervisor_step4.md)
+8. [Risk-gated tangent backup report](reports/risk_gated_tangent_report.md)
 
 Intermediate round notes are preserved under
 `reports/archive/legacy_round_reports/` for provenance, but they are not the
 main reading path.
 
 ## Key Results
+
+### Risk-Gated Tangent Backup
+
+The proxy controller experiment compares the same PPO policy under three
+execution modes: unshielded PPO, always-on tangent backup, and risk-gated
+tangent backup. The risk gate records interpretable intervention reasons such
+as proposed forbidden-zone proximity, low clearance, low safety budget, stalled
+progress, force proxy, and large action magnitude.
+
+| Preset | Method | Budget exhaustion | Supervisor activation |
+|---|---|---:|---:|
+| prototype | unshielded PPO | 0.907 | 0.000 |
+| prototype | always tangent | 0.000 | 1.000 |
+| prototype | risk-gated tangent | 0.000 | 0.450 |
+| strict | unshielded PPO | 0.977 | 0.000 |
+| strict | always tangent | 0.000 | 1.000 |
+| strict | risk-gated tangent | 0.000 | 0.426 |
+
+This is the controller-level result: risk-gated tangent preserves the 0.000
+budget-exhaustion safety of always tangent while cutting supervisor-on
+timesteps by roughly half.
+
+Report and visuals:
+
+- [Risk-gated tangent report](reports/risk_gated_tangent_report.md)
+- [Aggregate summary](outputs/risk_gated_tangent/aggregate_summary.csv)
+- [Budget/intervention figure](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png)
+- [Risk-gate architecture](reports/figures/risk_gated_tangent_visuals/risk_gate_architecture.png)
 
 ### 10-Seed SurRoL Recovery Evidence
 
@@ -130,6 +168,16 @@ Report and tables:
 ## Visual Evidence
 
 The repository includes rendered SurRoL/PyBullet rollout evidence:
+
+The risk-gated tangent upgrade also includes controller-level visuals:
+
+| Visual | File |
+|---|---|
+| architecture | [risk_gate_architecture.png](reports/figures/risk_gated_tangent_visuals/risk_gate_architecture.png) |
+| budget/intervention result | [aggregate_budget_intervention.png](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png) |
+| safety/intervention frontier | [safety_intervention_frontier.png](reports/figures/risk_gated_tangent_visuals/safety_intervention_frontier.png) |
+| prototype snapshots | [render_snapshots_prototype.png](reports/figures/risk_gated_tangent_visuals/render_snapshots_prototype.png) |
+| strict trajectory | [trajectory_strict.png](reports/figures/risk_gated_tangent_visuals/trajectory_strict.png) |
 
 | Task | GIF | MP4 | Trace |
 |---|---|---|---|

@@ -12,9 +12,10 @@ then migrated into SurRoL/PyBullet surgical manipulation tasks. The core idea is
 to place a reliability supervisor around an existing controller and decide when
 the system should continue autonomously, recover automatically, request
 human-style review/re-estimation, or stop because recovery may be unsafe. The
-current evidence covers SurRoL rendered rollouts, multi-seed failure injection,
-fault taxonomy, learned route classification, and an observable-proxy supervisor
-that reduces reliance on privileged simulator phase/contact state.
+current evidence covers a risk-gated tangent backup supervisor, SurRoL rendered
+rollouts, multi-seed failure injection, fault taxonomy, learned route
+classification, and an observable-proxy supervisor that reduces reliance on
+privileged simulator phase/contact state.
 
 ## Research Motivation
 
@@ -30,17 +31,20 @@ The project has four technical layers:
 
 1. A custom constrained 3D proxy environment for fast RL and safety-budget
    experiments.
-2. SurRoL task migration using `NeedleReach`, `NeedlePick`, and
+2. An action-level risk-gated tangent backup supervisor that decides when the
+   safety controller should be activated.
+3. SurRoL task migration using `NeedleReach`, `NeedlePick`, and
    `GauzeRetrieve` rollouts.
-3. Runtime failure taxonomy and route decisions:
+4. Runtime failure taxonomy and route decisions:
    `auto_execute`, `auto_recovery`, `human_review`, and `abort_candidate`.
-4. Learned and observable reliability supervisors built from rollout features,
+5. Learned and observable reliability supervisors built from rollout features,
    step traces, command history, and progress signals.
 
 ## Key Evidence
 
 | Component | Evidence |
 |---|---|
+| Risk-gated tangent backup | prototype/strict both preserve 0.000 budget exhaustion while reducing supervisor activation from 1.000 to 0.450/0.426 |
 | SurRoL migration | rendered RGB GIF/MP4 rollouts for NeedleReach, NeedlePick, and GauzeRetrieve |
 | Standard corruptions | 10-seed NeedlePick/GauzeRetrieve action noise, dropout, and execution slip |
 | Visual-state errors | 10-seed perception-bias and depth-scale error recovery via review/re-estimation |
@@ -49,6 +53,17 @@ The project has four technical layers:
 | Observable supervision | jaw-stuck recovery decision uses command/progress proxies instead of internal phase/contact state |
 
 ## Strongest Current Result
+
+At the controller level, the risk-gated tangent upgrade keeps the strongest
+safety property of the always-on tangent shield while using much less
+supervision:
+
+- prototype: budget exhaustion 0.000, supervisor activation 0.450;
+- strict: budget exhaustion 0.000, supervisor activation 0.426;
+- always tangent baseline: budget exhaustion 0.000, supervisor activation 1.000.
+
+This reframes the project from "I have a shield" to "reliability analysis
+becomes a runtime decision signal."
 
 In the strongest 10-seed SurRoL suites:
 
@@ -82,19 +97,22 @@ evidence structure around SurRoL rollouts.
 
 > I developed a simulation-based reliability-supervision prototype for surgical
 > robot learning. Starting from a custom constrained 3D proxy, I migrated the
-> supervisor into SurRoL tasks and evaluated failure-aware routing across
+> supervisor into SurRoL tasks and upgraded the proxy controller with a
+> risk-gated tangent backup layer. The supervisor decides when action-level
+> backup control is necessary and evaluates failure-aware routing across
 > execution drift, grasp/contact uncertainty, visual-state errors, and unsafe
 > recovery proxies. The project emphasizes multi-seed evidence, explicit
-> limitations, and a move from privileged simulator-state decisions toward
-> observable command/progress-based supervision.
+> limitations, and a move from post-hoc reliability analysis toward runtime
+> decision signals.
 
 ## What I Would Improve Next
 
-1. Convert the episode-level learned route classifier into a window-level online
+1. Convert the risk-gated tangent score into a learned online monitor evaluated
+   across additional policies and tasks.
+2. Convert the episode-level learned route classifier into a window-level online
    classifier.
-2. Add independent labels or stronger evaluation targets for review/abort
+3. Add independent labels or stronger evaluation targets for review/abort
    decisions.
-3. Replace scripted recovery primitives with learned or task-agnostic recovery
+4. Replace scripted recovery primitives with learned or task-agnostic recovery
    actions.
-4. Evaluate on additional SurRoL tasks and more diverse visual corruptions.
-5. Add calibration and selective-risk curves for the learned supervisor.
+5. Evaluate on additional SurRoL tasks and more diverse visual corruptions.

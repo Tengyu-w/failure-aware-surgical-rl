@@ -2,10 +2,11 @@
 
 Recommended reading order:
 
-1. [Research sequence](research_sequence.md)
+1. [Application index](APPLICATION_INDEX.md)
 2. [PhD application project brief](phd_application_project_brief.md)
 3. [Evidence index](evidence_index.md)
-4. [SurRoL upgrade project tracker](surrol_upgrade_project.md)
+4. [Research sequence](research_sequence.md)
+5. [SurRoL upgrade project tracker](surrol_upgrade_project.md)
 
 Archive folders:
 

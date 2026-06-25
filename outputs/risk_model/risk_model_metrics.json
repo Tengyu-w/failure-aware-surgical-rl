@@ -1,0 +1,39 @@
+{
+  "data_path": "E:\\RL_projects\\constraint_surgical_rl\\outputs\\risk_dataset\\risk_dataset.csv",
+  "implementation": "numpy_logistic_and_greedy_depth3_tree",
+  "split_strategy": "group_shuffle_by_episode_id",
+  "features": [
+    "distance_to_goal",
+    "distance_to_forbidden",
+    "force_proxy",
+    "remaining_budget",
+    "normalized_time",
+    "progress_5",
+    "action_norm"
+  ],
+  "threshold": 0.5,
+  "n_rows": 28551,
+  "n_train": 21443,
+  "n_test": 7108,
+  "positive_rate_all": 0.8987776260025918,
+  "positive_rate_train": 0.8912465606491629,
+  "positive_rate_test": 0.921496904895892,
+  "logistic": {
+    "auroc": 0.9234397657938658,
+    "aupr": 0.9934493979518704,
+    "f1": 0.9191678315927967,
+    "precision": 0.9960791302798075,
+    "recall": 0.8532824427480916,
+    "false_safe_rate": 0.1467175572519084,
+    "false_alarm_rate": 0.03942652329749104
+  },
+  "decision_tree": {
+    "auroc": 0.9488598867274071,
+    "aupr": 0.9948313319624186,
+    "f1": 0.9627723970944311,
+    "precision": 0.9543954395439544,
+    "recall": 0.9712977099236642,
+    "false_safe_rate": 0.028702290076335877,
+    "false_alarm_rate": 0.5448028673835126
+  }
+}

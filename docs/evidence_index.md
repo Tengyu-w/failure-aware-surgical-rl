@@ -12,6 +12,15 @@ README has a traceable report, table, figure, or media file.
 | Rendered rollouts have step traces, not only screenshots. | [NeedleReach trace](../reports/media/surrol_render_evidence/needlereach/rollout_trace.csv), [NeedlePick trace](../reports/media/surrol_render_evidence/needlepick/rollout_trace.csv), [GauzeRetrieve trace](../reports/media/surrol_render_evidence/gauzeretrieve/rollout_trace.csv) |
 | Recovery behavior is visualized. | [phase-aware success figure](../reports/figures/surrol_phase_aware/success_rate_by_failure.png), [distance curves](../reports/figures/surrol_phase_aware/representative_distance_curves.png), [observable jaw-stuck recovery](../reports/figures/surrol_cross_task_observable_jaw_stuck_10seed/cross_task_jaw_stuck_recovery.png) |
 
+## Risk-Gated Tangent Backup Upgrade
+
+| Claim | Evidence |
+|---|---|
+| Reliability analysis can become a runtime action-level decision signal. | [risk-gated tangent report](../reports/risk_gated_tangent_report.md) |
+| Risk-gated tangent preserves always-tangent safety while reducing supervisor activation. | [aggregate summary](../outputs/risk_gated_tangent/aggregate_summary.csv), [budget/intervention figure](../reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png) |
+| The gate is interpretable rather than a black-box always-on correction. | [risk architecture](../reports/figures/risk_gated_tangent_visuals/risk_gate_architecture.png), [risk coefficients](../reports/figures/risk_gated_tangent_visuals/risk_model_coefficients.png) |
+| The process can be shown visually as trajectories and simulated snapshots. | [prototype snapshots](../reports/figures/risk_gated_tangent_visuals/render_snapshots_prototype.png), [strict trajectory](../reports/figures/risk_gated_tangent_visuals/trajectory_strict.png), [strict snapshots](../reports/figures/risk_gated_tangent_visuals/render_snapshots_strict.png) |
+
 ## Four-Step Research Upgrade
 
 | Step | Purpose | Main Files |
@@ -20,6 +29,7 @@ README has a traceable report, table, figure, or media file.
 | Step 2 | Formalize fault taxonomy | [taxonomy table](../reports/tables/surrol_fault_taxonomy.csv), [taxonomy report](../reports/surrol_fault_taxonomy_step2.md) |
 | Step 3 | Learn route/risk classifier | [metrics](../reports/tables/surrol_learned_route_classifier_metrics.csv), [report](../reports/surrol_learned_route_classifier_step3.md) |
 | Step 4 | Reduce privileged simulator-state dependence | [signal audit](../reports/tables/surrol_observable_signal_audit.csv), [observable supervisor report](../reports/surrol_observable_supervisor_step4.md) |
+| Step 5 | Gate tangent backup with an interpretable action-level risk supervisor | [risk-gated tangent report](../reports/risk_gated_tangent_report.md), [summary](../outputs/risk_gated_tangent/summary.csv) |
 
 ## Key Result Tables
 
@@ -31,6 +41,8 @@ README has a traceable report, table, figure, or media file.
 | [surrol_learned_route_classifier_summary.csv](../reports/tables/surrol_learned_route_classifier_summary.csv) | held-out summary for the learned route classifier |
 | [surrol_observable_vs_privileged_jaw_stuck.csv](../reports/tables/surrol_observable_vs_privileged_jaw_stuck.csv) | internal phase-aware versus observable proxy recovery comparison |
 | [observable_proxy_threshold_sweep_10seed.csv](../reports/tables/observable_proxy_threshold_sweep_10seed.csv) | threshold sweep for observable risk scoring |
+| [risk_gated_tangent/aggregate_summary.csv](../outputs/risk_gated_tangent/aggregate_summary.csv) | cross-seed prototype/strict comparison of unshielded, always tangent, and risk-gated tangent |
+| [risk_gated_tangent/summary.csv](../outputs/risk_gated_tangent/summary.csv) | seed-level formal PPO comparison for the risk-gated tangent upgrade |
 
 ## Important Reports
 
@@ -41,6 +53,7 @@ README has a traceable report, table, figure, or media file.
 | [surrol_fault_taxonomy_step2.md](../reports/surrol_fault_taxonomy_step2.md) | formalizes failure families and intervention routes |
 | [surrol_learned_route_classifier_step3.md](../reports/surrol_learned_route_classifier_step3.md) | shows learned route-classifier metrics and boundary errors |
 | [surrol_observable_supervisor_step4.md](../reports/surrol_observable_supervisor_step4.md) | separates observable supervisor decisions from privileged simulator state |
+| [risk_gated_tangent_report.md](../reports/risk_gated_tangent_report.md) | controller-level upgrade from always-on tangent correction to explainable risk-gated supervision |
 | [claims_limitations_round46.md](../reports/claims_limitations_round46.md) | conservative claim and limitation framing from earlier synthesis |
 | [surrol_wsl_deployment_notes_zh.md](../reports/surrol_wsl_deployment_notes_zh.md) | documents the local SurRoL/WSL environment used for experiments |
 | [legacy round reports](../reports/archive/legacy_round_reports/) | preserved intermediate experiment notes, not the main reading path |
@@ -55,6 +68,11 @@ python scripts\build_surrol_fault_taxonomy.py
 python scripts\train_surrol_route_classifier.py
 python scripts\analyze_observable_proxy_risk.py
 python scripts\build_surrol_observable_supervisor_step4.py
+python scripts\build_risk_dataset.py
+python scripts\train_explainable_risk.py
+python scripts\offline_risk_gated_intervention.py
+python scripts\evaluate_risk_gated_tangent.py --policy ppo --model runs\pilot_3d_50k_prototype_conditioned_seed0\model.zip --episodes 100 --seeds 0,1,2 --presets prototype,strict --threshold 0.5 --deterministic --risk-model-mode default_rule --out-dir outputs\risk_gated_tangent
+python scripts\generate_risk_gated_visuals.py
 python scripts\audit_surrol_upgrade_status.py
 ```
 

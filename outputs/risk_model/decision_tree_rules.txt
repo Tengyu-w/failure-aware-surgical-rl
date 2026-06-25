@@ -1,0 +1,19 @@
+|--- remaining_budget <= 1.000000
+|   |--- distance_to_goal <= 0.357734
+|   |   |--- distance_to_goal <= 0.175633
+|   |   |   risk_prob=0.320 samples=821 positives=263
+|   |   |--- distance_to_goal >  0.175633
+|   |   |   risk_prob=0.727 samples=3275 positives=2381
+|   |--- distance_to_goal >  0.357734
+|   |   |--- action_norm <= 0.000000
+|   |   |   risk_prob=1.000 samples=16267 positives=16267
+|   |   |--- action_norm >  0.000000
+|   |   |   risk_prob=0.926 samples=94 positives=87
+|--- remaining_budget >  1.000000
+|   |--- progress_5 <= 0.000000
+|   |   risk_prob=1.000 samples=107 positives=107
+|   |--- progress_5 >  0.000000
+|   |   |--- distance_to_forbidden <= 0.103736
+|   |   |   risk_prob=0.068 samples=88 positives=6
+|   |   |--- distance_to_forbidden >  0.103736
+|   |   |   risk_prob=0.000 samples=791 positives=0

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
@@ -168,6 +170,177 @@ class TangentSafetyShieldAction(SafetyShieldAction):
         return executed.astype(np.float32)
 
 
+class RiskGatedTangentSafetyShieldAction(TangentSafetyShieldAction):
+    """Gate tangent backup control with an interpretable timestep risk score.
+
+    The default gate is deliberately simple and transparent: it raises risk
+    from forbidden-zone clearance, force proxy, remaining budget, recent
+    progress, normalized time, and action magnitude. A learned model can be
+    passed as a callable that accepts the feature dict and returns a risk
+    probability.
+    """
+
+    def __init__(
+        self,
+        env: gym.Env,
+        risk_model: Callable[[dict[str, float]], float] | None = None,
+        threshold: float = 0.5,
+        safety_margin: float = 0.08,
+        budget_floor: float = 0.25,
+        stall_distance: float = 0.35,
+        progress_window: int = 5,
+    ):
+        super().__init__(env)
+        self.risk_model = risk_model
+        self.threshold = float(threshold)
+        self.safety_margin = float(safety_margin)
+        self.budget_floor = float(budget_floor)
+        self.stall_distance = float(stall_distance)
+        self.progress_window = int(progress_window)
+
+        self.risk_gate_activation_count = 0
+        self.risk_gated_tangent_intervention_count = 0
+        self.last_risk_score = 0.0
+        self.last_risk_reasons = "low_risk"
+        self.last_risk_gate_active = False
+        self._distance_history: list[float] = []
+
+    def reset(self, **kwargs):
+        self.risk_gate_activation_count = 0
+        self.risk_gated_tangent_intervention_count = 0
+        self.last_risk_score = 0.0
+        self.last_risk_reasons = "low_risk"
+        self.last_risk_gate_active = False
+        self._distance_history = []
+        return super().reset(**kwargs)
+
+    @staticmethod
+    def _clip01(value: float) -> float:
+        return float(np.clip(value, 0.0, 1.0))
+
+    def _risk_features(self, clipped_action: np.ndarray) -> dict[str, float]:
+        unwrapped = self.env.unwrapped
+        distance_to_goal = float(np.linalg.norm(unwrapped.target_xy - unwrapped.tool_xy))
+        previous_distance = (
+            self._distance_history[-self.progress_window]
+            if len(self._distance_history) >= self.progress_window
+            else distance_to_goal
+        )
+        progress_5 = float(previous_distance - distance_to_goal)
+
+        forbidden_center_distance = float(np.linalg.norm(unwrapped.tool_xy - unwrapped.forbidden_xy))
+        clearance = float(unwrapped.config.forbidden_radius + unwrapped.config.tool_radius)
+        distance_to_forbidden = forbidden_center_distance - clearance
+        proposed_xy = unwrapped.tool_xy + clipped_action * unwrapped.config.action_scale
+        proposed_distance_to_forbidden = float(np.linalg.norm(proposed_xy - unwrapped.forbidden_xy) - clearance)
+        proposed_outside_workspace = float(np.any(np.abs(proposed_xy) > 0.98))
+        force_proxy = float(unwrapped._force_proxy())
+        remaining_budget = float(unwrapped.safety_budget - unwrapped.cumulative_cost)
+        normalized_time = float(unwrapped.step_count / max(unwrapped.config.max_steps, 1))
+        action_norm = float(np.linalg.norm(clipped_action))
+
+        self._distance_history.append(distance_to_goal)
+        return {
+            "distance_to_goal": distance_to_goal,
+            "distance_to_forbidden": distance_to_forbidden,
+            "proposed_distance_to_forbidden": proposed_distance_to_forbidden,
+            "proposed_outside_workspace": proposed_outside_workspace,
+            "force_proxy": force_proxy,
+            "remaining_budget": remaining_budget,
+            "normalized_time": normalized_time,
+            "progress_5": progress_5,
+            "action_norm": action_norm,
+        }
+
+    def _default_risk_score(self, features: dict[str, float]) -> tuple[float, str]:
+        forbidden_score = self._clip01(1.0 - features["distance_to_forbidden"] / max(self.safety_margin, 1e-6))
+        proposed_forbidden_score = self._clip01(
+            1.0 - features["proposed_distance_to_forbidden"] / max(self.safety_margin, 1e-6)
+        )
+        closing_forbidden_score = self._clip01(
+            (features["distance_to_forbidden"] - features["proposed_distance_to_forbidden"])
+            / max(self.safety_margin, 1e-6)
+        )
+        force_score = self._clip01(features["force_proxy"] / max(self.env.unwrapped.config.max_force, 1e-6))
+        budget_score = self._clip01((self.budget_floor - features["remaining_budget"]) / max(self.budget_floor, 1e-6))
+        stalled = features["progress_5"] <= 0.0 and features["distance_to_goal"] >= self.stall_distance
+        stall_score = 1.0 if stalled else 0.0
+        late_stall_score = self._clip01(features["normalized_time"]) if stalled else 0.0
+        action_score = self._clip01((features["action_norm"] - 0.85) / 0.55)
+
+        weighted = (
+            0.18 * forbidden_score
+            + 0.34 * proposed_forbidden_score
+            + 0.10 * closing_forbidden_score
+            + 0.16 * force_score
+            + 0.12 * budget_score
+            + 0.06 * stall_score
+            + 0.02 * late_stall_score
+            + 0.02 * action_score
+        )
+        score = max(
+            weighted,
+            0.65 if features["proposed_distance_to_forbidden"] < self.safety_margin else 0.0,
+            0.7 if features["proposed_outside_workspace"] > 0.0 else 0.0,
+            forbidden_score if features["distance_to_forbidden"] <= 0.0 else 0.0,
+        )
+
+        reasons = []
+        if features["distance_to_forbidden"] < self.safety_margin:
+            reasons.append("near_forbidden")
+        if features["proposed_distance_to_forbidden"] < self.safety_margin:
+            reasons.append("proposed_near_forbidden")
+        if features["proposed_outside_workspace"] > 0.0:
+            reasons.append("proposed_outside_workspace")
+        if force_score >= 0.75:
+            reasons.append("force_proxy_high")
+        if features["remaining_budget"] < self.budget_floor:
+            reasons.append("remaining_budget_low")
+        if stalled:
+            reasons.append("progress_stalled")
+        if action_score >= 0.5:
+            reasons.append("large_action")
+        return self._clip01(score), ",".join(reasons) if reasons else "low_risk"
+
+    def _score_risk(self, features: dict[str, float]) -> tuple[float, str]:
+        if self.risk_model is None:
+            return self._default_risk_score(features)
+        score = float(self.risk_model(features))
+        return self._clip01(score), "learned_risk_model"
+
+    def action(self, action):
+        action = np.asarray(action, dtype=np.float32)
+        clipped = np.clip(action, self.action_space.low, self.action_space.high).astype(np.float32)
+        features = self._risk_features(clipped)
+        risk_score, reasons = self._score_risk(features)
+
+        self.last_risk_score = risk_score
+        self.last_risk_reasons = reasons
+        self.last_risk_gate_active = risk_score >= self.threshold
+
+        if not self.last_risk_gate_active:
+            self.last_action_deviation = 0.0
+            self.cumulative_action_deviation += self.last_action_deviation
+            return clipped
+
+        self.risk_gate_activation_count += 1
+        previous_interventions = self.intervention_count
+        executed = super().action(clipped)
+        if self.intervention_count > previous_interventions:
+            self.risk_gated_tangent_intervention_count += 1
+        return executed
+
+    def step(self, action):
+        obs, reward, terminated, truncated, info = super().step(action)
+        info["risk_score"] = self.last_risk_score
+        info["risk_reasons"] = self.last_risk_reasons
+        info["risk_gate_active"] = float(self.last_risk_gate_active)
+        info["risk_gate_activations"] = self.risk_gate_activation_count
+        info["risk_gated_tangent_interventions"] = self.risk_gated_tangent_intervention_count
+        info["risk_gate_threshold"] = self.threshold
+        return obs, reward, terminated, truncated, info
+
+
 def make_tool_navigation_env(
     variant: str = "conditioned", render_mode: str | None = None, config_preset: str = "default"
 ) -> gym.Env:
@@ -181,12 +354,16 @@ def make_tool_navigation_env(
         return SafetyShieldAction(env)
     if variant == "conditioned_tangent_shielded":
         return TangentSafetyShieldAction(env)
+    if variant == "conditioned_risk_gated_tangent_shielded":
+        return RiskGatedTangentSafetyShieldAction(env)
     if variant == "no_phase_budget":
         return DropObservationIndices(env, drop_indices=(12, 13))
     if variant == "no_phase_budget_shielded":
         return SafetyShieldAction(DropObservationIndices(env, drop_indices=(12, 13)))
     if variant == "no_phase_budget_tangent_shielded":
         return TangentSafetyShieldAction(DropObservationIndices(env, drop_indices=(12, 13)))
+    if variant == "no_phase_budget_risk_gated_tangent_shielded":
+        return RiskGatedTangentSafetyShieldAction(DropObservationIndices(env, drop_indices=(12, 13)))
     if variant == "no_budget":
         return DropObservationIndices(env, drop_indices=(13,))
     raise ValueError(f"Unknown environment variant: {variant}")
@@ -202,12 +379,16 @@ def make_tool_manipulation_env(variant: str = "conditioned", render_mode: str | 
         return SafetyShieldAction(env)
     if variant == "conditioned_tangent_shielded":
         return TangentSafetyShieldAction(env)
+    if variant == "conditioned_risk_gated_tangent_shielded":
+        return RiskGatedTangentSafetyShieldAction(env)
     if variant == "no_phase_budget":
         return DropObservationIndices(env, drop_indices=(19, 20))
     if variant == "no_phase_budget_shielded":
         return SafetyShieldAction(DropObservationIndices(env, drop_indices=(19, 20)))
     if variant == "no_phase_budget_tangent_shielded":
         return TangentSafetyShieldAction(DropObservationIndices(env, drop_indices=(19, 20)))
+    if variant == "no_phase_budget_risk_gated_tangent_shielded":
+        return RiskGatedTangentSafetyShieldAction(DropObservationIndices(env, drop_indices=(19, 20)))
     if variant == "no_budget":
         return DropObservationIndices(env, drop_indices=(20,))
     raise ValueError(f"Unknown manipulation variant: {variant}")

@@ -1,6 +1,7 @@
 from constraint_surgical_rl import (
     ConstrainedToolManipulationEnv,
     ConstrainedToolNavigationEnv,
+    RiskGatedTangentSafetyShieldAction,
     make_tool_manipulation_env,
     make_tool_navigation_env,
 )
@@ -29,19 +30,27 @@ def test_tool_navigation_variants_have_expected_shapes():
     conditioned = make_tool_navigation_env("conditioned", config_preset="prototype")
     conditioned_shielded = make_tool_navigation_env("conditioned_shielded", config_preset="prototype")
     conditioned_tangent_shielded = make_tool_navigation_env("conditioned_tangent_shielded", config_preset="prototype")
+    conditioned_risk_gated_tangent = make_tool_navigation_env(
+        "conditioned_risk_gated_tangent_shielded", config_preset="prototype"
+    )
     no_phase_budget = make_tool_navigation_env("no_phase_budget", config_preset="prototype")
     no_phase_budget_shielded = make_tool_navigation_env("no_phase_budget_shielded", config_preset="prototype")
     no_phase_budget_tangent_shielded = make_tool_navigation_env(
         "no_phase_budget_tangent_shielded", config_preset="prototype"
+    )
+    no_phase_budget_risk_gated_tangent = make_tool_navigation_env(
+        "no_phase_budget_risk_gated_tangent_shielded", config_preset="prototype"
     )
     no_budget = make_tool_navigation_env("no_budget", config_preset="prototype")
 
     assert conditioned.observation_space.shape == (14,)
     assert conditioned_shielded.observation_space.shape == (14,)
     assert conditioned_tangent_shielded.observation_space.shape == (14,)
+    assert conditioned_risk_gated_tangent.observation_space.shape == (14,)
     assert no_phase_budget.observation_space.shape == (12,)
     assert no_phase_budget_shielded.observation_space.shape == (12,)
     assert no_phase_budget_tangent_shielded.observation_space.shape == (12,)
+    assert no_phase_budget_risk_gated_tangent.observation_space.shape == (12,)
     assert no_budget.observation_space.shape == (13,)
 
 
@@ -77,6 +86,34 @@ def test_tangent_shield_reports_positive_deviation_when_it_intervenes():
 
     assert info["shield_interventions"] > 0
     assert info["mean_action_deviation"] > 0.0
+
+
+def test_risk_gated_tangent_reports_risk_info():
+    env = make_tool_navigation_env("conditioned_risk_gated_tangent_shielded", config_preset="prototype")
+    assert isinstance(env, RiskGatedTangentSafetyShieldAction)
+    obs, _ = env.reset(seed=13)
+
+    obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
+
+    assert obs.shape == env.observation_space.shape
+    assert isinstance(reward, float)
+    assert "risk_score" in info
+    assert "risk_reasons" in info
+    assert "risk_gate_active" in info
+    assert "risk_gate_activations" in info
+
+
+def test_risk_gated_tangent_activates_near_forbidden_region():
+    env = make_tool_navigation_env("conditioned_risk_gated_tangent_shielded", config_preset="prototype")
+    env.reset(seed=14)
+    env.unwrapped.tool_xy = env.unwrapped.forbidden_xy.copy()
+
+    _, _, _, _, info = env.step(env.action_space.sample())
+
+    assert info["risk_score"] >= env.threshold
+    assert info["risk_gate_active"] == 1.0
+    assert info["risk_gate_activations"] > 0
+    assert info["shield_interventions"] > 0
 
 
 def test_config_presets_include_curriculum_levels():
@@ -139,12 +176,14 @@ def test_tool_manipulation_variants_have_expected_shapes():
     conditioned = make_tool_manipulation_env("conditioned")
     conditioned_shielded = make_tool_manipulation_env("conditioned_shielded")
     conditioned_tangent_shielded = make_tool_manipulation_env("conditioned_tangent_shielded")
+    conditioned_risk_gated_tangent = make_tool_manipulation_env("conditioned_risk_gated_tangent_shielded")
     no_phase_budget = make_tool_manipulation_env("no_phase_budget")
     no_budget = make_tool_manipulation_env("no_budget")
 
     assert conditioned.observation_space.shape == (21,)
     assert conditioned_shielded.observation_space.shape == (21,)
     assert conditioned_tangent_shielded.observation_space.shape == (21,)
+    assert conditioned_risk_gated_tangent.observation_space.shape == (21,)
     assert no_phase_budget.observation_space.shape == (19,)
     assert no_budget.observation_space.shape == (20,)
 
