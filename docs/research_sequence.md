@@ -1,8 +1,7 @@
 # Research Sequence
 
 This page is the recommended reading order for the repository. It is designed
-for a supervisor or reviewer who wants the research logic without browsing all
-intermediate experiment notes.
+for a reader who wants the research logic without browsing every result file.
 
 ## 1. Custom Constrained Surgical Proxy
 
@@ -16,7 +15,6 @@ Main files:
 
 - [source environments](../src/constraint_surgical_rl/envs/)
 - [custom proxy recovery report](../reports/cross_task_recovery_report.md)
-- [project brief](../reports/project_brief.md)
 - [risk-gated tangent report](../reports/risk_gated_tangent_report.md)
 
 ## 2. Migration To SurRoL
@@ -31,7 +29,6 @@ Main evidence:
 - [NeedlePick GIF](../reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif)
 - [GauzeRetrieve GIF](../reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif)
 - [SurRoL rendered media folder](../reports/media/surrol_render_evidence/)
-- [SurRoL deployment notes](../reports/surrol_wsl_deployment_notes_zh.md)
 
 ## 3. Fault Taxonomy And Intervention Routes
 
@@ -60,7 +57,7 @@ Main files:
 
 ## 4. Multi-Seed SurRoL Recovery Experiments
 
-The project then upgraded the key experiments to 10-seed evidence on
+The project then evaluated the key experiments with 10-seed evidence on
 `NeedlePick` and `GauzeRetrieve`.
 
 Main result:
@@ -73,7 +70,7 @@ Main result:
 
 Main files:
 
-- [master results report](../reports/surrol_master_results_round13_zh.md)
+- [master results report](../reports/surrol_master_results.md)
 - [paired results table](../reports/tables/surrol_master_paired_results.csv)
 - [episode rows](../reports/tables/surrol_master_episode_rows.csv)
 
@@ -99,7 +96,7 @@ Main files:
 
 ## 6. Observable Supervisor
 
-The final upgrade reduced the supervisor decision's dependence on privileged
+The final reliability layer reduced the supervisor decision's dependence on privileged
 SurRoL phase/contact state for jaw-stuck recovery. The recovery trigger uses
 observable command/progress proxies:
 
@@ -115,7 +112,7 @@ Main files:
 - [observable versus privileged comparison](../reports/tables/surrol_observable_vs_privileged_jaw_stuck.csv)
 - [threshold sweep figure](../reports/figures/observable_proxy_risk/observable_proxy_threshold_sweep.png)
 
-## 7. Limitations And Next Steps
+## 7. Claim Boundaries
 
 The project is deliberately framed as a simulation research prototype.
 
@@ -132,16 +129,3 @@ Not yet claimed:
 - real-robot deployment;
 - complete end-to-end learned surgical autonomy;
 - parity with or improvement over the full SurRoL platform.
-
-Main file:
-
-- [claims and limitations](../reports/claims_limitations_round46.md)
-
-## Archive
-
-All intermediate round notes are preserved under:
-
-- [legacy round reports](../reports/archive/legacy_round_reports/)
-
-They are kept for provenance, but they are not the recommended first reading
-path.

@@ -1,7 +1,7 @@
 param(
-    [string]$SurrolRoot = "/mnt/e/RL_projects/SurRoL_clean_SR-VPPV",
-    [string]$EnvPath = "/mnt/e/RL_projects/surrol_py38_env",
-    [string]$MambaRoot = "/mnt/e/RL_projects/micromamba",
+    [string]$SurrolRoot = "external/SurRoL_clean_SR-VPPV",
+    [string]$EnvPath = "external/surrol_py38_env",
+    [string]$MambaRoot = "external/micromamba",
     [string]$Task = "NeedlePickRL-v0",
     [int]$Seed = 43000,
     [int]$TotalTimesteps = 2048,
@@ -30,7 +30,7 @@ param(
     [double]$PpoClipRange = 0.2,
     [double]$PpoEntCoef = 0.0,
     [string]$InitModel = "",
-    [string]$OutDir = "/mnt/e/RL_projects/constraint_surgical_rl/runs/surrol_ppo_failure_aware",
+    [string]$OutDir = "runs/surrol_ppo_failure_aware",
     [switch]$CheckOnly,
     [switch]$FreezeLogStd
 )
@@ -39,7 +39,7 @@ $ErrorActionPreference = "Stop"
 
 $workdir = "$SurrolRoot/Benchmark/state_based"
 $micromamba = "$MambaRoot/bin/micromamba"
-$script = "/mnt/e/RL_projects/constraint_surgical_rl/scripts/train_surrol_ppo_failure_aware.py"
+$script = "scripts/train_surrol_ppo_failure_aware.py"
 
 $argsList = @(
     "--surrol-root", $SurrolRoot,

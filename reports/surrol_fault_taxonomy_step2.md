@@ -2,7 +2,7 @@
 
 ## Takeaway
 
-The upgraded SurRoL prototype now organizes failures into a small runtime-reliability taxonomy rather than treating every failure as a generic control disturbance. Reversible action/execution faults are routed to automatic recovery, visual-state errors are routed to review/re-estimation, and silent grasp-contact faults are handled by observable grasp retry or human-review style routing. This is still a simulation-only research prototype; the current routes are rule/proxy based and should not be described as clinical or real-robot validation.
+The SurRoL prototype organizes failures into a small runtime-reliability taxonomy rather than treating every failure as a generic control disturbance. Reversible action/execution faults are routed to automatic recovery, visual-state errors are routed to review/re-estimation, and silent grasp-contact faults are handled by observable grasp retry or human-review style routing. This is still a simulation-only research prototype; the current routes are rule/proxy based and should not be described as clinical or real-robot validation.
 
 ## Route Definitions
 
@@ -50,6 +50,13 @@ The upgraded SurRoL prototype now organizes failures into a small runtime-reliab
 - Several recovery primitives still use SurRoL task logic; Step 4 should reduce privileged simulator-state dependence.
 - No real-robot, clinical, or sim-to-real claim is supported.
 
-## Application-Ready Wording
+## Summary Claim
 
-> I formalized the SurRoL migration as a runtime-reliability taxonomy: reversible execution drift is routed to bounded automatic recovery, visual-state errors are routed to review/re-estimation, and grasp-contact uncertainty is handled through observable retry or human-review style routing. In 10-seed SurRoL pilots, the system restores most injected failures from zero perturbed success to successful monitor-corrected execution, while retaining clear limitations around learned risk calibration and privileged simulator primitives.
+The SurRoL migration is formalized as a runtime-reliability taxonomy:
+reversible execution drift is routed to bounded automatic recovery,
+visual-state errors are routed to review/re-estimation, and grasp-contact
+uncertainty is handled through observable retry or human-review style routing.
+In 10-seed SurRoL pilots, the system restores most injected failures from zero
+perturbed success to successful monitor-corrected execution, while retaining
+clear limitations around learned risk calibration and privileged simulator
+primitives.

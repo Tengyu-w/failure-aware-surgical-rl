@@ -182,7 +182,7 @@ def write_report(path: Path, rows: list[dict[str, str]]) -> None:
         "## Takeaway",
         "",
         (
-            "The upgraded SurRoL prototype now organizes failures into a small "
+            "The SurRoL prototype organizes failures into a small "
             "runtime-reliability taxonomy rather than treating every failure as a generic "
             "control disturbance. Reversible action/execution faults are routed to automatic "
             "recovery, visual-state errors are routed to review/re-estimation, and silent "
@@ -229,10 +229,10 @@ def write_report(path: Path, rows: list[dict[str, str]]) -> None:
             "- Several recovery primitives still use SurRoL task logic; Step 4 should reduce privileged simulator-state dependence.",
             "- No real-robot, clinical, or sim-to-real claim is supported.",
             "",
-            "## Application-Ready Wording",
+            "## Summary Claim",
             "",
             (
-                "> I formalized the SurRoL migration as a runtime-reliability taxonomy: "
+                "The SurRoL migration is formalized as a runtime-reliability taxonomy: "
                 "reversible execution drift is routed to bounded automatic recovery, visual-state "
                 "errors are routed to review/re-estimation, and grasp-contact uncertainty is handled "
                 "through observable retry or human-review style routing. In 10-seed SurRoL pilots, "

@@ -223,7 +223,7 @@ def write_report(rows: list[dict], out: Path) -> None:
             "- Manipulation covers object-state bias, object dropout, execution slip, and contact loss.",
             "- Nominal `none` cases estimate unnecessary intervention behavior.",
             "- The current manipulation monitor reports explicit failure-type diagnosis.",
-            "- For legacy navigation CSVs without explicit classification fields, class correctness is inferred from the injected failure mode and detection flag.",
+            "- For older navigation CSVs without explicit classification fields, class correctness is inferred from the injected failure mode and detection flag.",
             "- `N/A` means the metric was not logged and cannot be inferred for that task family yet.",
             "",
             "## What Remains Unproven",

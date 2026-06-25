@@ -18,7 +18,7 @@ from train_surrol_ppo_failure_aware import make_env  # noqa: E402
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=Path, required=True)
-    parser.add_argument("--surrol-root", type=Path, default=Path("/mnt/e/RL_projects/SurRoL_clean_SR-VPPV"))
+    parser.add_argument("--surrol-root", type=Path, default=Path("external/SurRoL_clean_SR-VPPV"))
     parser.add_argument("--task", default="NeedlePickRL-v0")
     parser.add_argument("--seed", type=int, default=44000)
     parser.add_argument("--episodes", type=int, default=3)

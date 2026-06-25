@@ -21,7 +21,7 @@ from train_surrol_ppo_failure_aware import run_training  # noqa: E402
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--surrol-root", type=Path, default=Path("/mnt/e/RL_projects/SurRoL_clean_SR-VPPV"))
+    parser.add_argument("--surrol-root", type=Path, default=Path("external/SurRoL_clean_SR-VPPV"))
     parser.add_argument("--task", default="NeedleReachRL-v0")
     parser.add_argument("--scales", type=float, nargs="+", default=[0.0, 10.0, 30.0, 50.0])
     parser.add_argument("--seeds", type=int, nargs="+", default=[46000, 46001, 46002])

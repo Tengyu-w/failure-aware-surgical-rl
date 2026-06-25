@@ -1,8 +1,8 @@
 param(
-    [string]$SurrolRoot = "/mnt/e/RL_projects/SurRoL_clean_SR-VPPV",
-    [string]$EnvPath = "/mnt/e/RL_projects/surrol_py38_env",
-    [string]$MambaRoot = "/mnt/e/RL_projects/micromamba",
-    [string]$OutDir = "/mnt/e/RL_projects/constraint_surgical_rl/reports/media/surrol_render_evidence",
+    [string]$SurrolRoot = "external/SurRoL_clean_SR-VPPV",
+    [string]$EnvPath = "external/surrol_py38_env",
+    [string]$MambaRoot = "external/micromamba",
+    [string]$OutDir = "reports/media/surrol_render_evidence",
     [string]$Tasks = "NeedleReach,NeedlePick,GauzeRetrieve",
     [int]$Seed = 56000,
     [int]$MaxSteps = 120,

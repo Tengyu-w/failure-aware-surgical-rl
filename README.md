@@ -11,7 +11,7 @@ is narrower and research-oriented: evaluate when a surgical RL or scripted
 controller should continue autonomously, recover automatically, request human
 review, or stop because recovery may be unsafe.
 
-The current main upgrade is an action-level risk-gated tangent backup
+The current controller-level result is an action-level risk-gated tangent backup
 supervisor in the custom proxy controller setting. Instead of allowing the
 tangent backup controller to supervise every timestep, an interpretable risk
 gate first checks whether the proposed state/action is unsafe. Reliability
@@ -38,7 +38,7 @@ The current supervisor studies four intervention routes:
 
 ## Project Logic
 
-The project should be read as a staged upgrade, not as one mixed experiment:
+The project should be read as a staged research path, not as one mixed experiment:
 
 1. **Self-built proxy simulation.** A simplified constrained surgical-tool
    environment was built first. It supports obstacle/forbidden-region avoidance,
@@ -51,9 +51,9 @@ The project should be read as a staged upgrade, not as one mixed experiment:
 3. **Four intervention routes.** SurRoL rollout failures were organized into
    `auto_execute`, `auto_recovery`, `human_review`, and `abort_candidate`, so
    the project is about deciding what type of runtime response is appropriate.
-4. **Final reliability upgrades.** The SurRoL side was stress-tested with
+4. **Final reliability results.** The SurRoL side was stress-tested with
    multi-seed recovery, route classification, and observable-proxy supervision;
-   the proxy controller side was upgraded from always-on tangent backup to
+   the proxy controller side was changed from always-on tangent backup to
    risk-gated tangent backup.
 
 ## Main Contributions
@@ -80,20 +80,16 @@ The project should be read as a staged upgrade, not as one mixed experiment:
 ## Recommended Reading Order
 
 For a quick review, do not browse the full `reports/` folder first. Read the
-application-facing path in this order:
+project-facing path in this order:
 
-1. [Application index](docs/APPLICATION_INDEX.md)
-2. [PhD application project brief](docs/phd_application_project_brief.md)
+1. [Project index](docs/PROJECT_INDEX.md)
+2. [Project overview](docs/project_overview.md)
 3. [Evidence index](docs/evidence_index.md)
 4. [Research sequence](docs/research_sequence.md)
-5. [SurRoL master results](reports/surrol_master_results_round13_zh.md)
+5. [SurRoL master results](reports/surrol_master_results.md)
 6. [Learned route classifier](reports/surrol_learned_route_classifier_step3.md)
 7. [Observable supervisor](reports/surrol_observable_supervisor_step4.md)
 8. [Risk-gated tangent backup report](reports/risk_gated_tangent_report.md)
-
-Intermediate round notes are preserved under
-`reports/archive/legacy_round_reports/` for provenance, but they are not the
-main reading path.
 
 ## Key Results
 
@@ -146,7 +142,7 @@ Report and visuals:
 Full tables:
 
 - [SurRoL master paired results](reports/tables/surrol_master_paired_results.csv)
-- [SurRoL master report](reports/surrol_master_results_round13_zh.md)
+- [SurRoL master report](reports/surrol_master_results.md)
 - [Fault taxonomy report](reports/surrol_fault_taxonomy_step2.md)
 
 ### Learned Route Classifier
@@ -196,7 +192,7 @@ merged when explaining the project.
 
 ### Custom Proxy Controller Visuals
 
-These figures explain the risk-gated tangent upgrade in the self-built proxy
+These figures explain the risk-gated tangent result in the self-built proxy
 environment. The `prototype` and `strict` snapshots are top-down/controller
 visualizations from this proxy setting, not SurRoL/PyBullet screenshots.
 
@@ -231,7 +227,7 @@ tests/                       lightweight unit and regression tests
 reports/                     research reports, figures, media, and result tables
 reports/tables/              CSV summaries for SurRoL reliability experiments
 reports/media/               rendered SurRoL rollout evidence
-docs/                        ordered research sequence and application-facing notes
+docs/                        ordered research sequence and project notes
 ```
 
 Local training outputs and checkpoints are intentionally not committed:
@@ -247,28 +243,22 @@ runs/
 For the custom proxy environment:
 
 ```powershell
-conda create --prefix E:\RL_projects\constraint_surgical_rl\.conda python=3.10 pip -y
-conda activate E:\RL_projects\constraint_surgical_rl\.conda
+conda create --prefix .\.conda python=3.10 pip -y
+conda activate .\.conda
 pip install -e .[rl,dev]
 ```
 
 Run smoke tests:
 
 ```powershell
-$env:PYTHONPATH="E:\RL_projects\constraint_surgical_rl\src"
+$env:PYTHONPATH="$PWD\src"
 python -m pytest tests\test_tool_navigation.py tests\test_surrol_ppo_reward_and_vision.py
 ```
 
-For SurRoL experiments, this repository assumes a separate local SurRoL checkout
-and environment. The local runner used during development points to:
-
-```text
-SurRoL source: /mnt/e/RL_projects/SurRoL_clean_SR-VPPV
-SurRoL env:    /mnt/e/RL_projects/surrol_py38_env
-```
-
-See [reports/surrol_wsl_deployment_notes_zh.md](reports/surrol_wsl_deployment_notes_zh.md)
-for environment notes.
+For SurRoL experiments, this repository assumes a separate SurRoL/PyBullet
+checkout and compatible Python environment. The committed CSV, figure, and
+media evidence can be inspected without committing a local SurRoL installation
+path.
 
 ## Reproduce Key Summaries
 
@@ -280,7 +270,6 @@ python scripts\build_surrol_fault_taxonomy.py
 python scripts\train_surrol_route_classifier.py
 python scripts\analyze_observable_proxy_risk.py
 python scripts\build_surrol_observable_supervisor_step4.py
-python scripts\audit_surrol_upgrade_status.py
 ```
 
 Regenerate rendered SurRoL media:
@@ -289,12 +278,12 @@ Regenerate rendered SurRoL media:
 .\scripts\export_surrol_render_assets.ps1 -Tasks "NeedleReach,NeedlePick,GauzeRetrieve" -MaxSteps 80 -FrameStride 4
 ```
 
-## Application Notes
+## Project Notes
 
-For a concise PhD-application style description, see:
+For a concise project-level description, see:
 
 - [Research sequence](docs/research_sequence.md)
-- [Project brief](docs/phd_application_project_brief.md)
+- [Project overview](docs/project_overview.md)
 - [Evidence index](docs/evidence_index.md)
 
 ## Limitations

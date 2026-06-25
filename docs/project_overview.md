@@ -1,4 +1,4 @@
-# PhD Application Project Brief
+# Project Overview
 
 ## Title
 
@@ -57,7 +57,7 @@ The project has five technical layers:
 
 ## Strongest Current Result
 
-At the controller level, the risk-gated tangent upgrade keeps the strongest
+At the controller level, the risk-gated tangent result keeps the strongest
 safety property of the always-on tangent shield while using much less
 supervision:
 
@@ -65,8 +65,8 @@ supervision:
 - strict: budget exhaustion 0.000, supervisor activation 0.426;
 - always tangent baseline: budget exhaustion 0.000, supervisor activation 1.000.
 
-This reframes the project from "I have a shield" to "reliability analysis
-becomes a runtime decision signal." This result is from the self-built proxy
+This reframes the project from an always-on safety shield to reliability
+analysis as a runtime decision signal. This result is from the self-built proxy
 controller experiment; the separate SurRoL evidence is the rendered surgical
 rollout and recovery suite.
 
@@ -102,27 +102,3 @@ rendered evidence.
 - Labels are distilled from current rule/proxy routing rather than independent
   expert labels.
 - `abort_candidate` is low-support and uses a geometric danger-zone proxy.
-
-## Suitable Application Framing
-
-> I developed a simulation-based reliability-supervision prototype for surgical
-> robot learning. Starting from a custom constrained 3D proxy, I migrated the
-> supervisor into SurRoL tasks and upgraded the proxy controller with a
-> risk-gated tangent backup layer. The supervisor decides when action-level
-> backup control is necessary and evaluates failure-aware routing across
-> execution drift, grasp/contact uncertainty, visual-state errors, and unsafe
-> recovery proxies. The project emphasizes multi-seed evidence, explicit
-> limitations, and a move from post-hoc reliability analysis toward runtime
-> decision signals.
-
-## What I Would Improve Next
-
-1. Convert the risk-gated tangent score into a learned online monitor evaluated
-   across additional policies and tasks.
-2. Convert the episode-level learned route classifier into a window-level online
-   classifier.
-3. Add independent labels or stronger evaluation targets for review/abort
-   decisions.
-4. Replace scripted recovery primitives with learned or task-agnostic recovery
-   actions.
-5. Evaluate on additional SurRoL tasks and more diverse visual corruptions.

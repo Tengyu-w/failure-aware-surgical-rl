@@ -149,7 +149,7 @@ def main() -> None:
         ),
         "",
         "## Interpretation",
-            "This upgrade turns the tangent backup controller from an always-available correction layer into a risk-gated supervisor. The key evidence is not only task success, but whether the gate preserves coverage of risky states while reducing unnecessary controller activation.",
+            "This result turns the tangent backup controller from an always-available correction layer into a risk-gated supervisor. The key evidence is not only task success, but whether the gate preserves coverage of risky states while reducing unnecessary controller activation.",
             "",
             "## Limitations",
             "- The labels are weak simulation labels, not clinical or hardware safety ground truth.",
@@ -157,8 +157,8 @@ def main() -> None:
             "- If the held-out split shares similar generators or failure modes with training, external validity remains limited.",
             "- The next ablation should sweep thresholds online across prototype and strict presets with multiple seeds.",
             "",
-            "## Reusable Claim",
-            "I further upgraded the project with an explainable risk-gated supervisor: instead of always activating the backup controller, a lightweight risk model predicts when the policy is entering a risky state and gates the tangent backup controller accordingly. This turns reliability analysis from post-hoc explanation into a runtime decision signal for safer and more efficient surgical RL.",
+            "## Summary Claim",
+            "The risk-gated supervisor replaces always-on backup activation with an interpretable action-level risk decision. A lightweight risk model predicts when the policy is entering a risky state and gates the tangent backup controller accordingly. This turns reliability analysis from post-hoc explanation into a runtime decision signal for safer and more efficient surgical RL.",
             "",
         ]
     )

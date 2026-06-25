@@ -121,7 +121,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-recovery-overrides", type=int, default=None)
     parser.add_argument("--max-consecutive-recoveries", type=int, default=None)
     parser.add_argument("--stagnation-head", type=Path, default=None)
-    parser.add_argument("--surrol-root", type=Path, default=Path("/mnt/e/RL_projects/SurRoL_clean_SR-VPPV"))
+    parser.add_argument("--surrol-root", type=Path, default=Path("external/SurRoL_clean_SR-VPPV"))
     parser.add_argument("--task", default="NeedleReachRL-v0")
     parser.add_argument("--seed", type=int, default=50900)
     parser.add_argument("--episodes", type=int, default=10)

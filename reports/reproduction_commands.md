@@ -1,21 +1,11 @@
 # Reproduction Commands
 
-All commands assume the project root is:
-
-```powershell
-E:\RL_projects\constraint_surgical_rl
-```
-
-Use the local environment:
-
-```powershell
-E:\RL_projects\constraint_surgical_rl\.conda\python.exe
-```
+All commands assume they are run from the repository root.
 
 ## Tests
 
 ```powershell
-& .\.conda\python.exe -m pytest -q
+python -m pytest -q
 ```
 
 ## Heuristic Checks
@@ -85,10 +75,12 @@ E:\RL_projects\constraint_surgical_rl\.conda\python.exe
 ## Reports
 
 ```powershell
-& .\.conda\python.exe scripts\write_project_brief.py --prototype runs\prototype_all_aggregate_summary.csv --strict runs\cmp_strict_all_aggregate_summary.csv --out reports\project_brief.md
-& .\.conda\python.exe scripts\write_cross_task_recovery_report.py --out reports\cross_task_recovery_report.md
-& .\.conda\python.exe scripts\write_human_review_trigger_report.py --out reports\human_review_trigger_report.md
-& .\.conda\python.exe scripts\write_risk_model_report.py --out reports\risk_model_report.md --dataset-out reports\risk_model_dataset.csv
+python scripts\build_surrol_master_results.py
+python scripts\build_surrol_fault_taxonomy.py
+python scripts\train_surrol_route_classifier.py
+python scripts\analyze_observable_proxy_risk.py
+python scripts\build_surrol_observable_supervisor_step4.py
+python scripts\write_risk_gated_report.py
 ```
 
 ## Multi-Seed Reliability

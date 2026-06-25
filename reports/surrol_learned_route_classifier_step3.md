@@ -2,7 +2,7 @@
 
 ## Takeaway
 
-This step upgrades the rule/proxy taxonomy into an episode-level learned route classifier. The classifier predicts `auto_execute`, `auto_recovery`, `human_review`, or `abort_candidate` from numeric SurRoL rollout features and is evaluated with an even/odd seed split to reduce episode leakage. It remains a prototype reliability classifier because the labels are distilled from current rule-based routing and simulator logs.
+This step extends the rule/proxy taxonomy into an episode-level learned route classifier. The classifier predicts `auto_execute`, `auto_recovery`, `human_review`, or `abort_candidate` from numeric SurRoL rollout features and is evaluated with an even/odd seed split to reduce episode leakage. It remains a prototype reliability classifier because the labels are distilled from current rule-based routing and simulator logs.
 
 ## Held-Out Summary
 

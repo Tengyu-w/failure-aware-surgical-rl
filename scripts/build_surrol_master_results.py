@@ -340,7 +340,7 @@ def main() -> None:
     raw_out = out_dir / "surrol_master_episode_rows.csv"
     summary_out = out_dir / "surrol_master_summary.csv"
     paired_out = out_dir / "surrol_master_paired_results.csv"
-    report_out = ROOT / "reports" / "surrol_master_results_round13_zh.md"
+    report_out = ROOT / "reports" / "surrol_master_results.md"
 
     df.to_csv(raw_out, index=False)
     summary.to_csv(summary_out, index=False)
