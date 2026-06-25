@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
         choices=(
             "conditioned",
             "conditioned_embedding_risk_penalty",
+            "conditioned_embedding_risk_curriculum",
             "conditioned_shielded",
             "conditioned_tangent_shielded",
             "conditioned_risk_gated_tangent_shielded",
@@ -39,6 +40,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--embedding-risk-dataset", type=Path, default=None)
     parser.add_argument("--embedding-risk-penalty-scale", type=float, default=0.75)
     parser.add_argument("--embedding-risk-threshold", type=float, default=0.55)
+    parser.add_argument("--embedding-risk-curriculum-probability", type=float, default=0.35)
+    parser.add_argument("--embedding-risk-curriculum-candidates", type=int, default=8)
     return parser.parse_args()
 
 
@@ -49,6 +52,8 @@ def make_env(
     embedding_risk_dataset: Path | None = None,
     embedding_risk_penalty_scale: float = 0.75,
     embedding_risk_threshold: float = 0.55,
+    embedding_risk_curriculum_probability: float = 0.35,
+    embedding_risk_curriculum_candidates: int = 8,
 ):
     if task == "navigation":
         return make_tool_navigation_env(
@@ -57,6 +62,8 @@ def make_env(
             embedding_risk_dataset=embedding_risk_dataset,
             embedding_risk_penalty_scale=embedding_risk_penalty_scale,
             embedding_risk_threshold=embedding_risk_threshold,
+            embedding_risk_curriculum_probability=embedding_risk_curriculum_probability,
+            embedding_risk_curriculum_candidates=embedding_risk_curriculum_candidates,
         )
     return make_tool_manipulation_env(variant=variant)
 
@@ -71,6 +78,8 @@ def run_episode(
     embedding_risk_dataset: Path | None = None,
     embedding_risk_penalty_scale: float = 0.75,
     embedding_risk_threshold: float = 0.55,
+    embedding_risk_curriculum_probability: float = 0.35,
+    embedding_risk_curriculum_candidates: int = 8,
 ) -> dict:
     env = make_env(
         task=task,
@@ -79,6 +88,8 @@ def run_episode(
         embedding_risk_dataset=embedding_risk_dataset,
         embedding_risk_penalty_scale=embedding_risk_penalty_scale,
         embedding_risk_threshold=embedding_risk_threshold,
+        embedding_risk_curriculum_probability=embedding_risk_curriculum_probability,
+        embedding_risk_curriculum_candidates=embedding_risk_curriculum_candidates,
     )
     obs, _ = env.reset(seed=seed)
 
@@ -111,6 +122,8 @@ def run_episode(
         "max_embedding_risk": float(info.get("max_embedding_risk", np.nan)),
         "embedding_risk_score": float(info.get("embedding_risk_score", np.nan)),
         "embedding_risk_active_score": float(info.get("embedding_risk_active_score", np.nan)),
+        "embedding_curriculum_active": float(info.get("embedding_curriculum_active", np.nan)),
+        "embedding_curriculum_score": float(info.get("embedding_curriculum_score", np.nan)),
     }
 
 
@@ -135,6 +148,8 @@ def main() -> None:
             embedding_risk_dataset=args.embedding_risk_dataset,
             embedding_risk_penalty_scale=args.embedding_risk_penalty_scale,
             embedding_risk_threshold=args.embedding_risk_threshold,
+            embedding_risk_curriculum_probability=args.embedding_risk_curriculum_probability,
+            embedding_risk_curriculum_candidates=args.embedding_risk_curriculum_candidates,
         )
         for i in range(args.episodes)
     ]

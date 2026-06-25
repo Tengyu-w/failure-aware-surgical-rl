@@ -39,7 +39,7 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | Stage 3 | Formalize four runtime intervention routes: auto-execute, auto-recovery, human-review, abort-candidate | [taxonomy table](../reports/tables/surrol_fault_taxonomy.csv), [taxonomy report](../reports/surrol_fault_taxonomy_step2.md) |
 | Stage 4 | Stress-test SurRoL recovery with multi-seed fault injections | [master paired results](../reports/tables/surrol_master_paired_results.csv), [master report](../reports/surrol_master_results.md) |
 | Stage 5 | Add learned/observable reliability supervisors and risk-gated proxy backup control | [route classifier report](../reports/surrol_learned_route_classifier_step3.md), [observable supervisor report](../reports/surrol_observable_supervisor_step4.md), [risk-gated tangent report](../reports/risk_gated_tangent_report.md) |
-| Stage 6 | Test whether embedding/KNN risk can become a training signal | [embedding-risk training pilot](../reports/embedding_risk_training_pilot.md), [pilot comparison](../outputs/embedding_risk_training_pilot_comparison.csv) |
+| Stage 6 | Test whether embedding/KNN risk can become a training signal | [embedding-risk training pilot](../reports/embedding_risk_training_pilot.md), [reward-only pilot comparison](../outputs/embedding_risk_training_pilot_comparison.csv), [curriculum fine-tune summary](../outputs/embedding_risk_curriculum_finetune_pilot_summary.csv), [curriculum figure](../reports/figures/embedding_risk_training_pilot/curriculum_finetune_metrics.png) |
 
 ## Key Result Tables
 
@@ -54,6 +54,7 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [risk_gated_tangent/aggregate_summary.csv](../outputs/risk_gated_tangent/aggregate_summary.csv) | cross-seed prototype/strict comparison of unshielded, always tangent, and risk-gated tangent |
 | [risk_gated_tangent/summary.csv](../outputs/risk_gated_tangent/summary.csv) | seed-level formal PPO comparison for the risk-gated tangent result |
 | [embedding_risk_training_pilot_comparison.csv](../outputs/embedding_risk_training_pilot_comparison.csv) | one-seed PPO pilot comparing baseline training against embedding-risk reward shaping |
+| [embedding_risk_curriculum_finetune_pilot_summary.csv](../outputs/embedding_risk_curriculum_finetune_pilot_summary.csv) | one-seed PPO pilot comparing reward shaping, hard-negative curriculum, and curriculum fine-tuning |
 
 ## Important Reports
 
@@ -82,6 +83,7 @@ python scripts\train_explainable_risk.py
 python scripts\offline_risk_gated_intervention.py
 python scripts\evaluate_risk_gated_tangent.py --policy ppo --model runs\pilot_3d_50k_prototype_conditioned_seed0\model.zip --episodes 100 --seeds 0,1,2 --presets prototype,strict --threshold 0.5 --deterministic --risk-model-mode default_rule --out-dir outputs\risk_gated_tangent
 python scripts\generate_risk_gated_visuals.py
+python scripts\run_embedding_risk_training_pilot.py --timesteps 8192 --episodes 40 --penalty-scale 0.25 --risk-threshold 0.55 --curriculum-probability 0.35 --curriculum-candidates 8 --out-dir outputs\embedding_risk_curriculum_finetune_pilot
 ```
 
 Run lightweight tests:

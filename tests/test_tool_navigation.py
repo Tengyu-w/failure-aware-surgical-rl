@@ -1,6 +1,7 @@
 from constraint_surgical_rl import (
     ConstrainedToolManipulationEnv,
     ConstrainedToolNavigationEnv,
+    EmbeddingRiskCurriculumReset,
     EmbeddingRiskPenaltyReward,
     EmbeddingRiskScorer,
     RiskGatedTangentSafetyShieldAction,
@@ -33,6 +34,9 @@ def test_tool_navigation_variants_have_expected_shapes():
     conditioned_embedding_risk = make_tool_navigation_env(
         "conditioned_embedding_risk_penalty", config_preset="prototype"
     )
+    conditioned_embedding_curriculum = make_tool_navigation_env(
+        "conditioned_embedding_risk_curriculum", config_preset="prototype"
+    )
     conditioned_shielded = make_tool_navigation_env("conditioned_shielded", config_preset="prototype")
     conditioned_tangent_shielded = make_tool_navigation_env("conditioned_tangent_shielded", config_preset="prototype")
     conditioned_risk_gated_tangent = make_tool_navigation_env(
@@ -50,6 +54,7 @@ def test_tool_navigation_variants_have_expected_shapes():
 
     assert conditioned.observation_space.shape == (14,)
     assert conditioned_embedding_risk.observation_space.shape == (14,)
+    assert conditioned_embedding_curriculum.observation_space.shape == (14,)
     assert conditioned_shielded.observation_space.shape == (14,)
     assert conditioned_tangent_shielded.observation_space.shape == (14,)
     assert conditioned_risk_gated_tangent.observation_space.shape == (14,)
@@ -134,6 +139,27 @@ def test_embedding_risk_penalty_reports_training_signal():
     assert 0.0 <= info["embedding_risk_score"] <= 1.0
     assert "embedding_risk_penalty" in info
     assert "mean_embedding_risk" in info
+
+
+def test_embedding_risk_curriculum_reset_reports_hard_negative_info():
+    env = make_tool_navigation_env(
+        "conditioned_embedding_risk_curriculum",
+        config_preset="prototype",
+        embedding_risk_curriculum_probability=1.0,
+        embedding_risk_curriculum_candidates=3,
+    )
+    assert isinstance(env, EmbeddingRiskCurriculumReset)
+
+    obs, info = env.reset(seed=16)
+    assert obs.shape == env.observation_space.shape
+    assert info["embedding_curriculum_active"] == 1.0
+    assert 0.0 <= info["embedding_curriculum_score"] <= 1.0
+
+    obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
+    assert obs.shape == env.observation_space.shape
+    assert isinstance(reward, float)
+    assert info["embedding_curriculum_active"] == 1.0
+    assert "embedding_risk_score" in info
 
 
 def test_embedding_risk_scorer_loads_synthetic_reference():

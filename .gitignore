@@ -23,3 +23,5 @@ outputs/risk_gated_tangent_rule_*/
 outputs/risk_gated_tangent_action_rule_*/
 outputs/embedding_risk_training_pilot*/
 !outputs/embedding_risk_training_pilot_comparison.csv
+outputs/embedding_risk_curriculum*_pilot*/
+!outputs/embedding_risk_curriculum_finetune_pilot_summary.csv

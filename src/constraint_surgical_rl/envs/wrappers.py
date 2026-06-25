@@ -529,6 +529,140 @@ class EmbeddingRiskPenaltyReward(gym.Wrapper):
         return obs, shaped_reward, terminated, truncated, info
 
 
+class EmbeddingRiskCurriculumReset(gym.Wrapper):
+    """Use embedding/KNN risk to sample hard-negative reset states."""
+
+    def __init__(
+        self,
+        env: gym.Env,
+        scorer: EmbeddingRiskScorer,
+        probability: float = 0.35,
+        candidate_count: int = 8,
+        min_budget_fraction: float = 0.45,
+    ):
+        super().__init__(env)
+        self.scorer = scorer
+        self.probability = float(np.clip(probability, 0.0, 1.0))
+        self.candidate_count = max(1, int(candidate_count))
+        self.min_budget_fraction = float(np.clip(min_budget_fraction, 0.05, 1.0))
+        self.last_curriculum_active = 0.0
+        self.last_curriculum_score = 0.0
+
+    def reset(self, **kwargs):
+        obs, info = self.env.reset(**kwargs)
+        self.last_curriculum_active = 0.0
+        self.last_curriculum_score = self._score_current(action_norm=0.0)
+
+        rng = self.env.unwrapped.np_random
+        if rng.random() >= self.probability:
+            info["embedding_curriculum_active"] = 0.0
+            info["embedding_curriculum_score"] = self.last_curriculum_score
+            return obs, info
+
+        best_state = self._snapshot()
+        best_score = self.last_curriculum_score
+        for _ in range(self.candidate_count):
+            self._sample_hard_negative_candidate()
+            score = self._score_current(action_norm=0.0)
+            if score > best_score:
+                best_score = score
+                best_state = self._snapshot()
+
+        self._restore(best_state)
+        self.last_curriculum_active = 1.0
+        self.last_curriculum_score = best_score
+        info = self.env.unwrapped._info()
+        info["embedding_curriculum_active"] = 1.0
+        info["embedding_curriculum_score"] = best_score
+        return self.env.unwrapped._obs(), info
+
+    def step(self, action):
+        obs, reward, terminated, truncated, info = self.env.step(action)
+        info["embedding_curriculum_active"] = self.last_curriculum_active
+        info["embedding_curriculum_score"] = self.last_curriculum_score
+        return obs, reward, terminated, truncated, info
+
+    def _snapshot(self) -> dict[str, np.ndarray | float | int]:
+        unwrapped = self.env.unwrapped
+        return {
+            "tool_xy": unwrapped.tool_xy.copy(),
+            "target_xy": unwrapped.target_xy.copy(),
+            "forbidden_xy": unwrapped.forbidden_xy.copy(),
+            "step_count": int(unwrapped.step_count),
+            "safety_budget": float(unwrapped.safety_budget),
+            "cumulative_cost": float(unwrapped.cumulative_cost),
+        }
+
+    def _restore(self, state: dict[str, np.ndarray | float | int]) -> None:
+        unwrapped = self.env.unwrapped
+        unwrapped.tool_xy = np.asarray(state["tool_xy"], dtype=np.float32).copy()
+        unwrapped.target_xy = np.asarray(state["target_xy"], dtype=np.float32).copy()
+        unwrapped.forbidden_xy = np.asarray(state["forbidden_xy"], dtype=np.float32).copy()
+        unwrapped.step_count = int(state["step_count"])
+        unwrapped.safety_budget = float(state["safety_budget"])
+        unwrapped.cumulative_cost = float(state["cumulative_cost"])
+
+    def _sample_hard_negative_candidate(self) -> None:
+        unwrapped = self.env.unwrapped
+        rng = unwrapped.np_random
+        cfg = unwrapped.config
+        clearance = cfg.forbidden_radius + cfg.tool_radius
+        direction = self._random_unit_vector(rng, cfg.workspace_dim)
+
+        if rng.random() < 0.55:
+            near_distance = clearance + float(rng.uniform(0.0, 0.09))
+            forbidden = unwrapped.tool_xy + direction * near_distance
+        else:
+            path = unwrapped.target_xy - unwrapped.tool_xy
+            path_norm = float(np.linalg.norm(path))
+            if path_norm < 1e-6:
+                path_direction = direction
+            else:
+                path_direction = path / path_norm
+            alpha = float(rng.uniform(0.20, 0.72))
+            perpendicular = self._perpendicular_unit_vector(rng, path_direction)
+            lateral_offset = float(rng.uniform(-0.06, 0.06))
+            forbidden = unwrapped.tool_xy + alpha * path + perpendicular * lateral_offset
+
+        unwrapped.forbidden_xy = np.clip(forbidden, -0.85, 0.85).astype(np.float32)
+        max_budget = max(cfg.safety_budget_low, cfg.safety_budget_high * self.min_budget_fraction)
+        unwrapped.safety_budget = float(rng.uniform(cfg.safety_budget_low, max_budget))
+        unwrapped.cumulative_cost = 0.0
+        unwrapped.step_count = 0
+
+    def _score_current(self, action_norm: float) -> float:
+        unwrapped = self.env.unwrapped
+        clearance = float(unwrapped.config.forbidden_radius + unwrapped.config.tool_radius)
+        features = {
+            "distance_to_goal": float(np.linalg.norm(unwrapped.target_xy - unwrapped.tool_xy)),
+            "distance_to_forbidden": float(np.linalg.norm(unwrapped.tool_xy - unwrapped.forbidden_xy) - clearance),
+            "force_proxy": float(unwrapped._force_proxy()),
+            "remaining_budget": float(unwrapped.safety_budget - unwrapped.cumulative_cost),
+            "normalized_time": float(unwrapped.step_count / max(unwrapped.config.max_steps, 1)),
+            "progress_5": 0.0,
+            "action_norm": float(action_norm),
+        }
+        return self.scorer.score(features)
+
+    @staticmethod
+    def _random_unit_vector(rng: np.random.Generator, dim: int) -> np.ndarray:
+        vector = rng.normal(size=dim).astype(np.float32)
+        norm = float(np.linalg.norm(vector))
+        if norm < 1e-6:
+            vector[0] = 1.0
+            return vector
+        return vector / norm
+
+    @classmethod
+    def _perpendicular_unit_vector(cls, rng: np.random.Generator, direction: np.ndarray) -> np.ndarray:
+        vector = cls._random_unit_vector(rng, direction.shape[0])
+        vector = vector - direction * float(np.dot(vector, direction))
+        norm = float(np.linalg.norm(vector))
+        if norm < 1e-6:
+            return cls._random_unit_vector(rng, direction.shape[0])
+        return vector / norm
+
+
 def _default_risk_dataset_path() -> Path:
     return Path(__file__).resolve().parents[3] / "outputs" / "risk_dataset" / "risk_dataset.csv"
 
@@ -538,10 +672,36 @@ def make_embedding_risk_penalty_wrapper(
     dataset_path: str | Path | None = None,
     penalty_scale: float = 0.75,
     risk_threshold: float = 0.55,
+    scorer: EmbeddingRiskScorer | None = None,
 ) -> EmbeddingRiskPenaltyReward:
     path = Path(dataset_path) if dataset_path is not None else _default_risk_dataset_path()
-    scorer = EmbeddingRiskScorer.from_csv(path)
+    scorer = scorer or EmbeddingRiskScorer.from_csv(path)
     return EmbeddingRiskPenaltyReward(env, scorer=scorer, penalty_scale=penalty_scale, risk_threshold=risk_threshold)
+
+
+def make_embedding_risk_curriculum_wrapper(
+    env: gym.Env,
+    dataset_path: str | Path | None = None,
+    penalty_scale: float = 0.75,
+    risk_threshold: float = 0.55,
+    curriculum_probability: float = 0.35,
+    curriculum_candidates: int = 8,
+) -> EmbeddingRiskCurriculumReset:
+    path = Path(dataset_path) if dataset_path is not None else _default_risk_dataset_path()
+    scorer = EmbeddingRiskScorer.from_csv(path)
+    penalty_env = make_embedding_risk_penalty_wrapper(
+        env,
+        dataset_path=path,
+        penalty_scale=penalty_scale,
+        risk_threshold=risk_threshold,
+        scorer=scorer,
+    )
+    return EmbeddingRiskCurriculumReset(
+        penalty_env,
+        scorer=scorer,
+        probability=curriculum_probability,
+        candidate_count=curriculum_candidates,
+    )
 
 
 def make_tool_navigation_env(
@@ -551,6 +711,8 @@ def make_tool_navigation_env(
     embedding_risk_dataset: str | Path | None = None,
     embedding_risk_penalty_scale: float = 0.75,
     embedding_risk_threshold: float = 0.55,
+    embedding_risk_curriculum_probability: float = 0.35,
+    embedding_risk_curriculum_candidates: int = 8,
 ) -> gym.Env:
     from constraint_surgical_rl.envs.presets import get_config_preset
     from constraint_surgical_rl.envs.tool_navigation import ConstrainedToolNavigationEnv
@@ -564,6 +726,15 @@ def make_tool_navigation_env(
             embedding_risk_dataset,
             embedding_risk_penalty_scale,
             embedding_risk_threshold,
+        )
+    if variant == "conditioned_embedding_risk_curriculum":
+        return make_embedding_risk_curriculum_wrapper(
+            env,
+            embedding_risk_dataset,
+            embedding_risk_penalty_scale,
+            embedding_risk_threshold,
+            embedding_risk_curriculum_probability,
+            embedding_risk_curriculum_candidates,
         )
     if variant == "conditioned_shielded":
         return SafetyShieldAction(env)

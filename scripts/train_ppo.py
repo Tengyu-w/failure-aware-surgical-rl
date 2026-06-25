@@ -21,6 +21,7 @@ def parse_args() -> argparse.Namespace:
         choices=(
             "conditioned",
             "conditioned_embedding_risk_penalty",
+            "conditioned_embedding_risk_curriculum",
             "conditioned_shielded",
             "conditioned_tangent_shielded",
             "conditioned_risk_gated_tangent_shielded",
@@ -36,6 +37,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--embedding-risk-dataset", type=Path, default=None)
     parser.add_argument("--embedding-risk-penalty-scale", type=float, default=0.75)
     parser.add_argument("--embedding-risk-threshold", type=float, default=0.55)
+    parser.add_argument("--embedding-risk-curriculum-probability", type=float, default=0.35)
+    parser.add_argument("--embedding-risk-curriculum-candidates", type=int, default=8)
     parser.add_argument("--init-model", type=Path, default=None)
     parser.add_argument("--verbose", type=int, default=1)
     parser.add_argument("--out-dir", type=Path, default=Path("runs") / "ppo_tool_navigation")
@@ -53,6 +56,8 @@ def main() -> None:
             embedding_risk_dataset=args.embedding_risk_dataset,
             embedding_risk_penalty_scale=args.embedding_risk_penalty_scale,
             embedding_risk_threshold=args.embedding_risk_threshold,
+            embedding_risk_curriculum_probability=args.embedding_risk_curriculum_probability,
+            embedding_risk_curriculum_candidates=args.embedding_risk_curriculum_candidates,
         )
     else:
         env = make_tool_manipulation_env(variant=args.variant)

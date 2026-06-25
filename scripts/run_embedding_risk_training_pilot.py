@@ -14,13 +14,15 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run a PPO pilot with embedding-risk reward shaping.")
+    parser = argparse.ArgumentParser(description="Run PPO pilots with embedding-risk reward and curriculum training.")
     parser.add_argument("--timesteps", type=int, default=8_192)
     parser.add_argument("--episodes", type=int, default=40)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--eval-seed", type=int, default=100)
     parser.add_argument("--penalty-scale", type=float, default=0.75)
     parser.add_argument("--risk-threshold", type=float, default=0.55)
+    parser.add_argument("--curriculum-probability", type=float, default=0.35)
+    parser.add_argument("--curriculum-candidates", type=int, default=8)
     parser.add_argument("--out-dir", type=Path, default=ROOT / "outputs" / "embedding_risk_training_pilot")
     parser.add_argument("--dataset", type=Path, default=ROOT / "outputs" / "risk_dataset" / "risk_dataset.csv")
     parser.add_argument("--presets", default="prototype,strict")
@@ -37,7 +39,7 @@ def mean_metric(path: Path, key: str) -> float:
     return float(np.nanmean(df[key].to_numpy(dtype=float)))
 
 
-def train_model(label: str, variant: str, args: argparse.Namespace) -> Path:
+def train_model(label: str, variant: str, args: argparse.Namespace, init_model: Path | None = None) -> Path:
     out_dir = args.out_dir / label
     cmd = [
         sys.executable,
@@ -57,7 +59,9 @@ def train_model(label: str, variant: str, args: argparse.Namespace) -> Path:
         "--verbose",
         "0",
     ]
-    if variant == "conditioned_embedding_risk_penalty":
+    if init_model is not None:
+        cmd += ["--init-model", str(init_model)]
+    if variant in {"conditioned_embedding_risk_penalty", "conditioned_embedding_risk_curriculum"}:
         cmd += [
             "--embedding-risk-dataset",
             str(args.dataset),
@@ -65,6 +69,13 @@ def train_model(label: str, variant: str, args: argparse.Namespace) -> Path:
             str(args.penalty_scale),
             "--embedding-risk-threshold",
             str(args.risk_threshold),
+        ]
+    if variant == "conditioned_embedding_risk_curriculum":
+        cmd += [
+            "--embedding-risk-curriculum-probability",
+            str(args.curriculum_probability),
+            "--embedding-risk-curriculum-candidates",
+            str(args.curriculum_candidates),
         ]
     run(cmd)
     return out_dir / "model.zip"
@@ -109,9 +120,21 @@ def main() -> None:
         args.dataset = ROOT / args.dataset
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
+    baseline_model = train_model("baseline_ppo", "conditioned", args)
     models = {
-        "baseline_ppo": train_model("baseline_ppo", "conditioned", args),
+        "baseline_ppo": baseline_model,
         "embedding_risk_ppo": train_model("embedding_risk_ppo", "conditioned_embedding_risk_penalty", args),
+        "embedding_curriculum_ppo": train_model(
+            "embedding_curriculum_ppo",
+            "conditioned_embedding_risk_curriculum",
+            args,
+        ),
+        "embedding_curriculum_finetune_ppo": train_model(
+            "embedding_curriculum_finetune_ppo",
+            "conditioned_embedding_risk_curriculum",
+            args,
+            init_model=baseline_model,
+        ),
     }
 
     presets = [item.strip() for item in args.presets.split(",") if item.strip()]
