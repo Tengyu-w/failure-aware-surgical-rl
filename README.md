@@ -1,9 +1,10 @@
 # Failure-Aware Reliability Supervision for Surgical RL
 
 This repository is a research prototype for reliability-supervised surgical
-robot learning. It starts from a custom constrained 3D surgical-tool proxy and
-migrates the same failure-aware supervision idea into SurRoL/PyBullet surgical
-simulation tasks.
+robot learning. The research path is deliberately staged: first build a simple
+custom constrained surgical-tool proxy to test obstacle avoidance, backup
+control, and safety-budget ideas; then migrate the same reliability-supervision
+logic into SurRoL/PyBullet surgical simulation tasks.
 
 The project is not presented as a finished surgical autonomy system. Its goal
 is narrower and research-oriented: evaluate when a surgical RL or scripted
@@ -11,10 +12,11 @@ controller should continue autonomously, recover automatically, request human
 review, or stop because recovery may be unsafe.
 
 The current main upgrade is an action-level risk-gated tangent backup
-supervisor. Instead of allowing the tangent backup controller to supervise every
-timestep, an interpretable risk gate first checks whether the proposed
-state/action is unsafe. Reliability analysis therefore becomes a runtime
-decision signal, not only a post-hoc explanation.
+supervisor in the custom proxy controller setting. Instead of allowing the
+tangent backup controller to supervise every timestep, an interpretable risk
+gate first checks whether the proposed state/action is unsafe. Reliability
+analysis therefore becomes a runtime decision signal, not only a post-hoc
+explanation.
 
 ![SurRoL NeedlePick rendered rollout](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_040.png)
 
@@ -34,13 +36,34 @@ The current supervisor studies four intervention routes:
 | `human_review` | route uncertain grasp/contact or visual-state errors to review/re-estimation |
 | `abort_candidate` | stop or flag recovery when an unsafe proxy is triggered |
 
+## Project Logic
+
+The project should be read as a staged upgrade, not as one mixed experiment:
+
+1. **Self-built proxy simulation.** A simplified constrained surgical-tool
+   environment was built first. It supports obstacle/forbidden-region avoidance,
+   safety budgets, tangent backup control, and fast PPO/controller experiments.
+   The `prototype` and `strict` risk-gated tangent figures belong to this proxy
+   setting; they are controller-level visualizations, not SurRoL renders.
+2. **SurRoL migration.** The same reliability-supervision idea was then embedded
+   into SurRoL/PyBullet surgical tasks, using `NeedleReach`, `NeedlePick`, and
+   `GauzeRetrieve` rendered rollouts.
+3. **Four intervention routes.** SurRoL rollout failures were organized into
+   `auto_execute`, `auto_recovery`, `human_review`, and `abort_candidate`, so
+   the project is about deciding what type of runtime response is appropriate.
+4. **Final reliability upgrades.** The SurRoL side was stress-tested with
+   multi-seed recovery, route classification, and observable-proxy supervision;
+   the proxy controller side was upgraded from always-on tangent backup to
+   risk-gated tangent backup.
+
 ## Main Contributions
 
 1. Custom constrained surgical proxy environment for fast method development:
    3D tool navigation, forbidden-region costs, safety budgets, and recovery
    monitors.
-2. Risk-gated tangent backup: an action-level reliability supervisor that keeps
-   always-tangent budget safety while reducing always-on supervisor activation.
+2. Risk-gated tangent backup in the proxy controller setting: an action-level
+   reliability supervisor that keeps always-tangent budget safety while reducing
+   always-on supervisor activation.
 3. SurRoL migration evidence across `NeedleReach`, `NeedlePick`, and
    `GauzeRetrieve`, including rendered RGB rollouts, traces, figures, and CSV
    summaries.
@@ -76,11 +99,12 @@ main reading path.
 
 ### Risk-Gated Tangent Backup
 
-The proxy controller experiment compares the same PPO policy under three
-execution modes: unshielded PPO, always-on tangent backup, and risk-gated
-tangent backup. The risk gate records interpretable intervention reasons such
-as proposed forbidden-zone proximity, low clearance, low safety budget, stalled
-progress, force proxy, and large action magnitude.
+This is a custom proxy/controller experiment, not a SurRoL experiment. It
+compares the same PPO policy under three execution modes: unshielded PPO,
+always-on tangent backup, and risk-gated tangent backup. The risk gate records
+interpretable intervention reasons such as proposed forbidden-zone proximity,
+low clearance, low safety budget, stalled progress, force proxy, and large
+action magnitude.
 
 | Preset | Method | Budget exhaustion | Supervisor activation |
 |---|---|---:|---:|
@@ -167,9 +191,14 @@ Report and tables:
 
 ## Visual Evidence
 
-The repository includes rendered SurRoL/PyBullet rollout evidence:
+The repository has two different kinds of visual evidence. They should not be
+merged when explaining the project.
 
-The risk-gated tangent upgrade also includes controller-level visuals:
+### Custom Proxy Controller Visuals
+
+These figures explain the risk-gated tangent upgrade in the self-built proxy
+environment. The `prototype` and `strict` snapshots are top-down/controller
+visualizations from this proxy setting, not SurRoL/PyBullet screenshots.
 
 | Visual | File |
 |---|---|
@@ -179,11 +208,17 @@ The risk-gated tangent upgrade also includes controller-level visuals:
 | prototype snapshots | [render_snapshots_prototype.png](reports/figures/risk_gated_tangent_visuals/render_snapshots_prototype.png) |
 | strict trajectory | [trajectory_strict.png](reports/figures/risk_gated_tangent_visuals/trajectory_strict.png) |
 
-| Task | GIF | MP4 | Trace |
-|---|---|---|---|
-| NeedleReach | [GIF](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.mp4) | [CSV](reports/media/surrol_render_evidence/needlereach/rollout_trace.csv) |
-| NeedlePick | [GIF](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.mp4) | [CSV](reports/media/surrol_render_evidence/needlepick/rollout_trace.csv) |
-| GauzeRetrieve | [GIF](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.mp4) | [CSV](reports/media/surrol_render_evidence/gauzeretrieve/rollout_trace.csv) |
+### SurRoL/PyBullet Rendered Evidence
+
+These media files are the actual SurRoL visual evidence. They show rendered
+rollouts for the surgical simulation tasks and include GIF/MP4 media, selected
+frame PNGs, and trace CSVs.
+
+| Task | GIF | MP4 | Selected frames | Trace |
+|---|---|---|---|---|
+| NeedleReach | [GIF](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.mp4) | [000](reports/media/surrol_render_evidence/needlereach/frames/needlereach_step_000.png), [020](reports/media/surrol_render_evidence/needlereach/frames/needlereach_step_020.png) | [CSV](reports/media/surrol_render_evidence/needlereach/rollout_trace.csv) |
+| NeedlePick | [GIF](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.mp4) | [000](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_000.png), [020](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_020.png), [040](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_040.png) | [CSV](reports/media/surrol_render_evidence/needlepick/rollout_trace.csv) |
+| GauzeRetrieve | [GIF](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.mp4) | [000](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_000.png), [020](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_020.png), [034](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_034.png) | [CSV](reports/media/surrol_render_evidence/gauzeretrieve/rollout_trace.csv) |
 
 More evidence is indexed in [docs/evidence_index.md](docs/evidence_index.md).
 

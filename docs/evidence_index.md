@@ -6,13 +6,22 @@ README has a traceable report, table, figure, or media file.
 
 ## Visual SurRoL Migration Evidence
 
+This section is the actual SurRoL/PyBullet visual evidence. It is separate from
+the `prototype` and `strict` risk-gated tangent snapshots, which belong to the
+custom proxy controller experiment.
+
 | Claim | Evidence |
 |---|---|
 | The project moved beyond the custom proxy into SurRoL/PyBullet simulation. | [NeedleReach GIF](../reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif), [NeedlePick GIF](../reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif), [GauzeRetrieve GIF](../reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) |
 | Rendered rollouts have step traces, not only screenshots. | [NeedleReach trace](../reports/media/surrol_render_evidence/needlereach/rollout_trace.csv), [NeedlePick trace](../reports/media/surrol_render_evidence/needlepick/rollout_trace.csv), [GauzeRetrieve trace](../reports/media/surrol_render_evidence/gauzeretrieve/rollout_trace.csv) |
+| Rendered rollouts also have selected frame PNGs. | [NeedleReach frames](../reports/media/surrol_render_evidence/needlereach/frames/), [NeedlePick frames](../reports/media/surrol_render_evidence/needlepick/frames/), [GauzeRetrieve frames](../reports/media/surrol_render_evidence/gauzeretrieve/frames/) |
 | Recovery behavior is visualized. | [phase-aware success figure](../reports/figures/surrol_phase_aware/success_rate_by_failure.png), [distance curves](../reports/figures/surrol_phase_aware/representative_distance_curves.png), [observable jaw-stuck recovery](../reports/figures/surrol_cross_task_observable_jaw_stuck_10seed/cross_task_jaw_stuck_recovery.png) |
 
-## Risk-Gated Tangent Backup Upgrade
+## Risk-Gated Tangent Backup Upgrade In The Custom Proxy
+
+This section is the controller-level upgrade from the self-built proxy
+environment. The `prototype` and `strict` figures are top-down/controller
+visualizations from the proxy simulator; they are not SurRoL screenshots.
 
 | Claim | Evidence |
 |---|---|
@@ -21,15 +30,15 @@ README has a traceable report, table, figure, or media file.
 | The gate is interpretable rather than a black-box always-on correction. | [risk architecture](../reports/figures/risk_gated_tangent_visuals/risk_gate_architecture.png), [risk coefficients](../reports/figures/risk_gated_tangent_visuals/risk_model_coefficients.png) |
 | The process can be shown visually as trajectories and simulated snapshots. | [prototype snapshots](../reports/figures/risk_gated_tangent_visuals/render_snapshots_prototype.png), [strict trajectory](../reports/figures/risk_gated_tangent_visuals/trajectory_strict.png), [strict snapshots](../reports/figures/risk_gated_tangent_visuals/render_snapshots_strict.png) |
 
-## Four-Step Research Upgrade
+## Project Logic And Research Upgrade
 
 | Step | Purpose | Main Files |
 |---|---|---|
-| Step 1 | Upgrade key experiments to 10 seeds | [master paired results](../reports/tables/surrol_master_paired_results.csv), [master report](../reports/surrol_master_results_round13_zh.md) |
-| Step 2 | Formalize fault taxonomy | [taxonomy table](../reports/tables/surrol_fault_taxonomy.csv), [taxonomy report](../reports/surrol_fault_taxonomy_step2.md) |
-| Step 3 | Learn route/risk classifier | [metrics](../reports/tables/surrol_learned_route_classifier_metrics.csv), [report](../reports/surrol_learned_route_classifier_step3.md) |
-| Step 4 | Reduce privileged simulator-state dependence | [signal audit](../reports/tables/surrol_observable_signal_audit.csv), [observable supervisor report](../reports/surrol_observable_supervisor_step4.md) |
-| Step 5 | Gate tangent backup with an interpretable action-level risk supervisor | [risk-gated tangent report](../reports/risk_gated_tangent_report.md), [summary](../outputs/risk_gated_tangent/summary.csv) |
+| Stage 1 | Build a self-contained constrained proxy to test obstacle avoidance, tangent backup, and safety-budget supervision | [source environments](../src/constraint_surgical_rl/envs/), [custom proxy recovery report](../reports/cross_task_recovery_report.md) |
+| Stage 2 | Migrate the reliability-supervision idea into SurRoL/PyBullet tasks | [SurRoL rendered evidence](../reports/media/surrol_render_evidence/), [deployment notes](../reports/surrol_wsl_deployment_notes_zh.md) |
+| Stage 3 | Formalize four runtime intervention routes: auto-execute, auto-recovery, human-review, abort-candidate | [taxonomy table](../reports/tables/surrol_fault_taxonomy.csv), [taxonomy report](../reports/surrol_fault_taxonomy_step2.md) |
+| Stage 4 | Stress-test SurRoL recovery with multi-seed fault injections | [master paired results](../reports/tables/surrol_master_paired_results.csv), [master report](../reports/surrol_master_results_round13_zh.md) |
+| Stage 5 | Add learned/observable reliability supervisors and risk-gated proxy backup control | [route classifier report](../reports/surrol_learned_route_classifier_step3.md), [observable supervisor report](../reports/surrol_observable_supervisor_step4.md), [risk-gated tangent report](../reports/risk_gated_tangent_report.md) |
 
 ## Key Result Tables
 
@@ -53,7 +62,7 @@ README has a traceable report, table, figure, or media file.
 | [surrol_fault_taxonomy_step2.md](../reports/surrol_fault_taxonomy_step2.md) | formalizes failure families and intervention routes |
 | [surrol_learned_route_classifier_step3.md](../reports/surrol_learned_route_classifier_step3.md) | shows learned route-classifier metrics and boundary errors |
 | [surrol_observable_supervisor_step4.md](../reports/surrol_observable_supervisor_step4.md) | separates observable supervisor decisions from privileged simulator state |
-| [risk_gated_tangent_report.md](../reports/risk_gated_tangent_report.md) | controller-level upgrade from always-on tangent correction to explainable risk-gated supervision |
+| [risk_gated_tangent_report.md](../reports/risk_gated_tangent_report.md) | proxy controller-level upgrade from always-on tangent correction to explainable risk-gated supervision |
 | [claims_limitations_round46.md](../reports/claims_limitations_round46.md) | conservative claim and limitation framing from earlier synthesis |
 | [surrol_wsl_deployment_notes_zh.md](../reports/surrol_wsl_deployment_notes_zh.md) | documents the local SurRoL/WSL environment used for experiments |
 | [legacy round reports](../reports/archive/legacy_round_reports/) | preserved intermediate experiment notes, not the main reading path |
@@ -87,4 +96,7 @@ python -m pytest tests\test_tool_navigation.py tests\test_surrol_ppo_reward_and_
 
 The evidence supports a simulation research prototype for reliability
 supervision. It does not support claims of clinical validation, real-robot
-deployment, or a complete end-to-end learned surgical autonomy system.
+deployment, or a complete end-to-end learned surgical autonomy system. The
+risk-gated tangent `prototype`/`strict` visuals support the custom proxy
+controller result; the SurRoL evidence is the rendered `NeedleReach`,
+`NeedlePick`, and `GauzeRetrieve` media and associated recovery tables.

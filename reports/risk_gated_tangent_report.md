@@ -4,6 +4,12 @@
 Can a reliability signal decide when the tangent backup controller is necessary, instead of applying safety correction at every timestep?
 
 ## Method
+Scope note: this report is for the custom constrained proxy/controller
+experiment. The `prototype` and `strict` plots generated for this upgrade are
+proxy visualizations, not SurRoL/PyBullet rendered surgical rollouts. The SurRoL
+visual evidence is stored separately under
+`reports/media/surrol_render_evidence/`.
+
 1. Build weak timestep risk labels from rollout logs and lightweight navigation rollouts.
 2. Train interpretable logistic and depth-3 decision-tree risk models.
 3. Use predicted risk to gate tangent backup activation.

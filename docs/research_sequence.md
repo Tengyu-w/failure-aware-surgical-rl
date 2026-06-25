@@ -9,13 +9,15 @@ intermediate experiment notes.
 The project began with a custom 3D surgical-tool proxy environment. This stage
 was used to develop the core idea: a controller should be supervised not only by
 task reward, but also by safety budgets, recovery triggers, and failure-aware
-routing.
+routing. The `prototype` and `strict` risk-gated tangent visualizations belong
+to this self-built proxy setting; they are not SurRoL/PyBullet renders.
 
 Main files:
 
 - [source environments](../src/constraint_surgical_rl/envs/)
 - [custom proxy recovery report](../reports/cross_task_recovery_report.md)
 - [project brief](../reports/project_brief.md)
+- [risk-gated tangent report](../reports/risk_gated_tangent_report.md)
 
 ## 2. Migration To SurRoL
 
@@ -28,6 +30,7 @@ Main evidence:
 - [NeedleReach GIF](../reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif)
 - [NeedlePick GIF](../reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif)
 - [GauzeRetrieve GIF](../reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif)
+- [SurRoL rendered media folder](../reports/media/surrol_render_evidence/)
 - [SurRoL deployment notes](../reports/surrol_wsl_deployment_notes_zh.md)
 
 ## 3. Fault Taxonomy And Intervention Routes

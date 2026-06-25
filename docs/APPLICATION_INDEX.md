@@ -8,16 +8,27 @@ the longer reports.
 
 This repository studies runtime reliability supervision for surgical robot
 learning in simulation. The project begins with a custom constrained 3D
-surgical-tool proxy and then migrates the same reliability-routing idea into
+surgical-tool proxy for obstacle avoidance, tangent backup control, and safety
+budget testing. The same reliability-routing idea is then migrated into
 SurRoL/PyBullet manipulation tasks. The supervisor decides whether execution
 should continue, recover automatically, request human-style review or
 re-estimation, or stop because recovery may be unsafe.
 
 The newest upgrade is risk-gated tangent backup: an action-level supervisor
-that decides when the tangent backup controller should be active. In the proxy
-PPO experiment, risk-gated tangent preserves the 0.000 budget exhaustion of
+that decides when the tangent backup controller should be active. This upgrade
+is in the custom proxy controller setting, not yet the SurRoL policy wrapper. In
+the proxy PPO experiment, risk-gated tangent preserves the 0.000 budget exhaustion of
 always tangent while reducing supervisor activation from 1.000 to 0.450 on
 prototype and 0.426 on strict.
+
+## Project Logic
+
+| Stage | What It Shows | Evidence Type |
+|---|---|---|
+| Self-built proxy simulation | The core safety-control idea works in a simple constrained surgical-tool environment. | PPO/controller logs, prototype/strict trajectories, top-down snapshots |
+| SurRoL migration | The same reliability-supervision idea is embedded into surgical simulation tasks. | Rendered NeedleReach, NeedlePick, and GauzeRetrieve GIF/MP4 rollouts |
+| Four intervention routes | Failures are not treated as one generic failure; they are routed to continue, recover, review, or abort-candidate. | Fault taxonomy, paired recovery tables, route labels |
+| Final reliability upgrades | SurRoL recovery is stress-tested, and the proxy tangent controller is changed from always-on to risk-gated. | Multi-seed SurRoL results, learned route classifier, observable proxy audit, risk-gated tangent report |
 
 ## Best Application Framing
 
@@ -41,14 +52,14 @@ Suggested wording:
 | 5 minutes | [PhD application brief](phd_application_project_brief.md) | Concise supervisor-facing project narrative |
 | 10 minutes | [Evidence index](evidence_index.md) | Claim-by-claim evidence map |
 | 20 minutes | [Research sequence](research_sequence.md) | How the project developed from proxy RL to SurRoL supervision |
-| 20 minutes | [Risk-gated tangent report](../reports/risk_gated_tangent_report.md) | Main controller-level upgrade and visual evidence |
+| 20 minutes | [Risk-gated tangent report](../reports/risk_gated_tangent_report.md) | Proxy controller-level upgrade and proxy visual evidence |
 | Deep dive | [SurRoL master report](../reports/surrol_master_results_round13_zh.md) | Main paired recovery tables |
 
 ## Evidence Snapshot
 
 | Claim | Current evidence | Strength |
 |---|---|---|
-| The backup controller is no longer just always-on. | Risk-gated tangent keeps 0.000 budget exhaustion while reducing supervisor activation to 0.450/0.426. | Strong for the proxy controller setting |
+| The proxy backup controller is no longer just always-on. | Risk-gated tangent keeps 0.000 budget exhaustion while reducing supervisor activation to 0.450/0.426. | Strong for the proxy controller setting |
 | The idea moved beyond a toy proxy. | Rendered SurRoL rollouts for NeedleReach, NeedlePick, and GauzeRetrieve with traces. | Strong for simulation migration |
 | Failure routing helps under injected faults. | 10-seed NeedlePick/GauzeRetrieve recovery suites for action, perception, and jaw-stuck faults. | Strong within current SurRoL setup |
 | Route prediction is learnable. | Held-out route classifier: 460 episodes, 84.6% accuracy, 82.8% macro-F1, 0.0 missed review-or-abort rate. | Moderate; labels are distilled |

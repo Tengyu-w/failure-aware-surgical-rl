@@ -8,12 +8,15 @@ Failure-Aware Reliability Supervision for Surgical Robot Learning
 
 This project studies runtime reliability supervision for surgical robot learning
 in simulation. It began as a custom constrained 3D surgical-tool proxy and was
-then migrated into SurRoL/PyBullet surgical manipulation tasks. The core idea is
-to place a reliability supervisor around an existing controller and decide when
-the system should continue autonomously, recover automatically, request
-human-style review/re-estimation, or stop because recovery may be unsafe. The
-current evidence covers a risk-gated tangent backup supervisor, SurRoL rendered
-rollouts, multi-seed failure injection, fault taxonomy, learned route
+then migrated into SurRoL/PyBullet surgical manipulation tasks. The custom
+proxy was used to test obstacle avoidance, tangent backup control, and
+safety-budget supervision; SurRoL was used to test the same reliability-routing
+idea in rendered surgical simulation tasks. The core idea is to place a
+reliability supervisor around an existing controller and decide when the system
+should continue autonomously, recover automatically, request human-style
+review/re-estimation, or stop because recovery may be unsafe. The current
+evidence covers a proxy-level risk-gated tangent backup supervisor, SurRoL
+rendered rollouts, multi-seed failure injection, fault taxonomy, learned route
 classification, and an observable-proxy supervisor that reduces reliance on
 privileged simulator phase/contact state.
 
@@ -27,12 +30,12 @@ This project frames those distinctions as a reliability-routing problem.
 
 ## Method Overview
 
-The project has four technical layers:
+The project has five technical layers:
 
 1. A custom constrained 3D proxy environment for fast RL and safety-budget
    experiments.
-2. An action-level risk-gated tangent backup supervisor that decides when the
-   safety controller should be activated.
+2. An action-level risk-gated tangent backup supervisor in the proxy controller
+   setting that decides when the safety controller should be activated.
 3. SurRoL task migration using `NeedleReach`, `NeedlePick`, and
    `GauzeRetrieve` rollouts.
 4. Runtime failure taxonomy and route decisions:
@@ -44,7 +47,7 @@ The project has four technical layers:
 
 | Component | Evidence |
 |---|---|
-| Risk-gated tangent backup | prototype/strict both preserve 0.000 budget exhaustion while reducing supervisor activation from 1.000 to 0.450/0.426 |
+| Proxy risk-gated tangent backup | prototype/strict both preserve 0.000 budget exhaustion while reducing supervisor activation from 1.000 to 0.450/0.426 |
 | SurRoL migration | rendered RGB GIF/MP4 rollouts for NeedleReach, NeedlePick, and GauzeRetrieve |
 | Standard corruptions | 10-seed NeedlePick/GauzeRetrieve action noise, dropout, and execution slip |
 | Visual-state errors | 10-seed perception-bias and depth-scale error recovery via review/re-estimation |
@@ -63,7 +66,9 @@ supervision:
 - always tangent baseline: budget exhaustion 0.000, supervisor activation 1.000.
 
 This reframes the project from "I have a shield" to "reliability analysis
-becomes a runtime decision signal."
+becomes a runtime decision signal." This result is from the self-built proxy
+controller experiment; the separate SurRoL evidence is the rendered surgical
+rollout and recovery suite.
 
 In the strongest 10-seed SurRoL suites:
 
@@ -81,6 +86,11 @@ used as the surgical simulation environment for evaluating a reliability
 supervision idea developed from the custom proxy environment. The research
 contribution is the failure-aware supervisor, taxonomy, routing evaluation, and
 evidence structure around SurRoL rollouts.
+
+The visual evidence should be read in the same way: `prototype` and `strict`
+risk-gated tangent snapshots are proxy/controller visualizations, while the
+NeedleReach, NeedlePick, and GauzeRetrieve GIF/MP4 files are the actual SurRoL
+rendered evidence.
 
 ## Limitations
 
