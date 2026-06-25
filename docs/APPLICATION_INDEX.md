@@ -4,7 +4,7 @@ This page is the supervisor-facing entry point. It is meant to help a PhD
 reviewer understand the project in five minutes before deciding whether to read
 the longer reports.
 
-## Thirty-Second Summary
+##  Summary
 
 This repository studies runtime reliability supervision for surgical robot
 learning in simulation. The project begins with a custom constrained 3D
