@@ -39,6 +39,7 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | Stage 3 | Formalize four runtime intervention routes: auto-execute, auto-recovery, human-review, abort-candidate | [taxonomy table](../reports/tables/surrol_fault_taxonomy.csv), [taxonomy report](../reports/surrol_fault_taxonomy_step2.md) |
 | Stage 4 | Stress-test SurRoL recovery with multi-seed fault injections | [master paired results](../reports/tables/surrol_master_paired_results.csv), [master report](../reports/surrol_master_results.md) |
 | Stage 5 | Add learned/observable reliability supervisors and risk-gated proxy backup control | [route classifier report](../reports/surrol_learned_route_classifier_step3.md), [observable supervisor report](../reports/surrol_observable_supervisor_step4.md), [risk-gated tangent report](../reports/risk_gated_tangent_report.md) |
+| Stage 6 | Test whether embedding/KNN risk can become a training signal | [embedding-risk training pilot](../reports/embedding_risk_training_pilot.md), [pilot comparison](../outputs/embedding_risk_training_pilot_comparison.csv) |
 
 ## Key Result Tables
 
@@ -52,6 +53,7 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [observable_proxy_threshold_sweep_10seed.csv](../reports/tables/observable_proxy_threshold_sweep_10seed.csv) | threshold sweep for observable risk scoring |
 | [risk_gated_tangent/aggregate_summary.csv](../outputs/risk_gated_tangent/aggregate_summary.csv) | cross-seed prototype/strict comparison of unshielded, always tangent, and risk-gated tangent |
 | [risk_gated_tangent/summary.csv](../outputs/risk_gated_tangent/summary.csv) | seed-level formal PPO comparison for the risk-gated tangent result |
+| [embedding_risk_training_pilot_comparison.csv](../outputs/embedding_risk_training_pilot_comparison.csv) | one-seed PPO pilot comparing baseline training against embedding-risk reward shaping |
 
 ## Important Reports
 
@@ -63,6 +65,7 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [surrol_learned_route_classifier_step3.md](../reports/surrol_learned_route_classifier_step3.md) | shows learned route-classifier metrics and boundary errors |
 | [surrol_observable_supervisor_step4.md](../reports/surrol_observable_supervisor_step4.md) | separates observable supervisor decisions from privileged simulator state |
 | [risk_gated_tangent_report.md](../reports/risk_gated_tangent_report.md) | proxy controller-level result: always-on tangent correction becomes explainable risk-gated supervision |
+| [embedding_risk_training_pilot.md](../reports/embedding_risk_training_pilot.md) | tests whether embedding/KNN instability analysis can be fed back into PPO training |
 
 ## Reproducibility Commands
 

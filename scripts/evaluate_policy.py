@@ -19,6 +19,7 @@ def parse_args() -> argparse.Namespace:
         "--variant",
         choices=(
             "conditioned",
+            "conditioned_embedding_risk_penalty",
             "conditioned_shielded",
             "conditioned_tangent_shielded",
             "conditioned_risk_gated_tangent_shielded",
@@ -35,17 +36,50 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=100)
     parser.add_argument("--out", type=Path, default=Path("runs") / "eval.csv")
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument("--embedding-risk-dataset", type=Path, default=None)
+    parser.add_argument("--embedding-risk-penalty-scale", type=float, default=0.75)
+    parser.add_argument("--embedding-risk-threshold", type=float, default=0.55)
     return parser.parse_args()
 
 
-def make_env(task: str, variant: str, config_preset: str):
+def make_env(
+    task: str,
+    variant: str,
+    config_preset: str,
+    embedding_risk_dataset: Path | None = None,
+    embedding_risk_penalty_scale: float = 0.75,
+    embedding_risk_threshold: float = 0.55,
+):
     if task == "navigation":
-        return make_tool_navigation_env(variant=variant, config_preset=config_preset)
+        return make_tool_navigation_env(
+            variant=variant,
+            config_preset=config_preset,
+            embedding_risk_dataset=embedding_risk_dataset,
+            embedding_risk_penalty_scale=embedding_risk_penalty_scale,
+            embedding_risk_threshold=embedding_risk_threshold,
+        )
     return make_tool_manipulation_env(variant=variant)
 
 
-def run_episode(model: PPO, task: str, variant: str, config_preset: str, seed: int, deterministic: bool) -> dict:
-    env = make_env(task=task, variant=variant, config_preset=config_preset)
+def run_episode(
+    model: PPO,
+    task: str,
+    variant: str,
+    config_preset: str,
+    seed: int,
+    deterministic: bool,
+    embedding_risk_dataset: Path | None = None,
+    embedding_risk_penalty_scale: float = 0.75,
+    embedding_risk_threshold: float = 0.55,
+) -> dict:
+    env = make_env(
+        task=task,
+        variant=variant,
+        config_preset=config_preset,
+        embedding_risk_dataset=embedding_risk_dataset,
+        embedding_risk_penalty_scale=embedding_risk_penalty_scale,
+        embedding_risk_threshold=embedding_risk_threshold,
+    )
     obs, _ = env.reset(seed=seed)
 
     total_reward = 0.0
@@ -73,6 +107,10 @@ def run_episode(model: PPO, task: str, variant: str, config_preset: str, seed: i
         "tool_object_distance": float(info.get("tool_object_distance", np.nan)),
         "object_goal_distance": float(info.get("object_goal_distance", np.nan)),
         "task_phase": float(info.get("task_phase", np.nan)),
+        "mean_embedding_risk": float(info.get("mean_embedding_risk", np.nan)),
+        "max_embedding_risk": float(info.get("max_embedding_risk", np.nan)),
+        "embedding_risk_score": float(info.get("embedding_risk_score", np.nan)),
+        "embedding_risk_active_score": float(info.get("embedding_risk_active_score", np.nan)),
     }
 
 
@@ -94,6 +132,9 @@ def main() -> None:
             config_preset=args.config_preset,
             seed=args.seed + i,
             deterministic=args.deterministic,
+            embedding_risk_dataset=args.embedding_risk_dataset,
+            embedding_risk_penalty_scale=args.embedding_risk_penalty_scale,
+            embedding_risk_threshold=args.embedding_risk_threshold,
         )
         for i in range(args.episodes)
     ]

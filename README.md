@@ -90,6 +90,7 @@ project-facing path in this order:
 6. [Learned route classifier](reports/surrol_learned_route_classifier_step3.md)
 7. [Observable supervisor](reports/surrol_observable_supervisor_step4.md)
 8. [Risk-gated tangent backup report](reports/risk_gated_tangent_report.md)
+9. [Embedding-risk training pilot](reports/embedding_risk_training_pilot.md)
 
 ## Key Results
 
@@ -184,6 +185,22 @@ Report and tables:
 - [Step 4 observable supervisor report](reports/surrol_observable_supervisor_step4.md)
 - [Observable signal audit](reports/tables/surrol_observable_signal_audit.csv)
 - [Observable versus privileged comparison](reports/tables/surrol_observable_vs_privileged_jaw_stuck.csv)
+
+### Embedding-Risk Training Pilot
+
+The embedding/KNN instability signal is also tested as a PPO reward-shaping
+signal in the custom proxy environment. This is a pilot training-loop result,
+not yet a formal model-improvement claim.
+
+The best single setting improves prototype success from 0.025 to 0.075 and
+reduces prototype budget exhaustion from 0.975 to 0.925, while another setting
+improves strict budget exhaustion from 1.000 to 0.925. No setting wins
+consistently across prototype and strict, so the current evidence supports
+"embedding risk can affect training" rather than "embedding risk reliably
+improves the policy."
+
+- [Embedding-risk training pilot report](reports/embedding_risk_training_pilot.md)
+- [Pilot comparison CSV](outputs/embedding_risk_training_pilot_comparison.csv)
 
 ## Visual Evidence
 

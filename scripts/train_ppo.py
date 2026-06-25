@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
         "--variant",
         choices=(
             "conditioned",
+            "conditioned_embedding_risk_penalty",
             "conditioned_shielded",
             "conditioned_tangent_shielded",
             "conditioned_risk_gated_tangent_shielded",
@@ -32,6 +33,9 @@ def parse_args() -> argparse.Namespace:
         default="conditioned",
     )
     parser.add_argument("--config-preset", choices=CONFIG_PRESET_NAMES, default="prototype")
+    parser.add_argument("--embedding-risk-dataset", type=Path, default=None)
+    parser.add_argument("--embedding-risk-penalty-scale", type=float, default=0.75)
+    parser.add_argument("--embedding-risk-threshold", type=float, default=0.55)
     parser.add_argument("--init-model", type=Path, default=None)
     parser.add_argument("--verbose", type=int, default=1)
     parser.add_argument("--out-dir", type=Path, default=Path("runs") / "ppo_tool_navigation")
@@ -43,7 +47,13 @@ def main() -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     if args.task == "navigation":
-        env = make_tool_navigation_env(variant=args.variant, config_preset=args.config_preset)
+        env = make_tool_navigation_env(
+            variant=args.variant,
+            config_preset=args.config_preset,
+            embedding_risk_dataset=args.embedding_risk_dataset,
+            embedding_risk_penalty_scale=args.embedding_risk_penalty_scale,
+            embedding_risk_threshold=args.embedding_risk_threshold,
+        )
     else:
         env = make_tool_manipulation_env(variant=args.variant)
     check_env(env, warn=True)

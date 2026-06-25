@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 
 import gymnasium as gym
 import numpy as np
@@ -341,8 +342,215 @@ class RiskGatedTangentSafetyShieldAction(TangentSafetyShieldAction):
         return obs, reward, terminated, truncated, info
 
 
+class EmbeddingRiskScorer:
+    """Small NumPy KNN risk scorer over standardized PCA feature embeddings."""
+
+    FEATURE_NAMES = (
+        "distance_to_goal",
+        "distance_to_forbidden",
+        "force_proxy",
+        "remaining_budget",
+        "normalized_time",
+        "progress_5",
+        "action_norm",
+    )
+
+    def __init__(
+        self,
+        positive_embedding: np.ndarray,
+        negative_embedding: np.ndarray,
+        mean: np.ndarray,
+        scale: np.ndarray,
+        components: np.ndarray,
+        k: int = 7,
+        temperature: float = 1.0,
+        ood_radius: float | None = None,
+    ):
+        self.positive_embedding = np.asarray(positive_embedding, dtype=np.float32)
+        self.negative_embedding = np.asarray(negative_embedding, dtype=np.float32)
+        self.mean = np.asarray(mean, dtype=np.float32)
+        self.scale = np.asarray(scale, dtype=np.float32)
+        self.components = np.asarray(components, dtype=np.float32)
+        self.k = int(k)
+        self.temperature = float(temperature)
+        self.ood_radius = float(ood_radius) if ood_radius is not None else self._default_ood_radius()
+
+    @classmethod
+    def from_csv(
+        cls,
+        dataset_path: str | Path,
+        source_kind: str = "synthetic_navigation",
+        pca_dim: int = 4,
+        k: int = 7,
+    ) -> "EmbeddingRiskScorer":
+        import csv
+
+        rows: list[list[float]] = []
+        labels: list[int] = []
+        with Path(dataset_path).open(newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                if source_kind and row.get("source_kind") != source_kind:
+                    continue
+                try:
+                    values = [float(row[name]) for name in cls.FEATURE_NAMES]
+                    label = int(float(row["risk_label"]))
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if np.all(np.isfinite(values)):
+                    rows.append(values)
+                    labels.append(label)
+
+        if not rows:
+            raise ValueError(f"No usable rows found in risk dataset: {dataset_path}")
+
+        x = np.asarray(rows, dtype=np.float32)
+        y = np.asarray(labels, dtype=np.int32)
+        if not np.any(y == 1) or not np.any(y == 0):
+            raise ValueError("Embedding risk scorer needs both risk and non-risk examples.")
+
+        mean = x.mean(axis=0)
+        scale = x.std(axis=0)
+        scale[scale < 1e-6] = 1.0
+        z = (x - mean) / scale
+
+        _, _, vt = np.linalg.svd(z, full_matrices=False)
+        components = vt[: min(int(pca_dim), vt.shape[0])]
+        embedding = z @ components.T
+        return cls(
+            positive_embedding=embedding[y == 1],
+            negative_embedding=embedding[y == 0],
+            mean=mean,
+            scale=scale,
+            components=components,
+            k=k,
+        )
+
+    def _default_ood_radius(self) -> float:
+        combined = np.concatenate([self.positive_embedding, self.negative_embedding], axis=0)
+        if combined.shape[0] < 2:
+            return 3.0
+        center = combined.mean(axis=0)
+        distances = np.linalg.norm(combined - center, axis=1)
+        return float(max(np.quantile(distances, 0.90), 1.0))
+
+    def _embed(self, features: dict[str, float]) -> np.ndarray:
+        x = np.asarray([float(features[name]) for name in self.FEATURE_NAMES], dtype=np.float32)
+        z = (x - self.mean) / self.scale
+        return z @ self.components.T
+
+    def _knn_distance(self, embedding: np.ndarray, reference: np.ndarray) -> float:
+        distances = np.linalg.norm(reference - embedding[None, :], axis=1)
+        k = min(self.k, distances.shape[0])
+        return float(np.partition(distances, k - 1)[:k].mean())
+
+    def score(self, features: dict[str, float]) -> float:
+        embedding = self._embed(features)
+        positive_distance = self._knn_distance(embedding, self.positive_embedding)
+        negative_distance = self._knn_distance(embedding, self.negative_embedding)
+        relative_risk = negative_distance / max(positive_distance + negative_distance, 1e-6)
+
+        nearest_distance = min(positive_distance, negative_distance)
+        ood_risk = np.clip((nearest_distance / max(self.ood_radius, 1e-6) - 0.75) / 0.75, 0.0, 1.0)
+        return float(np.clip(0.85 * relative_risk + 0.15 * ood_risk, 0.0, 1.0))
+
+
+class EmbeddingRiskPenaltyReward(gym.Wrapper):
+    """Turn embedding/KNN instability analysis into a reward penalty."""
+
+    def __init__(
+        self,
+        env: gym.Env,
+        scorer: EmbeddingRiskScorer,
+        penalty_scale: float = 0.75,
+        risk_threshold: float = 0.55,
+        progress_window: int = 5,
+    ):
+        super().__init__(env)
+        self.scorer = scorer
+        self.penalty_scale = float(penalty_scale)
+        self.risk_threshold = float(risk_threshold)
+        self.progress_window = int(progress_window)
+        self._distance_history: list[float] = []
+        self.last_embedding_risk_score = 0.0
+        self.cumulative_embedding_risk = 0.0
+        self.max_embedding_risk = 0.0
+
+    def reset(self, **kwargs):
+        self._distance_history = []
+        self.last_embedding_risk_score = 0.0
+        self.cumulative_embedding_risk = 0.0
+        self.max_embedding_risk = 0.0
+        return self.env.reset(**kwargs)
+
+    def _features(self, action: np.ndarray, info: dict) -> dict[str, float]:
+        unwrapped = self.env.unwrapped
+        distance_to_goal = float(info.get("distance_to_goal", np.linalg.norm(unwrapped.target_xy - unwrapped.tool_xy)))
+        previous_distance = (
+            self._distance_history[-self.progress_window]
+            if len(self._distance_history) >= self.progress_window
+            else distance_to_goal
+        )
+        progress_5 = float(previous_distance - distance_to_goal)
+        self._distance_history.append(distance_to_goal)
+
+        clearance = float(unwrapped.config.forbidden_radius + unwrapped.config.tool_radius)
+        distance_to_forbidden = float(np.linalg.norm(unwrapped.tool_xy - unwrapped.forbidden_xy) - clearance)
+        normalized_time = float(unwrapped.step_count / max(unwrapped.config.max_steps, 1))
+        return {
+            "distance_to_goal": distance_to_goal,
+            "distance_to_forbidden": distance_to_forbidden,
+            "force_proxy": float(info.get("force_proxy", 0.0)),
+            "remaining_budget": float(info.get("remaining_budget", 0.0)),
+            "normalized_time": normalized_time,
+            "progress_5": progress_5,
+            "action_norm": float(np.linalg.norm(action)),
+        }
+
+    def step(self, action):
+        obs, reward, terminated, truncated, info = self.env.step(action)
+        features = self._features(np.asarray(action, dtype=np.float32), info)
+        risk_score = self.scorer.score(features)
+        active_risk = float(np.clip((risk_score - self.risk_threshold) / max(1.0 - self.risk_threshold, 1e-6), 0.0, 1.0))
+        penalty = self.penalty_scale * active_risk
+        shaped_reward = float(reward - penalty)
+
+        self.last_embedding_risk_score = risk_score
+        self.cumulative_embedding_risk += risk_score
+        self.max_embedding_risk = max(self.max_embedding_risk, risk_score)
+
+        steps = max(self.env.unwrapped.step_count, 1)
+        info["embedding_risk_score"] = risk_score
+        info["embedding_risk_active_score"] = active_risk
+        info["embedding_risk_penalty"] = penalty
+        info["embedding_risk_threshold"] = self.risk_threshold
+        info["mean_embedding_risk"] = self.cumulative_embedding_risk / steps
+        info["max_embedding_risk"] = self.max_embedding_risk
+        return obs, shaped_reward, terminated, truncated, info
+
+
+def _default_risk_dataset_path() -> Path:
+    return Path(__file__).resolve().parents[3] / "outputs" / "risk_dataset" / "risk_dataset.csv"
+
+
+def make_embedding_risk_penalty_wrapper(
+    env: gym.Env,
+    dataset_path: str | Path | None = None,
+    penalty_scale: float = 0.75,
+    risk_threshold: float = 0.55,
+) -> EmbeddingRiskPenaltyReward:
+    path = Path(dataset_path) if dataset_path is not None else _default_risk_dataset_path()
+    scorer = EmbeddingRiskScorer.from_csv(path)
+    return EmbeddingRiskPenaltyReward(env, scorer=scorer, penalty_scale=penalty_scale, risk_threshold=risk_threshold)
+
+
 def make_tool_navigation_env(
-    variant: str = "conditioned", render_mode: str | None = None, config_preset: str = "default"
+    variant: str = "conditioned",
+    render_mode: str | None = None,
+    config_preset: str = "default",
+    embedding_risk_dataset: str | Path | None = None,
+    embedding_risk_penalty_scale: float = 0.75,
+    embedding_risk_threshold: float = 0.55,
 ) -> gym.Env:
     from constraint_surgical_rl.envs.presets import get_config_preset
     from constraint_surgical_rl.envs.tool_navigation import ConstrainedToolNavigationEnv
@@ -350,6 +558,13 @@ def make_tool_navigation_env(
     env = ConstrainedToolNavigationEnv(config=get_config_preset(config_preset), render_mode=render_mode)
     if variant == "conditioned":
         return env
+    if variant == "conditioned_embedding_risk_penalty":
+        return make_embedding_risk_penalty_wrapper(
+            env,
+            embedding_risk_dataset,
+            embedding_risk_penalty_scale,
+            embedding_risk_threshold,
+        )
     if variant == "conditioned_shielded":
         return SafetyShieldAction(env)
     if variant == "conditioned_tangent_shielded":

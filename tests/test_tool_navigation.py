@@ -1,6 +1,8 @@
 from constraint_surgical_rl import (
     ConstrainedToolManipulationEnv,
     ConstrainedToolNavigationEnv,
+    EmbeddingRiskPenaltyReward,
+    EmbeddingRiskScorer,
     RiskGatedTangentSafetyShieldAction,
     make_tool_manipulation_env,
     make_tool_navigation_env,
@@ -28,6 +30,9 @@ def test_tool_navigation_smoke_step():
 
 def test_tool_navigation_variants_have_expected_shapes():
     conditioned = make_tool_navigation_env("conditioned", config_preset="prototype")
+    conditioned_embedding_risk = make_tool_navigation_env(
+        "conditioned_embedding_risk_penalty", config_preset="prototype"
+    )
     conditioned_shielded = make_tool_navigation_env("conditioned_shielded", config_preset="prototype")
     conditioned_tangent_shielded = make_tool_navigation_env("conditioned_tangent_shielded", config_preset="prototype")
     conditioned_risk_gated_tangent = make_tool_navigation_env(
@@ -44,6 +49,7 @@ def test_tool_navigation_variants_have_expected_shapes():
     no_budget = make_tool_navigation_env("no_budget", config_preset="prototype")
 
     assert conditioned.observation_space.shape == (14,)
+    assert conditioned_embedding_risk.observation_space.shape == (14,)
     assert conditioned_shielded.observation_space.shape == (14,)
     assert conditioned_tangent_shielded.observation_space.shape == (14,)
     assert conditioned_risk_gated_tangent.observation_space.shape == (14,)
@@ -114,6 +120,36 @@ def test_risk_gated_tangent_activates_near_forbidden_region():
     assert info["risk_gate_active"] == 1.0
     assert info["risk_gate_activations"] > 0
     assert info["shield_interventions"] > 0
+
+
+def test_embedding_risk_penalty_reports_training_signal():
+    env = make_tool_navigation_env("conditioned_embedding_risk_penalty", config_preset="prototype")
+    assert isinstance(env, EmbeddingRiskPenaltyReward)
+    obs, _ = env.reset(seed=15)
+
+    obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
+
+    assert obs.shape == env.observation_space.shape
+    assert isinstance(reward, float)
+    assert 0.0 <= info["embedding_risk_score"] <= 1.0
+    assert "embedding_risk_penalty" in info
+    assert "mean_embedding_risk" in info
+
+
+def test_embedding_risk_scorer_loads_synthetic_reference():
+    scorer = EmbeddingRiskScorer.from_csv("outputs/risk_dataset/risk_dataset.csv", source_kind="synthetic_navigation")
+    score = scorer.score(
+        {
+            "distance_to_goal": 0.5,
+            "distance_to_forbidden": 0.05,
+            "force_proxy": 0.0,
+            "remaining_budget": 0.5,
+            "normalized_time": 0.25,
+            "progress_5": 0.01,
+            "action_norm": 0.5,
+        }
+    )
+    assert 0.0 <= score <= 1.0
 
 
 def test_config_presets_include_curriculum_levels():
