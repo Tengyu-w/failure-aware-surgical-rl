@@ -3,6 +3,10 @@
 This page is the recommended reading order for the repository. It is designed
 for a reader who wants the research logic without browsing every result file.
 
+For a complete ECG-style explanation of the full project, start with the
+[full research report](../reports/full_research_report.md). This page is a
+shorter navigation sequence.
+
 ## 1. Custom Constrained Surgical Proxy
 
 The project began with a custom 3D surgical-tool proxy environment. This stage

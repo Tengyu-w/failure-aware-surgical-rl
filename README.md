@@ -1,110 +1,78 @@
 # Failure-Aware Reliability Supervision for Surgical RL
 
-This repository is a research prototype for reliability-supervised surgical
-robot learning. The research path is deliberately staged: first build a simple
-custom constrained surgical-tool proxy to test obstacle avoidance, backup
-control, and safety-budget ideas; then migrate the same reliability-supervision
-logic into SurRoL/PyBullet surgical simulation tasks.
+## One-Page Summary
 
-The project is not presented as a finished surgical autonomy system. Its goal
-is narrower and research-oriented: evaluate when a surgical RL or scripted
-controller should continue autonomously, recover automatically, request human
-review, or stop because recovery may be unsafe.
+This repository is a simulation research prototype for **runtime reliability
+supervision in surgical robot learning**. The central question is not simply
+"can an RL policy finish the task?", but:
 
-The current controller-level result is an action-level risk-gated tangent backup
-supervisor in the custom proxy controller setting. Instead of allowing the
-tangent backup controller to supervise every timestep, an interpretable risk
-gate first checks whether the proposed state/action is unsafe. Reliability
-analysis therefore becomes a runtime decision signal, not only a post-hoc
-explanation.
+> When a surgical robot policy becomes unreliable, how should the system decide
+> whether to continue, recover automatically, request review, or stop?
+
+The project follows the same reliability-first logic as the VT/VF ECG work:
+accuracy or task success is not enough. The system should expose **why** a
+state/action is risky, **which mechanism** produced the risk, and **what runtime
+route** should be taken.
+
+The research path is staged:
+
+1. build a custom constrained surgical-tool proxy for fast safety-control
+   experiments;
+2. migrate the reliability-supervision idea into SurRoL/PyBullet surgical
+   simulation tasks;
+3. organize failures into explicit intervention routes;
+4. evaluate multi-seed recovery, learned route prediction, and observable
+   supervision;
+5. upgrade the proxy controller from always-on tangent backup to risk-gated
+   and then ECG-inspired mechanism-routed tangent supervision;
+6. test whether embedding/KNN instability signals can feed back into PPO
+   training.
+
+This is **not** a clinical, hardware, or deployment claim. It is internal
+simulation evidence that reliability analysis can become a runtime decision
+signal for surgical RL.
 
 ![SurRoL NeedlePick rendered rollout](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_040.png)
 
-## Research Question
+## Main Research Question
 
-Can a runtime reliability supervisor make surgical robot rollouts more robust
-to execution drift, grasp/contact uncertainty, visual-state errors, and unsafe
-recovery situations, while keeping the claims simulation-only and evidence
-based?
+Can a runtime reliability supervisor make simulated surgical robot rollouts
+more robust to execution drift, grasp/contact uncertainty, visual-state errors,
+and unsafe recovery situations, while keeping the claims simulation-only and
+evidence based?
 
-The current supervisor studies four intervention routes:
+The supervisor uses four runtime routes:
 
-| Route | Meaning |
-|---|---|
-| `auto_execute` | continue nominal execution |
-| `auto_recovery` | allow automatic recovery for reversible execution drift |
-| `human_review` | route uncertain grasp/contact or visual-state errors to review/re-estimation |
-| `abort_candidate` | stop or flag recovery when an unsafe proxy is triggered |
+| Route | Meaning | Typical trigger |
+|---|---|---|
+| `auto_execute` | continue nominal execution | no strong risk signal |
+| `auto_recovery` | allow automatic recovery | reversible execution drift |
+| `human_review` | route to review or re-estimation | visual-state uncertainty, grasp/contact ambiguity |
+| `abort_candidate` | stop or flag recovery as unsafe | near-target forbidden-zone or irreversible-risk proxy |
 
-## Project Logic
+## Method Logic
 
-The project should be read as a staged research path, not as one mixed experiment:
+The project is easiest to understand as a staged reliability system, not as one
+mixed experiment.
 
-1. **Self-built proxy simulation.** A simplified constrained surgical-tool
-   environment was built first. It supports obstacle/forbidden-region avoidance,
-   safety budgets, tangent backup control, and fast PPO/controller experiments.
-   The `prototype` and `strict` risk-gated tangent figures belong to this proxy
-   setting; they are controller-level visualizations, not SurRoL renders.
-2. **SurRoL migration.** The same reliability-supervision idea was then embedded
-   into SurRoL/PyBullet surgical tasks, using `NeedleReach`, `NeedlePick`, and
-   `GauzeRetrieve` rendered rollouts.
-3. **Four intervention routes.** SurRoL rollout failures were organized into
-   `auto_execute`, `auto_recovery`, `human_review`, and `abort_candidate`, so
-   the project is about deciding what type of runtime response is appropriate.
-4. **Final reliability results.** The SurRoL side was stress-tested with
-   multi-seed recovery, route classification, and observable-proxy supervision;
-   the proxy controller side was changed from always-on tangent backup to
-   risk-gated tangent backup.
-
-## Main Contributions
-
-1. Custom constrained surgical proxy environment for fast method development:
-   3D tool navigation, forbidden-region costs, safety budgets, and recovery
-   monitors.
-2. Risk-gated tangent backup in the proxy controller setting: an action-level
-   reliability supervisor that keeps always-tangent budget safety while reducing
-   always-on supervisor activation.
-3. ECG-inspired mechanism-separated tangent routing: the single risk gate is
-   upgraded into a two-stage boundary-first plus residual-mechanism supervisor.
-4. SurRoL migration evidence across `NeedleReach`, `NeedlePick`, and
-   `GauzeRetrieve`, including rendered RGB rollouts, traces, figures, and CSV
-   summaries.
-5. Formal fault taxonomy covering nominal execution, reversible execution
-   drift, grasp/contact uncertainty, visual-state error, and near-target
-   recovery risk.
-6. Multi-seed recovery experiments showing that runtime supervision can recover
-   corrupted SurRoL rollouts in simulation.
-7. Learned route classifier that predicts whether an episode should be routed
-   to `auto_execute`, `auto_recovery`, `human_review`, or `abort_candidate`.
-8. Observable-supervisor audit that reduces the jaw-stuck replan decision's
-   dependence on privileged SurRoL phase/contact state.
-
-## Recommended Reading Order
-
-For a quick review, do not browse the full `reports/` folder first. Read the
-project-facing path in this order:
-
-1. [Project index](docs/PROJECT_INDEX.md)
-2. [Project overview](docs/project_overview.md)
-3. [Evidence index](docs/evidence_index.md)
-4. [Research sequence](docs/research_sequence.md)
-5. [SurRoL master results](reports/surrol_master_results.md)
-6. [Learned route classifier](reports/surrol_learned_route_classifier_step3.md)
-7. [Observable supervisor](reports/surrol_observable_supervisor_step4.md)
-8. [Risk-gated tangent backup report](reports/risk_gated_tangent_report.md)
-9. [Mechanism-routed tangent v5d report](reports/mechanism_routed_tangent_v5d_report.md)
-10. [Embedding-risk training pilot](reports/embedding_risk_training_pilot.md)
+| Stage | What Was Built | Why It Was Needed | Main Evidence | Main Limitation |
+|---|---|---|---|---|
+| 1. Custom proxy environment | 3D constrained surgical-tool navigation with forbidden region, force proxy, safety budget, and PPO/controller interfaces | Fast environment for testing safety-control ideas before SurRoL | proxy rollouts, risk-gated tangent, mechanism-routed tangent | simplified geometry, not a real surgical simulator |
+| 2. Tangent backup control | backup action that moves tangentially around forbidden regions | safer than stopping or pushing into the forbidden zone | always-tangent gives 0.000 budget exhaustion | always-on correction over-intervenes |
+| 3. Risk-gated tangent | interpretable risk gate activates tangent backup only when needed | turns post-hoc reliability analysis into runtime control | activation falls from 1.000 to 0.450/0.426 while keeping 0.000 budget exhaustion | still one total risk decision |
+| 4. Mechanism-routed tangent | ECG-inspired two-stage router: boundary-first plus residual-mechanism review | separates irreversible boundary risk from residual mechanisms | activation falls to 0.443/0.416 with 0.000 budget exhaustion | improvement over risk-gated is modest; Stage 2 is logged, not yet a learned recovery policy |
+| 5. SurRoL migration | NeedleReach, NeedlePick, GauzeRetrieve rendered rollouts and traces | proves the project moved beyond the proxy into surgical simulation | GIF/MP4/PNG/CSV rollout evidence | uses scripted/oracle primitives in parts of the evaluation harness |
+| 6. Fault taxonomy and recovery routes | formal route labels for action drift, perception drift, jaw-stuck, unsafe recovery | makes failures explainable and comparable | fault taxonomy, 10-seed paired recovery tables | route labels are engineered, not expert annotated |
+| 7. Learned and observable supervisors | route classifier and observable jaw-stuck supervisor | reduces dependence on hand-written rules and privileged simulator state | held-out classifier metrics, observable signal audit | still simulation-only; observable recovery still uses scripted primitives |
+| 8. Embedding-risk training | reward shaping and hard-negative curriculum from embedding/KNN risk | tests whether instability analysis can improve training, not only explain failure | multi-seed PPO pilot | improves return/distance metrics, not robust success/budget outcomes |
 
 ## Key Results
 
-### Risk-Gated Tangent Backup
+### 1. Risk-Gated Tangent Backup
 
 This is a custom proxy/controller experiment, not a SurRoL experiment. It
-compares the same PPO policy under three execution modes: unshielded PPO,
-always-on tangent backup, and risk-gated tangent backup. The risk gate records
-interpretable intervention reasons such as proposed forbidden-zone proximity,
-low clearance, low safety budget, stalled progress, force proxy, and large
-action magnitude.
+compares the same PPO policy under unshielded execution, always-on tangent
+backup, and risk-gated tangent backup.
 
 | Preset | Method | Budget exhaustion | Supervisor activation |
 |---|---|---:|---:|
@@ -115,24 +83,20 @@ action magnitude.
 | strict | always tangent | 0.000 | 1.000 |
 | strict | risk-gated tangent | 0.000 | 0.426 |
 
-This is the controller-level result: risk-gated tangent preserves the 0.000
-budget-exhaustion safety of always tangent while cutting supervisor-on
-timesteps by roughly half.
+Interpretation: risk-gated tangent preserves the safety-budget behavior of
+always-on tangent backup while cutting supervisor-on timesteps by roughly half.
 
-Report and visuals:
+Limitations: the risk labels are weak simulation labels; offline risk coverage
+does not prove online causal safety; this is still the custom proxy setting.
 
-- [Risk-gated tangent report](reports/risk_gated_tangent_report.md)
-- [Aggregate summary](outputs/risk_gated_tangent/aggregate_summary.csv)
-- [Budget/intervention figure](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png)
-- [Risk-gate architecture](reports/figures/risk_gated_tangent_visuals/risk_gate_architecture.png)
+### 2. Mechanism-Routed Tangent Backup
 
-### Mechanism-Routed Tangent Backup
+Inspired by the VT/VF ECG reliability-routing upgrade, the proxy supervisor was
+upgraded from one total risk gate into a two-stage mechanism router:
 
-Inspired by the VT/VF ECG reliability-routing upgrade, the proxy supervisor is
-also tested as a mechanism-separated two-stage router. Stage 1 handles
-boundary/force/workspace risks with tangent backup. Stage 2 records residual
-mechanisms such as low budget, stagnation, and abnormal action patterns as
-review evidence rather than automatically correcting every uncertain state.
+- Stage 1: boundary/force/workspace risks trigger tangent backup.
+- Stage 2: residual mechanisms such as low budget, stagnation, late progress,
+  and large actions are logged as review evidence.
 
 | Preset | Method | Budget exhaustion | Supervisor activation | Non-correction activation |
 |---|---|---:|---:|---:|
@@ -141,17 +105,18 @@ review evidence rather than automatically correcting every uncertain state.
 | strict | risk-gated tangent | 0.000 | 0.426 | 0.030 |
 | strict | mechanism-routed tangent | 0.000 | 0.416 | 0.021 |
 
-This is a modest but useful upgrade: safety is preserved, unnecessary
-supervisor activation is slightly reduced, and each intervention is assigned a
-mechanism-level route rather than a single total-risk label.
+Interpretation: this is a modest but cleaner upgrade. Safety is preserved,
+unnecessary supervisor activation is slightly reduced, and every intervention
+has a mechanism-level explanation rather than a single black-box risk label.
 
-- [Mechanism-routed tangent report](reports/mechanism_routed_tangent_v5d_report.md)
-- [Mechanism-routed aggregate CSV](outputs/mechanism_routed_tangent_v5d_aggregate_summary.csv)
-- [Mechanism route summary CSV](outputs/mechanism_routed_tangent_v5d_route_summary.csv)
-- [Mechanism router figure](reports/figures/mechanism_routed_tangent_v5d/mechanism_router_metrics.png)
-- [Stage split figure](reports/figures/mechanism_routed_tangent_v5d/mechanism_router_stage_split.png)
+Limitations: Stage 2 is currently a logging/review route, not a separate learned
+recovery controller; the numerical improvement over risk-gated tangent is
+small.
 
-### 10-Seed SurRoL Recovery Evidence
+### 3. SurRoL Recovery Evidence
+
+The reliability-supervision idea was migrated into SurRoL/PyBullet tasks. The
+main recovery evidence uses 10-seed paired experiments.
 
 | Task | Fault | Intervention | Perturbed | Recovered |
 |---|---|---|---:|---:|
@@ -168,16 +133,16 @@ mechanism-level route rather than a single total-risk label.
 | NeedlePick | `jaw_stuck_open` | observable proxy recovery | 0/10 | 10/10 |
 | GauzeRetrieve | `jaw_stuck_open` | observable proxy recovery | 0/10 | 10/10 |
 
-Full tables:
+Interpretation: the project demonstrates a reliability-supervision pipeline
+for routing and recovering several injected failure families in simulation.
 
-- [SurRoL master paired results](reports/tables/surrol_master_paired_results.csv)
-- [SurRoL master report](reports/surrol_master_results.md)
-- [Fault taxonomy report](reports/surrol_fault_taxonomy_step2.md)
+Limitations: some recovery behavior uses scripted/oracle primitives; these
+experiments do not prove end-to-end learned surgical autonomy.
 
-### Learned Route Classifier
+### 4. Learned Route Classifier
 
-The safety-biased episode-level route classifier is evaluated with an even/odd
-seed split.
+The route classifier tests whether route decisions can be learned from episode
+features rather than only hand-written rules.
 
 | Metric | Value |
 |---|---:|
@@ -187,17 +152,18 @@ seed split.
 | missed review-or-abort rate | 0.000 |
 | false review-or-abort rate | 0.162 |
 
-Report and tables:
+Interpretation: route prediction is learnable with a safety-biased classifier,
+and the held-out split avoids missing review-or-abort cases in the current
+data.
 
-- [Step 3 learned route classifier report](reports/surrol_learned_route_classifier_step3.md)
-- [Per-route metrics](reports/tables/surrol_learned_route_classifier_metrics.csv)
-- [Confusion table](reports/tables/surrol_learned_route_classifier_confusion.csv)
+Limitations: labels are distilled from the current routing logic, not
+independent human/expert labels; the classifier is episode-level rather than a
+full online policy.
 
-### Observable Supervisor
+### 5. Observable Supervisor
 
-For silent `jaw_stuck_open` failures, the replan decision is moved away from
-SurRoL internal waypoint/contact checks toward observable command/progress
-signals:
+The observable supervisor reduces dependence on privileged SurRoL internal
+state for silent `jaw_stuck_open` failures. It uses:
 
 - jaw close command count;
 - goal-distance stagnation;
@@ -208,111 +174,90 @@ At threshold 3.0, the observable risk score detects 10/10 jaw-stuck perturbed
 episodes for both `NeedlePick` and `GauzeRetrieve`, with 0/10 nominal
 monitor-corrected alarms in the current logs.
 
-Report and tables:
+Limitations: the decision trigger is more observable, but the executed recovery
+primitive still uses scripted SurRoL waypoint regeneration.
 
-- [Step 4 observable supervisor report](reports/surrol_observable_supervisor_step4.md)
-- [Observable signal audit](reports/tables/surrol_observable_signal_audit.csv)
-- [Observable versus privileged comparison](reports/tables/surrol_observable_vs_privileged_jaw_stuck.csv)
+### 6. Embedding-Risk Training Pilot
 
-### Embedding-Risk Training Pilot
+The embedding/KNN instability signal was connected to PPO training in two ways:
 
-The embedding/KNN instability signal is now tested inside the PPO training
-loop in two ways: risk-aware reward shaping and hard-negative curriculum reset
-sampling. This is a pilot training-loop result in the custom proxy environment,
-not yet a formal model-improvement claim.
+- risk-aware reward shaping;
+- hard-negative curriculum reset sampling.
 
-A three-seed follow-up shows the important limitation. Curriculum fine-tuning
-improves mean return on both prototype and strict and improves strict final
-distance, but it does not reliably improve success rate or safety-budget
-exhaustion. The honest claim is therefore that embedding risk can be used as a
-training signal and changes the learned policy, while robust success/safety
-improvement remains future work.
+The three-seed follow-up shows that curriculum fine-tuning improves mean return
+and strict final distance, but does **not** reliably improve success rate or
+safety-budget exhaustion.
 
-- [Embedding-risk training pilot report](reports/embedding_risk_training_pilot.md)
-- [Pilot comparison CSV](outputs/embedding_risk_training_pilot_comparison.csv)
-- [Curriculum fine-tune summary CSV](outputs/embedding_risk_curriculum_finetune_pilot_summary.csv)
-- [Multi-seed curriculum aggregate CSV](outputs/embedding_risk_multiseed_curriculum_aggregate_summary.csv)
-- [Curriculum pilot figure](reports/figures/embedding_risk_training_pilot/curriculum_finetune_metrics.png)
-- [Multi-seed curriculum figure](reports/figures/embedding_risk_training_pilot/multiseed_curriculum_metrics.png)
+Interpretation: embedding risk can affect training and change learned behavior,
+but it is not yet a robust policy-improvement method.
+
+Limitations: short-horizon PPO, only three seeds, and no stable success/safety
+improvement yet.
+
+## Claim-Evidence-Limitation Map
+
+| Claim | Evidence | Strength | Boundary |
+|---|---|---|---|
+| Runtime reliability can decide when tangent backup is needed. | risk-gated tangent preserves 0.000 budget exhaustion while reducing activation | strong for proxy controller | custom proxy only |
+| Mechanism-separated routing makes the controller more interpretable. | Stage 1/Stage 2 mechanism-routed tangent report and route summary | moderate-to-strong | modest numerical improvement |
+| The idea moved beyond the toy proxy. | SurRoL rendered GIF/MP4/PNG rollouts for NeedleReach, NeedlePick, GauzeRetrieve | strong for simulation migration | not real robot |
+| Failure routing improves recovery under injected faults. | 10-seed paired recovery tables | strong within current SurRoL setup | scripted recovery components |
+| Route prediction is learnable. | held-out route classifier metrics | moderate | labels are distilled |
+| Observable signals can reduce privileged-state dependence. | jaw-stuck observable supervisor audit | promising | recovery primitive remains scripted |
+| Embedding risk can enter training. | reward shaping and curriculum PPO pilots | preliminary | not robust success/safety improvement |
+
+## Recommended Reading Order
+
+For a teacher or reviewer, read in this order:
+
+1. [Full research report](reports/full_research_report.md)
+2. [Project index](docs/PROJECT_INDEX.md)
+3. [Evidence index](docs/evidence_index.md)
+4. [SurRoL master results](reports/surrol_master_results.md)
+5. [Risk-gated tangent report](reports/risk_gated_tangent_report.md)
+6. [Mechanism-routed tangent v5d report](reports/mechanism_routed_tangent_v5d_report.md)
+7. [Embedding-risk training pilot](reports/embedding_risk_training_pilot.md)
 
 ## Visual Evidence
 
-The repository has two different kinds of visual evidence. They should not be
-merged when explaining the project.
+The repository contains two kinds of visual evidence, and they should not be
+confused:
 
-### Custom Proxy Controller Visuals
-
-These figures explain the risk-gated tangent result in the self-built proxy
-environment. The `prototype` and `strict` snapshots are top-down/controller
-visualizations from this proxy setting, not SurRoL/PyBullet screenshots.
-
-| Visual | File |
-|---|---|
-| architecture | [risk_gate_architecture.png](reports/figures/risk_gated_tangent_visuals/risk_gate_architecture.png) |
-| budget/intervention result | [aggregate_budget_intervention.png](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png) |
-| safety/intervention frontier | [safety_intervention_frontier.png](reports/figures/risk_gated_tangent_visuals/safety_intervention_frontier.png) |
-| prototype snapshots | [render_snapshots_prototype.png](reports/figures/risk_gated_tangent_visuals/render_snapshots_prototype.png) |
-| strict trajectory | [trajectory_strict.png](reports/figures/risk_gated_tangent_visuals/trajectory_strict.png) |
-
-### SurRoL/PyBullet Rendered Evidence
-
-These media files are the actual SurRoL visual evidence. They show rendered
-rollouts for the surgical simulation tasks and include GIF/MP4 media, selected
-frame PNGs, and trace CSVs.
-
-| Task | GIF | MP4 | Selected frames | Trace |
-|---|---|---|---|---|
-| NeedleReach | [GIF](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.mp4) | [000](reports/media/surrol_render_evidence/needlereach/frames/needlereach_step_000.png), [020](reports/media/surrol_render_evidence/needlereach/frames/needlereach_step_020.png) | [CSV](reports/media/surrol_render_evidence/needlereach/rollout_trace.csv) |
-| NeedlePick | [GIF](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.mp4) | [000](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_000.png), [020](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_020.png), [040](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_040.png) | [CSV](reports/media/surrol_render_evidence/needlepick/rollout_trace.csv) |
-| GauzeRetrieve | [GIF](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) | [MP4](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.mp4) | [000](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_000.png), [020](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_020.png), [034](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_034.png) | [CSV](reports/media/surrol_render_evidence/gauzeretrieve/rollout_trace.csv) |
-
-More evidence is indexed in [docs/evidence_index.md](docs/evidence_index.md).
+| Visual family | What it shows | Where |
+|---|---|---|
+| Custom proxy controller visuals | top-down proxy trajectories, tangent backup behavior, controller activation | `reports/figures/risk_gated_tangent_visuals/`, `reports/figures/mechanism_routed_tangent_v5d/` |
+| SurRoL/PyBullet rendered evidence | rendered surgical simulation rollouts for NeedleReach, NeedlePick, GauzeRetrieve | `reports/media/surrol_render_evidence/` |
 
 ## Repository Structure
 
 ```text
 src/                         custom constrained surgical RL environments
 scripts/                     experiment, analysis, plotting, and report scripts
-tests/                       lightweight unit and regression tests
-reports/                     research reports, figures, media, and result tables
+tests/                       unit and regression tests
+reports/                     research reports, figures, media, and tables
 reports/tables/              CSV summaries for SurRoL reliability experiments
 reports/media/               rendered SurRoL rollout evidence
-docs/                        ordered research sequence and project notes
+docs/                        project index, evidence map, research sequence
+outputs/                     selected lightweight experiment summaries
+runs/                        local training outputs and checkpoints, not committed
 ```
-
-Local training outputs and checkpoints are intentionally not committed:
-
-```text
-runs/
-.conda/
-*.zip
-```
-
-## Setup
-
-For the custom proxy environment:
-
-```powershell
-conda create --prefix .\.conda python=3.10 pip -y
-conda activate .\.conda
-pip install -e .[rl,dev]
-```
-
-Run smoke tests:
-
-```powershell
-$env:PYTHONPATH="$PWD\src"
-python -m pytest tests\test_tool_navigation.py tests\test_surrol_ppo_reward_and_vision.py
-```
-
-For SurRoL experiments, this repository assumes a separate SurRoL/PyBullet
-checkout and compatible Python environment. The committed CSV, figure, and
-media evidence can be inspected without committing a local SurRoL installation
-path.
 
 ## Reproduce Key Summaries
 
-The generated reports can be rebuilt from stored CSV logs:
+Custom proxy tests:
+
+```powershell
+$env:PYTHONPATH="$PWD\src"
+python -m pytest tests\test_tool_navigation.py
+```
+
+Risk-gated and mechanism-routed tangent comparison:
+
+```powershell
+python scripts\evaluate_risk_gated_tangent.py --policy ppo --model runs\pilot_3d_50k_prototype_conditioned_seed0\model.zip --episodes 100 --seeds 0,1,2 --presets prototype,strict --threshold 0.5 --deterministic --risk-model-mode default_rule --out-dir outputs\mechanism_routed_tangent_v5d
+```
+
+SurRoL summaries:
 
 ```powershell
 python scripts\build_surrol_master_results.py
@@ -322,37 +267,25 @@ python scripts\analyze_observable_proxy_risk.py
 python scripts\build_surrol_observable_supervisor_step4.py
 ```
 
-Regenerate rendered SurRoL media:
+Embedding-risk PPO pilot:
 
 ```powershell
-.\scripts\export_surrol_render_assets.ps1 -Tasks "NeedleReach,NeedlePick,GauzeRetrieve" -MaxSteps 80 -FrameStride 4
+python scripts\run_embedding_risk_multiseed_curriculum.py --seeds 0,1,2 --timesteps 8192 --episodes 50 --penalty-scale 0.25 --risk-threshold 0.55 --curriculum-probability 0.35 --curriculum-candidates 8
 ```
 
-## Project Notes
+## What Not To Overclaim
 
-For a concise project-level description, see:
-
-- [Research sequence](docs/research_sequence.md)
-- [Project overview](docs/project_overview.md)
-- [Evidence index](docs/evidence_index.md)
-
-## Limitations
-
-- This is a simulation-only research prototype.
-- SurRoL recovery experiments use scripted/oracle task primitives as part of
-  the evaluation harness.
-- The learned route classifier is episode-level and uses labels distilled from
-  current rule/proxy routing, not independent expert annotations.
-- `abort_candidate` remains low-support and geometry-proxy based.
-- The observable supervisor reduces decision dependence on privileged
-  phase/contact state for jaw-stuck recovery, but the executed recovery
-  primitive still uses scripted SurRoL waypoint regeneration.
-- The project should not be described as clinical validation, real-robot
-  deployment, or a complete end-to-end surgical autonomy solution.
+- Do not describe the project as clinical validation.
+- Do not describe it as real-robot deployment.
+- Do not claim formal safety guarantees.
+- Do not claim complete end-to-end learned surgical autonomy.
+- Do not claim embedding-risk curriculum reliably improves success rate; the
+  current evidence only supports partial return/distance improvements.
 
 ## Suggested One-Sentence Summary
 
-This project studies failure-aware runtime supervision for SurRoL-based
-surgical robot learning, moving from a custom constrained 3D proxy to
-multi-seed SurRoL recovery, risk routing, learned route classification, and
-observable proxy supervision.
+This project studies failure-aware runtime supervision for simulated surgical
+robot learning, moving from a custom constrained 3D proxy to SurRoL recovery,
+learned route classification, observable supervision, risk-gated tangent
+backup, ECG-inspired mechanism-routed reliability control, and preliminary
+embedding-risk-guided PPO training.
