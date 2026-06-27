@@ -64,17 +64,19 @@ The project should be read as a staged research path, not as one mixed experimen
 2. Risk-gated tangent backup in the proxy controller setting: an action-level
    reliability supervisor that keeps always-tangent budget safety while reducing
    always-on supervisor activation.
-3. SurRoL migration evidence across `NeedleReach`, `NeedlePick`, and
+3. ECG-inspired mechanism-separated tangent routing: the single risk gate is
+   upgraded into a two-stage boundary-first plus residual-mechanism supervisor.
+4. SurRoL migration evidence across `NeedleReach`, `NeedlePick`, and
    `GauzeRetrieve`, including rendered RGB rollouts, traces, figures, and CSV
    summaries.
-4. Formal fault taxonomy covering nominal execution, reversible execution
+5. Formal fault taxonomy covering nominal execution, reversible execution
    drift, grasp/contact uncertainty, visual-state error, and near-target
    recovery risk.
-5. Multi-seed recovery experiments showing that runtime supervision can recover
+6. Multi-seed recovery experiments showing that runtime supervision can recover
    corrupted SurRoL rollouts in simulation.
-6. Learned route classifier that predicts whether an episode should be routed
+7. Learned route classifier that predicts whether an episode should be routed
    to `auto_execute`, `auto_recovery`, `human_review`, or `abort_candidate`.
-7. Observable-supervisor audit that reduces the jaw-stuck replan decision's
+8. Observable-supervisor audit that reduces the jaw-stuck replan decision's
    dependence on privileged SurRoL phase/contact state.
 
 ## Recommended Reading Order
@@ -90,7 +92,8 @@ project-facing path in this order:
 6. [Learned route classifier](reports/surrol_learned_route_classifier_step3.md)
 7. [Observable supervisor](reports/surrol_observable_supervisor_step4.md)
 8. [Risk-gated tangent backup report](reports/risk_gated_tangent_report.md)
-9. [Embedding-risk training pilot](reports/embedding_risk_training_pilot.md)
+9. [Mechanism-routed tangent v5d report](reports/mechanism_routed_tangent_v5d_report.md)
+10. [Embedding-risk training pilot](reports/embedding_risk_training_pilot.md)
 
 ## Key Results
 
@@ -122,6 +125,31 @@ Report and visuals:
 - [Aggregate summary](outputs/risk_gated_tangent/aggregate_summary.csv)
 - [Budget/intervention figure](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png)
 - [Risk-gate architecture](reports/figures/risk_gated_tangent_visuals/risk_gate_architecture.png)
+
+### Mechanism-Routed Tangent Backup
+
+Inspired by the VT/VF ECG reliability-routing upgrade, the proxy supervisor is
+also tested as a mechanism-separated two-stage router. Stage 1 handles
+boundary/force/workspace risks with tangent backup. Stage 2 records residual
+mechanisms such as low budget, stagnation, and abnormal action patterns as
+review evidence rather than automatically correcting every uncertain state.
+
+| Preset | Method | Budget exhaustion | Supervisor activation | Non-correction activation |
+|---|---|---:|---:|---:|
+| prototype | risk-gated tangent | 0.000 | 0.450 | 0.027 |
+| prototype | mechanism-routed tangent | 0.000 | 0.443 | 0.020 |
+| strict | risk-gated tangent | 0.000 | 0.426 | 0.030 |
+| strict | mechanism-routed tangent | 0.000 | 0.416 | 0.021 |
+
+This is a modest but useful upgrade: safety is preserved, unnecessary
+supervisor activation is slightly reduced, and each intervention is assigned a
+mechanism-level route rather than a single total-risk label.
+
+- [Mechanism-routed tangent report](reports/mechanism_routed_tangent_v5d_report.md)
+- [Mechanism-routed aggregate CSV](outputs/mechanism_routed_tangent_v5d_aggregate_summary.csv)
+- [Mechanism route summary CSV](outputs/mechanism_routed_tangent_v5d_route_summary.csv)
+- [Mechanism router figure](reports/figures/mechanism_routed_tangent_v5d/mechanism_router_metrics.png)
+- [Stage split figure](reports/figures/mechanism_routed_tangent_v5d/mechanism_router_stage_split.png)
 
 ### 10-Seed SurRoL Recovery Evidence
 

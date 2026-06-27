@@ -28,6 +28,7 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | Reliability analysis can become a runtime action-level decision signal. | [risk-gated tangent report](../reports/risk_gated_tangent_report.md) |
 | Risk-gated tangent preserves always-tangent safety while reducing supervisor activation. | [aggregate summary](../outputs/risk_gated_tangent/aggregate_summary.csv), [budget/intervention figure](../reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png) |
 | The gate is interpretable rather than a black-box always-on correction. | [risk architecture](../reports/figures/risk_gated_tangent_visuals/risk_gate_architecture.png), [risk coefficients](../reports/figures/risk_gated_tangent_visuals/risk_model_coefficients.png) |
+| ECG-style mechanism-separated routing can be transferred to the proxy RL supervisor. | [mechanism-routed tangent report](../reports/mechanism_routed_tangent_v5d_report.md), [mechanism aggregate](../outputs/mechanism_routed_tangent_v5d_aggregate_summary.csv), [stage split figure](../reports/figures/mechanism_routed_tangent_v5d/mechanism_router_stage_split.png) |
 | The process can be shown visually as trajectories and simulated snapshots. | [prototype snapshots](../reports/figures/risk_gated_tangent_visuals/render_snapshots_prototype.png), [strict trajectory](../reports/figures/risk_gated_tangent_visuals/trajectory_strict.png), [strict snapshots](../reports/figures/risk_gated_tangent_visuals/render_snapshots_strict.png) |
 
 ## Project Logic And Research Evidence
@@ -39,7 +40,8 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | Stage 3 | Formalize four runtime intervention routes: auto-execute, auto-recovery, human-review, abort-candidate | [taxonomy table](../reports/tables/surrol_fault_taxonomy.csv), [taxonomy report](../reports/surrol_fault_taxonomy_step2.md) |
 | Stage 4 | Stress-test SurRoL recovery with multi-seed fault injections | [master paired results](../reports/tables/surrol_master_paired_results.csv), [master report](../reports/surrol_master_results.md) |
 | Stage 5 | Add learned/observable reliability supervisors and risk-gated proxy backup control | [route classifier report](../reports/surrol_learned_route_classifier_step3.md), [observable supervisor report](../reports/surrol_observable_supervisor_step4.md), [risk-gated tangent report](../reports/risk_gated_tangent_report.md) |
-| Stage 6 | Test whether embedding/KNN risk can become a training signal | [embedding-risk training pilot](../reports/embedding_risk_training_pilot.md), [reward-only pilot comparison](../outputs/embedding_risk_training_pilot_comparison.csv), [curriculum fine-tune summary](../outputs/embedding_risk_curriculum_finetune_pilot_summary.csv), [multi-seed aggregate](../outputs/embedding_risk_multiseed_curriculum_aggregate_summary.csv), [multi-seed figure](../reports/figures/embedding_risk_training_pilot/multiseed_curriculum_metrics.png) |
+| Stage 6 | Upgrade the proxy controller to ECG-style mechanism-separated routing | [mechanism-routed tangent report](../reports/mechanism_routed_tangent_v5d_report.md), [mechanism aggregate](../outputs/mechanism_routed_tangent_v5d_aggregate_summary.csv), [mechanism figures](../reports/figures/mechanism_routed_tangent_v5d/) |
+| Stage 7 | Test whether embedding/KNN risk can become a training signal | [embedding-risk training pilot](../reports/embedding_risk_training_pilot.md), [reward-only pilot comparison](../outputs/embedding_risk_training_pilot_comparison.csv), [curriculum fine-tune summary](../outputs/embedding_risk_curriculum_finetune_pilot_summary.csv), [multi-seed aggregate](../outputs/embedding_risk_multiseed_curriculum_aggregate_summary.csv), [multi-seed figure](../reports/figures/embedding_risk_training_pilot/multiseed_curriculum_metrics.png) |
 
 ## Key Result Tables
 
@@ -53,6 +55,8 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [observable_proxy_threshold_sweep_10seed.csv](../reports/tables/observable_proxy_threshold_sweep_10seed.csv) | threshold sweep for observable risk scoring |
 | [risk_gated_tangent/aggregate_summary.csv](../outputs/risk_gated_tangent/aggregate_summary.csv) | cross-seed prototype/strict comparison of unshielded, always tangent, and risk-gated tangent |
 | [risk_gated_tangent/summary.csv](../outputs/risk_gated_tangent/summary.csv) | seed-level formal PPO comparison for the risk-gated tangent result |
+| [mechanism_routed_tangent_v5d_aggregate_summary.csv](../outputs/mechanism_routed_tangent_v5d_aggregate_summary.csv) | ECG-inspired mechanism-routed tangent comparison against always tangent and risk-gated tangent |
+| [mechanism_routed_tangent_v5d_route_summary.csv](../outputs/mechanism_routed_tangent_v5d_route_summary.csv) | Stage 1 boundary versus Stage 2 residual route activity for the mechanism router |
 | [embedding_risk_training_pilot_comparison.csv](../outputs/embedding_risk_training_pilot_comparison.csv) | one-seed PPO pilot comparing baseline training against embedding-risk reward shaping |
 | [embedding_risk_curriculum_finetune_pilot_summary.csv](../outputs/embedding_risk_curriculum_finetune_pilot_summary.csv) | one-seed PPO pilot comparing reward shaping, hard-negative curriculum, and curriculum fine-tuning |
 

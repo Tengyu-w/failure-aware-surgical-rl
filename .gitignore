@@ -15,6 +15,10 @@ reports/docx_audit_paths.txt
 outputs/risk_dataset/
 outputs/risk_model/risk_score_predictions.csv
 outputs/*_run*.log
+outputs/vtvf_doc_extract/
+outputs/mechanism_routed_tangent_v5d/*
+!outputs/mechanism_routed_tangent_v5d_aggregate_summary.csv
+!outputs/mechanism_routed_tangent_v5d_route_summary.csv
 outputs/risk_gated_tangent/episodes*.csv
 outputs/risk_gated_tangent/online_summary*.csv
 outputs/risk_gated_tangent_final/

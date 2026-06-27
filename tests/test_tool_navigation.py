@@ -4,6 +4,7 @@ from constraint_surgical_rl import (
     EmbeddingRiskCurriculumReset,
     EmbeddingRiskPenaltyReward,
     EmbeddingRiskScorer,
+    MechanismRoutedTangentSafetyShieldAction,
     RiskGatedTangentSafetyShieldAction,
     make_tool_manipulation_env,
     make_tool_navigation_env,
@@ -42,6 +43,9 @@ def test_tool_navigation_variants_have_expected_shapes():
     conditioned_risk_gated_tangent = make_tool_navigation_env(
         "conditioned_risk_gated_tangent_shielded", config_preset="prototype"
     )
+    conditioned_mechanism_routed_tangent = make_tool_navigation_env(
+        "conditioned_mechanism_routed_tangent_shielded", config_preset="prototype"
+    )
     no_phase_budget = make_tool_navigation_env("no_phase_budget", config_preset="prototype")
     no_phase_budget_shielded = make_tool_navigation_env("no_phase_budget_shielded", config_preset="prototype")
     no_phase_budget_tangent_shielded = make_tool_navigation_env(
@@ -58,6 +62,7 @@ def test_tool_navigation_variants_have_expected_shapes():
     assert conditioned_shielded.observation_space.shape == (14,)
     assert conditioned_tangent_shielded.observation_space.shape == (14,)
     assert conditioned_risk_gated_tangent.observation_space.shape == (14,)
+    assert conditioned_mechanism_routed_tangent.observation_space.shape == (14,)
     assert no_phase_budget.observation_space.shape == (12,)
     assert no_phase_budget_shielded.observation_space.shape == (12,)
     assert no_phase_budget_tangent_shielded.observation_space.shape == (12,)
@@ -125,6 +130,21 @@ def test_risk_gated_tangent_activates_near_forbidden_region():
     assert info["risk_gate_active"] == 1.0
     assert info["risk_gate_activations"] > 0
     assert info["shield_interventions"] > 0
+
+
+def test_mechanism_routed_tangent_reports_stage_routes():
+    env = make_tool_navigation_env("conditioned_mechanism_routed_tangent_shielded", config_preset="prototype")
+    assert isinstance(env, MechanismRoutedTangentSafetyShieldAction)
+    env.reset(seed=17)
+    env.unwrapped.tool_xy = env.unwrapped.forbidden_xy.copy()
+
+    _, _, _, _, info = env.step(env.action_space.sample())
+
+    assert info["mechanism_route"] == "stage1_boundary_tangent_backup"
+    assert info["stage1_boundary_activations"] > 0
+    assert info["mechanism_router_activations"] > 0
+    assert "mechanism_boundary_score" in info
+    assert "mechanism_residual_score" in info
 
 
 def test_embedding_risk_penalty_reports_training_signal():

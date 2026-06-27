@@ -342,6 +342,156 @@ class RiskGatedTangentSafetyShieldAction(TangentSafetyShieldAction):
         return obs, reward, terminated, truncated, info
 
 
+class MechanismRoutedTangentSafetyShieldAction(RiskGatedTangentSafetyShieldAction):
+    """Mechanism-separated hierarchical reliability router.
+
+    Stage 1 handles irreversible boundary/safety risks with tangent backup.
+    Stage 2 records residual mechanism risks with a reserved review budget, but
+    does not automatically apply tangent correction unless Stage 1 is active.
+    """
+
+    def __init__(
+        self,
+        env: gym.Env,
+        boundary_threshold: float = 0.55,
+        residual_threshold: float = 0.60,
+        residual_budget_reserve: float = 0.20,
+        expected_activation_budget: float = 0.50,
+        **kwargs,
+    ):
+        super().__init__(env, threshold=boundary_threshold, **kwargs)
+        self.boundary_threshold = float(boundary_threshold)
+        self.residual_threshold = float(residual_threshold)
+        self.residual_budget_reserve = float(np.clip(residual_budget_reserve, 0.0, 1.0))
+        self.expected_activation_budget = float(np.clip(expected_activation_budget, 0.01, 1.0))
+        self.stage1_boundary_activations = 0
+        self.stage2_residual_activations = 0
+        self.mechanism_router_activations = 0
+        self.last_boundary_score = 0.0
+        self.last_residual_score = 0.0
+        self.last_mechanism_route = "auto_execute"
+        self.last_mechanism_reasons = "low_risk"
+
+    def reset(self, **kwargs):
+        self.stage1_boundary_activations = 0
+        self.stage2_residual_activations = 0
+        self.mechanism_router_activations = 0
+        self.last_boundary_score = 0.0
+        self.last_residual_score = 0.0
+        self.last_mechanism_route = "auto_execute"
+        self.last_mechanism_reasons = "low_risk"
+        return super().reset(**kwargs)
+
+    def _mechanism_scores(self, features: dict[str, float]) -> tuple[float, float, str, str]:
+        current_boundary = self._clip01(1.0 - features["distance_to_forbidden"] / max(self.safety_margin, 1e-6))
+        proposed_boundary = self._clip01(
+            1.0 - features["proposed_distance_to_forbidden"] / max(self.safety_margin, 1e-6)
+        )
+        closing_boundary = self._clip01(
+            (features["distance_to_forbidden"] - features["proposed_distance_to_forbidden"])
+            / max(self.safety_margin, 1e-6)
+        )
+        force_score = self._clip01(features["force_proxy"] / max(self.env.unwrapped.config.max_force, 1e-6))
+        workspace_score = 1.0 if features["proposed_outside_workspace"] > 0.0 else 0.0
+        boundary_score = max(
+            0.42 * proposed_boundary + 0.26 * current_boundary + 0.16 * closing_boundary + 0.16 * force_score,
+            0.92 if features["proposed_distance_to_forbidden"] <= 0.0 else 0.0,
+            0.86 if workspace_score else 0.0,
+            0.82 if features["distance_to_forbidden"] <= 0.0 else 0.0,
+        )
+
+        budget_score = self._clip01((self.budget_floor - features["remaining_budget"]) / max(self.budget_floor, 1e-6))
+        stalled = features["progress_5"] <= 0.0 and features["distance_to_goal"] >= self.stall_distance
+        stall_score = 1.0 if stalled else 0.0
+        late_score = self._clip01(features["normalized_time"]) if stalled else 0.0
+        action_score = self._clip01((features["action_norm"] - 0.85) / 0.55)
+        residual_score = self._clip01(
+            0.38 * budget_score + 0.34 * stall_score + 0.18 * late_score + 0.10 * action_score
+        )
+
+        reasons = []
+        route = "auto_execute"
+        if boundary_score >= self.boundary_threshold:
+            route = "stage1_boundary_tangent_backup"
+            if proposed_boundary >= 0.5:
+                reasons.append("proposed_boundary_risk")
+            if current_boundary >= 0.5:
+                reasons.append("current_clearance_low")
+            if closing_boundary >= 0.5:
+                reasons.append("moving_toward_boundary")
+            if force_score >= 0.5:
+                reasons.append("force_proxy")
+            if workspace_score:
+                reasons.append("workspace_boundary")
+        elif residual_score >= self.residual_threshold:
+            if budget_score >= 0.5:
+                route = "stage2_budget_review"
+                reasons.append("remaining_budget_low")
+            elif stalled:
+                route = "stage2_stagnation_review"
+                reasons.append("progress_stalled")
+            else:
+                route = "stage2_action_review"
+                reasons.append("large_or_late_action")
+
+        return self._clip01(boundary_score), residual_score, route, ",".join(reasons) if reasons else "low_risk"
+
+    def _residual_budget_available(self) -> bool:
+        max_steps = max(self.env.unwrapped.config.max_steps, 1)
+        reserved_steps = int(np.ceil(max_steps * self.expected_activation_budget * self.residual_budget_reserve))
+        return self.stage2_residual_activations < max(reserved_steps, 1)
+
+    def action(self, action):
+        action = np.asarray(action, dtype=np.float32)
+        clipped = np.clip(action, self.action_space.low, self.action_space.high).astype(np.float32)
+        features = self._risk_features(clipped)
+        boundary_score, residual_score, route, reasons = self._mechanism_scores(features)
+
+        stage1_active = route == "stage1_boundary_tangent_backup"
+        stage2_requested = route.startswith("stage2_")
+        stage2_active = bool(stage2_requested and self._residual_budget_available())
+        if stage2_requested and not stage2_active:
+            route = "auto_execute_residual_budget_exhausted"
+            reasons = "residual_budget_exhausted"
+
+        self.last_boundary_score = boundary_score
+        self.last_residual_score = residual_score
+        self.last_mechanism_route = route
+        self.last_mechanism_reasons = reasons
+        self.last_risk_score = max(boundary_score, residual_score)
+        self.last_risk_reasons = reasons
+        self.last_risk_gate_active = bool(stage1_active or stage2_active)
+
+        if stage1_active:
+            self.stage1_boundary_activations += 1
+            self.mechanism_router_activations += 1
+            previous_interventions = self.intervention_count
+            executed = TangentSafetyShieldAction.action(self, clipped)
+            if self.intervention_count > previous_interventions:
+                self.risk_gated_tangent_intervention_count += 1
+            return executed
+
+        if stage2_active:
+            self.stage2_residual_activations += 1
+            self.mechanism_router_activations += 1
+
+        self.last_action_deviation = 0.0
+        self.cumulative_action_deviation += self.last_action_deviation
+        return clipped
+
+    def step(self, action):
+        obs, reward, terminated, truncated, info = super().step(action)
+        info["mechanism_boundary_score"] = self.last_boundary_score
+        info["mechanism_residual_score"] = self.last_residual_score
+        info["mechanism_route"] = self.last_mechanism_route
+        info["mechanism_reasons"] = self.last_mechanism_reasons
+        info["stage1_boundary_activations"] = self.stage1_boundary_activations
+        info["stage2_residual_activations"] = self.stage2_residual_activations
+        info["mechanism_router_activations"] = self.mechanism_router_activations
+        info["residual_budget_reserve"] = self.residual_budget_reserve
+        return obs, reward, terminated, truncated, info
+
+
 class EmbeddingRiskScorer:
     """Small NumPy KNN risk scorer over standardized PCA feature embeddings."""
 
@@ -742,6 +892,8 @@ def make_tool_navigation_env(
         return TangentSafetyShieldAction(env)
     if variant == "conditioned_risk_gated_tangent_shielded":
         return RiskGatedTangentSafetyShieldAction(env)
+    if variant == "conditioned_mechanism_routed_tangent_shielded":
+        return MechanismRoutedTangentSafetyShieldAction(env)
     if variant == "no_phase_budget":
         return DropObservationIndices(env, drop_indices=(12, 13))
     if variant == "no_phase_budget_shielded":
@@ -750,6 +902,8 @@ def make_tool_navigation_env(
         return TangentSafetyShieldAction(DropObservationIndices(env, drop_indices=(12, 13)))
     if variant == "no_phase_budget_risk_gated_tangent_shielded":
         return RiskGatedTangentSafetyShieldAction(DropObservationIndices(env, drop_indices=(12, 13)))
+    if variant == "no_phase_budget_mechanism_routed_tangent_shielded":
+        return MechanismRoutedTangentSafetyShieldAction(DropObservationIndices(env, drop_indices=(12, 13)))
     if variant == "no_budget":
         return DropObservationIndices(env, drop_indices=(13,))
     raise ValueError(f"Unknown environment variant: {variant}")

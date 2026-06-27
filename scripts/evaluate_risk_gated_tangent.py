@@ -7,12 +7,16 @@ from pathlib import Path
 
 import numpy as np
 
-from constraint_surgical_rl import RiskGatedTangentSafetyShieldAction, make_tool_navigation_env
+from constraint_surgical_rl import (
+    MechanismRoutedTangentSafetyShieldAction,
+    RiskGatedTangentSafetyShieldAction,
+    make_tool_navigation_env,
+)
 from constraint_surgical_rl.envs.presets import CONFIG_PRESET_NAMES
 
 
 ROOT = Path(__file__).resolve().parents[1]
-METHODS = ("unshielded", "always_tangent", "risk_gated_tangent")
+METHODS = ("unshielded", "always_tangent", "risk_gated_tangent", "mechanism_routed_tangent")
 
 
 class LogisticRiskModel:
@@ -72,6 +76,9 @@ def make_env(method: str, preset: str, risk_model, threshold: float):
     if method == "risk_gated_tangent":
         base = make_tool_navigation_env("conditioned", config_preset=preset)
         return RiskGatedTangentSafetyShieldAction(base, risk_model=risk_model, threshold=threshold)
+    if method == "mechanism_routed_tangent":
+        base = make_tool_navigation_env("conditioned", config_preset=preset)
+        return MechanismRoutedTangentSafetyShieldAction(base, boundary_threshold=threshold)
     raise ValueError(f"Unknown method: {method}")
 
 
@@ -137,12 +144,17 @@ def run_episode(
     supervisor_activations = 0.0
     risk_gate_activations = float(info.get("risk_gate_activations", 0.0))
     risk_gated_tangent_interventions = float(info.get("risk_gated_tangent_interventions", 0.0))
+    stage1_boundary_activations = float(info.get("stage1_boundary_activations", 0.0))
+    stage2_residual_activations = float(info.get("stage2_residual_activations", 0.0))
+    mechanism_router_activations = float(info.get("mechanism_router_activations", 0.0))
     if method == "always_tangent":
         supervisor_activations = float(steps)
     elif method == "risk_gated_tangent":
         supervisor_activations = risk_gate_activations
+    elif method == "mechanism_routed_tangent":
+        supervisor_activations = mechanism_router_activations
 
-    if method == "risk_gated_tangent":
+    if method in {"risk_gated_tangent", "mechanism_routed_tangent"}:
         false_intervention_rate = max(supervisor_activations - risk_gated_tangent_interventions, 0.0) / max(steps, 1)
     elif method == "always_tangent":
         false_intervention_rate = max(supervisor_activations - tangent_interventions, 0.0) / max(steps, 1)
@@ -170,6 +182,9 @@ def run_episode(
         "risk_gate_activations": risk_gate_activations,
         "risk_gate_activation_rate": gate_active_steps / max(steps, 1),
         "risk_gated_tangent_interventions": risk_gated_tangent_interventions,
+        "stage1_boundary_activations": stage1_boundary_activations,
+        "stage2_residual_activations": stage2_residual_activations,
+        "mechanism_router_activations": mechanism_router_activations,
         "mean_risk_score": float(np.mean(risk_scores)) if risk_scores else np.nan,
         "max_risk_score": float(np.max(risk_scores)) if risk_scores else np.nan,
         "false_intervention_rate": false_intervention_rate,
@@ -204,6 +219,9 @@ def summarize(rows: list[dict]) -> list[dict]:
                 "tangent_correction_rate": mean("actual_tangent_correction_rate"),
                 "mean_gate_activations": mean("risk_gate_activations"),
                 "gate_activation_rate": mean("risk_gate_activation_rate"),
+                "mean_stage1_boundary_activations": mean("stage1_boundary_activations"),
+                "mean_stage2_residual_activations": mean("stage2_residual_activations"),
+                "mean_mechanism_router_activations": mean("mechanism_router_activations"),
                 "false_intervention_rate": mean("false_intervention_rate"),
                 "mean_risk_score": mean("mean_risk_score"),
                 "max_risk_score": mean("max_risk_score"),

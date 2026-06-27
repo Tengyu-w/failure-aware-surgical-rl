@@ -24,10 +24,12 @@ def parse_args() -> argparse.Namespace:
             "conditioned_shielded",
             "conditioned_tangent_shielded",
             "conditioned_risk_gated_tangent_shielded",
+            "conditioned_mechanism_routed_tangent_shielded",
             "no_phase_budget",
             "no_phase_budget_shielded",
             "no_phase_budget_tangent_shielded",
             "no_phase_budget_risk_gated_tangent_shielded",
+            "no_phase_budget_mechanism_routed_tangent_shielded",
             "no_budget",
         ),
         default="conditioned",
@@ -124,6 +126,11 @@ def run_episode(
         "embedding_risk_active_score": float(info.get("embedding_risk_active_score", np.nan)),
         "embedding_curriculum_active": float(info.get("embedding_curriculum_active", np.nan)),
         "embedding_curriculum_score": float(info.get("embedding_curriculum_score", np.nan)),
+        "mechanism_boundary_score": float(info.get("mechanism_boundary_score", np.nan)),
+        "mechanism_residual_score": float(info.get("mechanism_residual_score", np.nan)),
+        "stage1_boundary_activations": float(info.get("stage1_boundary_activations", np.nan)),
+        "stage2_residual_activations": float(info.get("stage2_residual_activations", np.nan)),
+        "mechanism_router_activations": float(info.get("mechanism_router_activations", np.nan)),
     }
 
 
