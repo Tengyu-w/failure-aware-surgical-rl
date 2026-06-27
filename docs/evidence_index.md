@@ -64,7 +64,10 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 
 | Report | Why It Matters |
 |---|---|
-| [full_research_report.md](../reports/full_research_report.md) | ECG-style structured research report: what was done, why, evidence, interpretation, limitations, and claims |
+| [RESEARCH_REPORT.md](RESEARCH_REPORT.md) | ECG-style structured research report: what was done, why, evidence, interpretation, limitations, and claims |
+| [EXPERIMENT_EVIDENCE_SUMMARY.md](EXPERIMENT_EVIDENCE_SUMMARY.md) | compact evidence narrative for explaining the main upgrades quickly |
+| [METHOD_OVERVIEW.md](METHOD_OVERVIEW.md) | mechanism diagram, evidence families, and routing policy |
+| [FIGURE_ATLAS.md](FIGURE_ATLAS.md) | visual evidence inventory separating proxy snapshots from SurRoL renders |
 | [research_sequence.md](research_sequence.md) | recommended reading order for the whole project |
 | [surrol_master_results.md](../reports/surrol_master_results.md) | overview of paired SurRoL recovery evidence |
 | [surrol_fault_taxonomy_step2.md](../reports/surrol_fault_taxonomy_step2.md) | formalizes failure families and intervention routes |
