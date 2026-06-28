@@ -171,6 +171,38 @@ specific failure mechanisms, explain why the policy becomes unreliable, and
 route each case to a different intervention. This is the logic later migrated
 to SurRoL recovery, observable supervision, and multi-signal mechanism routing.
 
+## Surgical-Simulation Task Upgrade Framework
+
+CircleRL is intentionally simple. The project therefore upgrades the same
+reliability-routing logic into a task-level SurRoL framework. Each task is
+treated as a different surgical reliability problem rather than as another
+generic obstacle-avoidance run.
+
+For the full framework, see
+[docs/SURROL_TASK_UPGRADE_FRAMEWORK.md](docs/SURROL_TASK_UPGRADE_FRAMEWORK.md)
+and the machine-readable table
+[reports/tables/surgical_task_upgrade_framework.csv](reports/tables/surgical_task_upgrade_framework.csv).
+
+| Task | Failure mechanism being tested | Route decision | Recovery / response |
+| --- | --- | --- | --- |
+| NeedleReach | final localization or near-target approach drift | `auto_recovery` or `human_review` | short-window correction or state re-estimation |
+| NeedlePick | needle grasp, perception bias, jaw-stuck, unsafe near-target recovery | `auto_recovery`, `human_review`, or `abort_candidate` | phase-aware recovery, review/re-estimation, observable jaw retry, or abort-candidate |
+| GauzeRetrieve | soft-object retrieval, depth-scale error, grasp uncertainty | `auto_recovery` or `human_review` | phase-aware recovery, depth/state re-estimation, observable grasp retry |
+| PickAndPlace | object-state bias, contact loss, object dropout | `auto_recovery` or `human_review` | monitor recovery and learned-route extension |
+| Unsafe-zone near target | recovery trajectory may become unsafe | `abort_candidate` | stop recovery or flag unsafe continuation |
+
+This is the intended project progression:
+
+```text
+CircleRL proxy
+  -> define reliability routing on a minimal constrained tool task
+SurRoL task framework
+  -> test route-specific failures in NeedleReach, NeedlePick, GauzeRetrieve,
+     PickAndPlace, and unsafe-zone recovery settings
+Multi-signal router
+  -> train and audit the review/abort risk head and mechanism router
+```
+
 ## How The Research Logic Evolved
 
 The project is best read as a staged research story.
@@ -371,6 +403,7 @@ mechanisms.
 
 | Research question | Visual evidence | Scope boundary |
 | --- | --- | --- |
+| How does the proxy recovery action look in motion? | [CircleRL recovery MP4](reports/media/circlerl_recovery_demo/circlerl_bias_recovery.mp4), [GIF preview](reports/media/circlerl_recovery_demo/circlerl_bias_recovery.gif) | Custom proxy visualization showing biased-state drift followed by monitor recovery; not SurRoL. |
 | Did the project run inside rendered SurRoL tasks? | ![GauzeRetrieve rendered frame](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_034.png) | Rendered simulation evidence, not real-robot footage. |
 | Are there task-level rollout media? | [NeedleReach GIF](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif), [NeedlePick GIF](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif), [GauzeRetrieve GIF](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) | Oracle rollout media used as visual migration evidence. |
 | Does risk gating preserve safety while reducing intervention? | ![Risk-gated tangent aggregate](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png) | Custom constrained surgical-tool proxy, not SurRoL. |

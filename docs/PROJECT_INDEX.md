@@ -28,7 +28,9 @@ prototype and from 0.426 to 0.416 on strict.
 | Stage | What It Shows | Evidence Type |
 |---|---|---|
 | Self-built proxy simulation | The core safety-control idea works in a simple constrained surgical-tool environment. | PPO/controller logs, prototype/strict trajectories, top-down snapshots |
+| CircleRL recovery media | A biased target estimate can visibly drive the proxy tool off route, then monitor recovery re-estimates the target and returns toward completion. | MP4/GIF recovery demo, selected frames, trace CSV |
 | SurRoL migration | The same reliability-supervision idea is embedded into surgical simulation tasks. | Rendered NeedleReach, NeedlePick, and GauzeRetrieve GIF/MP4 rollouts |
+| Task-specific SurRoL upgrade framework | The proxy idea is expanded into NeedleReach, NeedlePick, GauzeRetrieve, PickAndPlace, and unsafe-zone near-target settings. | Task-failure-route matrix and machine-readable CSV |
 | Four intervention routes | Failures are not treated as one generic failure; they are routed to continue, recover, review, or abort-candidate. | Fault taxonomy, paired recovery tables, route labels |
 | Final reliability results | SurRoL recovery is stress-tested, and the proxy tangent controller is changed from always-on to risk-gated, then to ECG-style mechanism-routed supervision. | Multi-seed SurRoL results, learned route classifier, observable proxy audit, risk-gated tangent report, mechanism-routed tangent report |
 
@@ -40,6 +42,7 @@ prototype and from 0.426 to 0.416 on strict.
 | 10 minutes | [Research report](RESEARCH_REPORT.md) | ECG-style structured explanation of what was done, why, evidence, and limits |
 | 10 minutes | [Experiment evidence summary](EXPERIMENT_EVIDENCE_SUMMARY.md) | Compact result narrative for a quick supervisor read |
 | 15 minutes | [Learning-to-routing flow](LEARNING_TO_ROUTING_FLOW.md) | How PPO training, weak labels, embedding/KNN, visual risk, failed retraining, and runtime routing connect |
+| 15 minutes | [SurRoL task upgrade framework](SURROL_TASK_UPGRADE_FRAMEWORK.md) | Task-level framework beyond CircleRL: NeedleReach, NeedlePick, GauzeRetrieve, PickAndPlace, unsafe-zone recovery |
 | 15 minutes | [ECG-style RL upgrade](ECG_STYLE_RL_UPGRADE.md) | Broad ECG-style diagnostics and model upgrade beyond embedding alone |
 | 15 minutes | [Method overview](METHOD_OVERVIEW.md) | Reliability signal families, routing logic, and scope boundary |
 | Visual | [Figure atlas](FIGURE_ATLAS.md) | Visual evidence inventory across proxy and SurRoL stages |
@@ -55,6 +58,8 @@ prototype and from 0.426 to 0.416 on strict.
 | The proxy backup controller is no longer just always-on. | Risk-gated tangent keeps 0.000 budget exhaustion while reducing supervisor activation to 0.450/0.426. | Strong for the proxy controller setting |
 | The proxy supervisor now has mechanism-separated routing. | Mechanism-routed tangent keeps 0.000 budget exhaustion while reducing activation to 0.443/0.416 and logging Stage 1 boundary versus Stage 2 residual routes. | Moderate-to-strong for the proxy controller setting |
 | The idea moved beyond a toy proxy. | Rendered SurRoL rollouts for NeedleReach, NeedlePick, and GauzeRetrieve with traces. | Strong for simulation migration |
+| The proxy recovery mechanism is visible. | CircleRL MP4/GIF shows biased-target drift followed by monitor recovery and successful completion. | Strong as a proxy visualization; not SurRoL |
+| The next tasks are structured, not ad hoc. | SurRoL task upgrade framework maps NeedleReach, NeedlePick, GauzeRetrieve, PickAndPlace, and unsafe-zone recovery to failures, signals, routes, and limitations. | Strong as framework; evidence maturity differs by task |
 | Failure routing helps under injected faults. | 10-seed NeedlePick/GauzeRetrieve recovery suites for action, perception, and jaw-stuck faults. | Strong within current SurRoL setup |
 | Route prediction is learnable. | Held-out route classifier: 460 episodes, 84.6% accuracy, 82.8% macro-F1, 0.0 missed review-or-abort rate. | Moderate; labels are distilled |
 | Embedding/KNN can be connected to training but does not solve policy robustness. | Multi-seed embedding-risk PPO improves return/distance in some settings but not robust success or budget exhaustion. | Preliminary; useful as a negative result |
