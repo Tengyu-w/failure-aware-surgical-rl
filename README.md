@@ -27,6 +27,9 @@ The final GitHub framing is:
 - **SurRoL recovery routing** is the surgical-simulation migration evidence.
 - **Embedding-risk PPO** is a preliminary training-loop experiment, not the
   main success claim.
+- **Learning-to-routing flow** explains why the project first tries to improve
+  the policy and then moves to runtime supervision when retraining is not
+  robust enough.
 - The strongest claim is internal simulation evidence for runtime reliability
   supervision, not real surgical autonomy.
 
@@ -54,6 +57,8 @@ The project is best read as a staged research story.
 8. Train and audit learned/observable route supervisors.
 9. Test whether embedding/KNN instability signals can feed back into PPO
    training through reward shaping and hard-negative curriculum.
+10. Treat the limited training gains as evidence that a stronger runtime
+    supervisor is still needed.
 
 The resulting chain is:
 
@@ -116,6 +121,37 @@ This is why the final contribution is best described as:
 > Mechanism-separated runtime reliability supervision for failure-aware
 > surgical RL in simulation.
 
+## Learning-To-Routing Logic
+
+The RL part is trained from simulator interaction, not from manual timestep
+labels. PPO observes state or visual features, outputs an action, receives
+reward and diagnostic information, and updates the policy.
+
+Labels enter later as reliability supervision:
+
+- timestep risk labels are weakly built from rollout logs, using boundary
+  distance, force proxy, remaining budget, progress stagnation, explicit risk
+  events, and episode failure;
+- SurRoL route labels are distilled from the injected failure family and
+  intended runtime response: `auto_execute`, `auto_recovery`, `human_review`,
+  or `abort_candidate`;
+- visual reliability labels use clean/corrupt visual-feature pairs and
+  policy-vs-oracle action gaps.
+
+The project then follows an ECG-style loop:
+
+```text
+train a baseline policy
+  -> collect failures and weak reliability labels
+  -> analyze embedding/PCA/KNN risk neighborhoods
+  -> feed risk back into PPO through reward shaping and hard-negative curriculum
+  -> observe limited multi-seed success/safety improvement
+  -> use risk-gated and mechanism-routed supervision at runtime
+```
+
+For the detailed version, see
+[docs/LEARNING_TO_ROUTING_FLOW.md](docs/LEARNING_TO_ROUTING_FLOW.md).
+
 ## Method And Evidence Chain
 
 | Stage | What was done | Why it mattered | Main conclusion |
@@ -130,6 +166,7 @@ This is why the final contribution is best described as:
 | 8. Learned route classifier | Trained a safety-biased route classifier. | Tests whether route decisions can be learned from evidence. | Held-out accuracy is 0.846 with 0.000 missed review-or-abort rate in the current split. |
 | 9. Observable supervisor | Replaced privileged jaw-stuck trigger evidence with observable command/progress signals. | Reduces dependence on internal simulator state. | Jaw-stuck perturbations are detected in 10/10 episodes for both core tasks. |
 | 10. Embedding-risk PPO | Fed embedding/KNN risk into reward shaping and hard-negative curriculum. | Tests whether explanation signals can improve training. | It changes learned behavior and improves some return/distance metrics, but not robust success/safety outcomes. |
+| 11. Runtime routing conclusion | Interpreted the limited PPO improvement as evidence for a supervisor around the policy. | Surgical autonomy needs execution-time reliability, not only better offline learning. | The final contribution is a policy-plus-supervisor system. |
 
 For the full stage-ordered report, see
 [docs/RESEARCH_REPORT.md](docs/RESEARCH_REPORT.md).
@@ -139,6 +176,9 @@ For the compact experiment-and-evidence narrative, see
 
 For the method diagram and reliability signal families, see
 [docs/METHOD_OVERVIEW.md](docs/METHOD_OVERVIEW.md).
+
+For the full learning-to-routing explanation, see
+[docs/LEARNING_TO_ROUTING_FLOW.md](docs/LEARNING_TO_ROUTING_FLOW.md).
 
 For the public figure and media index, see
 [docs/FIGURE_ATLAS.md](docs/FIGURE_ATLAS.md).

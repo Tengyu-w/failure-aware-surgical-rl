@@ -26,6 +26,8 @@ For final GitHub interpretation, use the following hierarchy:
 - learned and observable supervisors are reliability-routing prototypes;
 - embedding-risk PPO is preliminary training-loop evidence and should not be
   used as the main claim.
+- the full experimental arc is a learning-to-routing pipeline: train, label
+  failures, analyze embeddings, try retraining, then route unreliable execution.
 
 ## Project Logic At A Glance
 
@@ -69,6 +71,11 @@ training. Embedding/KNN risk was fed into PPO through reward shaping and
 hard-negative curriculum. This changed learned behavior and improved some
 return/distance metrics, but did not yet produce robust success/safety gains.
 
+That negative result is part of the final argument. The project does not stop
+at "make the RL model better." It shows that risk-aware retraining alone is not
+enough in the present setup, so the stronger design is to add runtime routing
+around the learned policy.
+
 This is the final project narrative:
 
 ```text
@@ -80,6 +87,7 @@ constrained surgical proxy
   -> route-specific recovery and review
   -> learned / observable route supervision
   -> preliminary embedding-risk-guided PPO training
+  -> runtime routing after retraining limits are observed
 ```
 
 ## Main Evidence Snapshot
@@ -92,6 +100,50 @@ constrained surgical proxy
 | Learned route classifier | Held-out accuracy 0.846, macro-F1 0.828, missed review-or-abort 0.000. | Route decisions are learnable from episode features. | Labels are distilled from current rules. |
 | Observable supervisor | Jaw-stuck perturbations detected in 10/10 episodes for NeedlePick and GauzeRetrieve. | Privileged-state dependence is reduced for the decision trigger. | Recovery execution remains scripted. |
 | Embedding-risk PPO | Curriculum fine-tuning improves return and strict final distance but not success/budget outcomes. | Instability analysis can enter training. | Preliminary and not robust policy improvement. |
+| Learning-to-routing flow | PPO is trained from reward; reliability labels are built afterward from rollout logs and failure design. | The project explains how labels, embeddings, failed retraining, and routing connect. | Labels remain weak/proxy labels, not expert clinical annotations. |
+
+## How RL, Labels, And Error Classes Connect
+
+### RL Training Signal
+
+The policy is trained primarily through simulator interaction. It observes
+state or visual features, outputs an action, receives reward and a termination
+signal, and updates through PPO. The proxy reward includes distance-to-goal,
+force/contact proxy, motion cost, forbidden-region and workspace penalties,
+success bonus, and safety-budget termination. The SurRoL wrapper adds options
+for progress reward, distance shaping, near-target action damping, danger-zone
+penalty, pseudo-vision, and rendered visual features.
+
+### Weak Risk Labels
+
+After rollouts are generated, timestep risk labels are built from logs. A
+timestep can be labeled risky because it is near a forbidden zone, has high
+force/contact proxy, has low remaining budget, is stalled while far from the
+goal, has explicit monitor/unsafe events, or belongs to a failed or
+budget-exhausted episode.
+
+### Failure And Route Labels
+
+Errors are then organized into routeable families:
+
+| Failure family | Examples | Runtime route |
+| --- | --- | --- |
+| nominal execution | no injected failure | `auto_execute` |
+| reversible execution drift | action noise, dropout, execution slip | `auto_recovery` |
+| visual-state error | perception bias, depth scale error | `human_review` or re-estimation |
+| grasp/contact uncertainty | jaw stuck open | review or observable retry |
+| unsafe recovery proxy | danger-zone abort | `abort_candidate` |
+
+This is the bridge from "the model made an error" to "the system knows what
+kind of intervention is appropriate."
+
+### Visual Reliability Signals
+
+The visual branch adds clean/corrupt visual-feature pairs for denoising and
+policy-vs-oracle action-gap labels for a visual action-risk head. These modules
+are closer to surgical embodied-intelligence concerns because they ask whether
+visual parsing and perception-to-action behavior remain reliable under
+occlusion, noise, brightness shift, frame lag, or corrupted rendered features.
 
 ## Stage 1: Custom Constrained Surgical Proxy
 
@@ -379,6 +431,39 @@ Embedding risk has become a training signal, not only an explanation tool.
 ### Limitation
 
 This is preliminary. It should not be claimed as robust model improvement.
+
+## Stage 11: Why Runtime Routing Remains Necessary
+
+### What Was Done
+
+The project interprets the embedding-risk PPO result as a training-loop test,
+not as the final system. Because risk-aware reward shaping and hard-negative
+curriculum do not reliably improve success rate or safety-budget exhaustion,
+the final architecture keeps a runtime reliability supervisor around the
+policy.
+
+### Why It Matters
+
+This mirrors the practical limitation in surgical embodied intelligence:
+better visual parsing, spatial priors, or RL training can improve the base
+policy, but final-step occlusion, grasp-point error, tissue deformation,
+stagnation, and action-outcome mismatch can still occur. A surgical autonomy
+system needs an execution-time decision layer.
+
+### Final Route
+
+```text
+baseline policy
+  -> risk and visual reliability evidence
+  -> failure family / mechanism inference
+  -> auto execute, auto recovery, human review, or abort candidate
+```
+
+### Limitation
+
+The current routing labels and recovery policies remain research prototypes.
+They are distilled from simulator logs, injected failures, and proxy rules.
+They are not independent surgeon annotations.
 
 ## Final Claim
 

@@ -66,6 +66,26 @@ policy action
   -> otherwise: execute policy action
 ```
 
+## Learning-To-Routing Policy
+
+The project first treats risk analysis as a possible training signal, then
+uses the negative result to justify runtime supervision:
+
+```text
+PPO baseline
+  -> rollout logs
+  -> weak risk labels and route labels
+  -> PCA / KNN embedding risk analysis
+  -> reward shaping and hard-negative curriculum
+  -> limited multi-seed success/safety improvement
+  -> runtime reliability supervisor
+```
+
+This distinction matters. The claim is not that embedding/KNN alone fixes RL.
+The claim is that embedding/KNN reveals failure neighborhoods, can be connected
+to training, and motivates a safer policy-plus-supervisor architecture when
+training alone is not robust.
+
 ## SurRoL Route Policy
 
 | Route | Intended behavior | Example trigger |

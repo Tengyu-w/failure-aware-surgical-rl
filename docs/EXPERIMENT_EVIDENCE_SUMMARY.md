@@ -154,7 +154,23 @@ Main lesson: embedding risk can affect training behavior.
 Limitation: multi-seed results do not show robust success-rate or
 safety-budget improvement. This is preliminary.
 
-## 10. Final Interpretation
+## 10. Visual Reliability Evidence
+
+The SurRoL branch also tests visual-side reliability. Rendered or pseudo-visual
+features can be corrupted with noise, brightness shifts, occlusion, blackout,
+or mixed perturbations. The project includes:
+
+- visual denoising adapter training from clean/corrupt feature pairs;
+- visual action-risk head training from policy-vs-oracle action gaps;
+- visual recovery memory using PCA/KNN over high-risk steps.
+
+Main lesson: the project is not only classifying final episode outcomes. It is
+also building pieces for perception-to-action reliability monitoring.
+
+Limitation: these visual modules are still lightweight proxies, not full
+surgical scene segmentation or clinical visual validation.
+
+## 11. Final Interpretation
 
 The project should be presented as a runtime reliability-supervision system:
 
@@ -167,3 +183,14 @@ execution evidence
 
 The strongest evidence is internal simulation reliability, not surgical
 deployment.
+
+The most honest experimental arc is:
+
+```text
+train baseline RL
+  -> collect errors and weak labels
+  -> run embedding/KNN analysis
+  -> try risk-aware retraining
+  -> find that retraining alone is not robust
+  -> use multi-mechanism runtime routing
+```

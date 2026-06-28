@@ -40,6 +40,7 @@ prototype and from 0.426 to 0.416 on strict.
 | 5 minutes | [Project overview](project_overview.md) | Concise project narrative |
 | 10 minutes | [Research report](RESEARCH_REPORT.md) | ECG-style structured explanation of what was done, why, evidence, and limits |
 | 10 minutes | [Experiment evidence summary](EXPERIMENT_EVIDENCE_SUMMARY.md) | Compact result narrative for a quick supervisor read |
+| 15 minutes | [Learning-to-routing flow](LEARNING_TO_ROUTING_FLOW.md) | How PPO training, weak labels, embedding/KNN, visual risk, failed retraining, and runtime routing connect |
 | 15 minutes | [Method overview](METHOD_OVERVIEW.md) | Reliability signal families, routing logic, and scope boundary |
 | Visual | [Figure atlas](FIGURE_ATLAS.md) | Visual evidence inventory across proxy and SurRoL stages |
 | 10 minutes | [Evidence index](evidence_index.md) | Claim-by-claim evidence map |
@@ -57,6 +58,7 @@ prototype and from 0.426 to 0.416 on strict.
 | The idea moved beyond a toy proxy. | Rendered SurRoL rollouts for NeedleReach, NeedlePick, and GauzeRetrieve with traces. | Strong for simulation migration |
 | Failure routing helps under injected faults. | 10-seed NeedlePick/GauzeRetrieve recovery suites for action, perception, and jaw-stuck faults. | Strong within current SurRoL setup |
 | Route prediction is learnable. | Held-out route classifier: 460 episodes, 84.6% accuracy, 82.8% macro-F1, 0.0 missed review-or-abort rate. | Moderate; labels are distilled |
+| Embedding/KNN can be connected to training but does not solve policy robustness. | Multi-seed embedding-risk PPO improves return/distance in some settings but not robust success or budget exhaustion. | Preliminary; useful as a negative result |
 | Privileged-state dependence is being reduced. | Observable jaw-stuck supervisor uses command/progress signals rather than direct phase/contact checks for the decision. | Promising, still partial |
 
 ## What Is Shown
@@ -68,6 +70,9 @@ prototype and from 0.426 to 0.416 on strict.
   robot rollouts.
 - Multi-seed evidence for recovery from several fault families.
 - A clear taxonomy connecting failures to intervention routes.
+- A complete learning-to-routing chain: baseline PPO, weak risk labels,
+  embedding/KNN analysis, risk-aware retraining attempt, visual risk modules,
+  and runtime route supervision.
 - Visual media, CSV traces, tables, unit tests, and reproducibility scripts.
 - Conservative scope language that separates simulation evidence from clinical
   or real-robot claims.
