@@ -30,7 +30,6 @@ experiment dump.
   reliability analysis and model-upgrade summary.
 - [FIGURE_ATLAS.md](FIGURE_ATLAS.md): visual evidence inventory.
 - [evidence_index.md](evidence_index.md): claim-to-evidence map.
-- [research_sequence.md](research_sequence.md): historical development order.
 - [PROJECT_INDEX.md](PROJECT_INDEX.md): short public entry point.
 
 ## Scope Boundary

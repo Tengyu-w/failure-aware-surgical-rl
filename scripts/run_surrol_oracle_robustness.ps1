@@ -3,7 +3,7 @@ param(
     [string]$EnvPath = "external/surrol_py38_env",
     [string]$MambaRoot = "external/micromamba",
     [string]$Out = "runs/surrol_oracle_robustness_pilot.csv",
-    [string]$Report = "reports/surrol_oracle_robustness_pilot_zh.md",
+    [string]$Report = "reports/surrol_oracle_robustness_pilot.md",
     [int]$Seeds = 3,
     [int]$Episodes = 1,
     [int]$MaxSteps = 25,

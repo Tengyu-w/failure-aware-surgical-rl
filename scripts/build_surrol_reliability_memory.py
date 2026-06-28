@@ -215,19 +215,21 @@ def write_report(metrics: pd.DataFrame, family_acc: float, route_acc: float, out
     lines = [
         "# SurRoL External Reliability Memory Prototype",
         "",
-        "## 一句话结论",
+        "## Takeaway",
         "",
         (
-            "这一步把已有 SurRoL episode 日志编码成 reliability embedding，并用最简单的 nearest-prototype memory "
-            "做错误类型和路由预测。它是 RAM 思路的可靠性版本雏形：不是检索物体该怎么操作，而是检索当前执行片段像不像历史上的 "
-            "visual-state error、execution drift、grasp uncertainty 或 unsafe abort。"
+            "This prototype embeds existing SurRoL episode logs into a reliability memory and uses a nearest-prototype "
+            "classifier for failure-family and route prediction. It is a reliability-oriented retrieval layer: instead "
+            "of retrieving how to manipulate an object, it asks whether the current execution segment resembles historical "
+            "visual-state errors, execution drift, grasp uncertainty, or unsafe-abort candidates."
         ),
         "",
         "## Label Definition",
         "",
         (
-            "本轮修正了一个重要细节：clean controller 且成功、无 unsafe abort、路由为 auto_execute 的 episode "
-            "被标为 nominal。也就是说，failure family 现在更接近“实际观测到的风险状态”，而不是简单继承实验套件里的注入故障名。"
+            "Successful clean-controller episodes without unsafe aborts and with an auto-execute route are labeled as "
+            "nominal. This keeps the failure-family label closer to the observed reliability state rather than simply "
+            "copying the injected fault name."
         ),
         "",
         "## Held-Out Prototype Accuracy",
@@ -337,13 +339,14 @@ def main() -> None:
     confusion.to_csv(table_dir / "surrol_reliability_memory_confusion.csv", index=False)
     plot_embedding(df, fig_dir, "family", "embedding_by_family.png")
     plot_embedding(df, fig_dir, "route", "embedding_by_route.png")
-    write_report(metrics, family_acc, route_acc, ROOT / "reports" / "surrol_reliability_memory_round24_zh.md")
+    report_path = ROOT / "reports" / "surrol_reliability_memory.md"
+    write_report(metrics, family_acc, route_acc, report_path)
 
     print(f"embeddings={table_dir / 'surrol_reliability_memory_embeddings.csv'}")
     print(f"predictions={table_dir / 'surrol_reliability_memory_predictions.csv'}")
     print(f"metrics={table_dir / 'surrol_reliability_memory_metrics.csv'}")
     print(f"figures={fig_dir}")
-    print(f"report={ROOT / 'reports' / 'surrol_reliability_memory_round24_zh.md'}")
+    print(f"report={report_path}")
 
 
 if __name__ == "__main__":

@@ -37,7 +37,6 @@ prototype and from 0.426 to 0.416 on strict.
 | Time budget | File | Purpose |
 |---|---|---|
 | 2 minutes | [README](../README.md) | Main question, key numbers, setup, limitations |
-| 5 minutes | [Project overview](project_overview.md) | Concise project narrative |
 | 10 minutes | [Research report](RESEARCH_REPORT.md) | ECG-style structured explanation of what was done, why, evidence, and limits |
 | 10 minutes | [Experiment evidence summary](EXPERIMENT_EVIDENCE_SUMMARY.md) | Compact result narrative for a quick supervisor read |
 | 15 minutes | [Learning-to-routing flow](LEARNING_TO_ROUTING_FLOW.md) | How PPO training, weak labels, embedding/KNN, visual risk, failed retraining, and runtime routing connect |
@@ -45,7 +44,6 @@ prototype and from 0.426 to 0.416 on strict.
 | 15 minutes | [Method overview](METHOD_OVERVIEW.md) | Reliability signal families, routing logic, and scope boundary |
 | Visual | [Figure atlas](FIGURE_ATLAS.md) | Visual evidence inventory across proxy and SurRoL stages |
 | 10 minutes | [Evidence index](evidence_index.md) | Claim-by-claim evidence map |
-| 20 minutes | [Research sequence](research_sequence.md) | How the project developed from proxy RL to SurRoL supervision |
 | 20 minutes | [Risk-gated tangent report](../reports/risk_gated_tangent_report.md) | Proxy controller-level result and proxy visual evidence |
 | 20 minutes | [Mechanism-routed tangent report](../reports/mechanism_routed_tangent_v5d_report.md) | ECG-inspired v5d-style reliability-routing upgrade |
 | Deep dive | [SurRoL master report](../reports/surrol_master_results.md) | Main paired recovery tables |

@@ -166,7 +166,7 @@ def main() -> None:
     summary.to_csv(summary_out, index=False)
     cross.to_csv(cross_out, index=False)
 
-    report = ROOT / "reports" / "surrol_risk_level_calibration_round25_zh.md"
+    report = ROOT / "reports" / "surrol_risk_level_calibration.md"
     lines = [
         "# SurRoL Risk-Level Calibration",
         "",

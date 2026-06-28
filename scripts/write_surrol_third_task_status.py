@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
-    out = ROOT / "reports" / "surrol_third_task_status_round23_zh.md"
+    out = ROOT / "reports" / "surrol_third_task_status.md"
     pnp_path = ROOT / "runs" / "surrol_pickandplace_clean_smoke.csv"
     lines = [
         "# SurRoL Third Complex Task Status",

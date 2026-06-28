@@ -153,10 +153,11 @@ def main() -> None:
     paired_df = paired(summary)
     summary.to_csv(table_dir / "surrol_review_reestimate_summary.csv", index=False)
     paired_df.to_csv(table_dir / "surrol_review_reestimate_paired.csv", index=False)
-    write_report(paired_df, ROOT / "reports" / "surrol_review_reestimate_round20_zh.md")
+    report_path = ROOT / "reports" / "surrol_review_reestimate.md"
+    write_report(paired_df, report_path)
     print(f"summary={table_dir / 'surrol_review_reestimate_summary.csv'}")
     print(f"paired={table_dir / 'surrol_review_reestimate_paired.csv'}")
-    print(f"report={ROOT / 'reports' / 'surrol_review_reestimate_round20_zh.md'}")
+    print(f"report={report_path}")
 
 
 if __name__ == "__main__":

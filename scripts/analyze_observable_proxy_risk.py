@@ -182,7 +182,7 @@ def main() -> None:
     scored.to_csv(table_dir / "observable_proxy_scored_steps_10seed.csv", index=False)
     sweep.to_csv(table_dir / "observable_proxy_threshold_sweep_10seed.csv", index=False)
     plot_sweep(sweep, figure_dir)
-    write_report(sweep, scored, ROOT / "reports" / "observable_proxy_risk_sweep_round14_zh.md")
+    write_report(sweep, scored, ROOT / "reports" / "observable_proxy_risk_sweep.md")
 
     print(f"scored={table_dir / 'observable_proxy_scored_steps_10seed.csv'}")
     print(f"sweep={table_dir / 'observable_proxy_threshold_sweep_10seed.csv'}")

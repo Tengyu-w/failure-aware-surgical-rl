@@ -77,7 +77,6 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [LEARNING_TO_ROUTING_FLOW.md](LEARNING_TO_ROUTING_FLOW.md) | explains how baseline RL, weak risk labels, embedding/KNN analysis, risk-aware retraining, visual reliability, and runtime routing connect |
 | [ECG_STYLE_RL_UPGRADE.md](ECG_STYLE_RL_UPGRADE.md) | explains the broad ECG-style analysis and model upgrade now added to the RL project |
 | [FIGURE_ATLAS.md](FIGURE_ATLAS.md) | visual evidence inventory separating proxy snapshots from SurRoL renders |
-| [research_sequence.md](research_sequence.md) | recommended reading order for the whole project |
 | [surrol_master_results.md](../reports/surrol_master_results.md) | overview of paired SurRoL recovery evidence |
 | [surrol_fault_taxonomy_step2.md](../reports/surrol_fault_taxonomy_step2.md) | formalizes failure families and intervention routes |
 | [surrol_learned_route_classifier_step3.md](../reports/surrol_learned_route_classifier_step3.md) | shows learned route-classifier metrics and boundary errors |

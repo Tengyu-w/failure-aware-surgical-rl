@@ -384,13 +384,14 @@ def main() -> None:
     summary.to_csv(table_dir / "surrol_risk_triage_summary.csv", index=False)
     scored_steps.to_csv(table_dir / "surrol_risk_triage_scored_steps.csv", index=False)
     plot_routes(summary, figure_dir)
-    write_report(routes, summary, ROOT / "reports" / "surrol_risk_triage_round17_zh.md")
+    report_path = ROOT / "reports" / "surrol_risk_triage.md"
+    write_report(routes, summary, report_path)
 
     print(f"routes={table_dir / 'surrol_risk_triage_episode_routes.csv'}")
     print(f"summary={table_dir / 'surrol_risk_triage_summary.csv'}")
     print(f"scored_steps={table_dir / 'surrol_risk_triage_scored_steps.csv'}")
     print(f"figure={figure_dir / 'surrol_risk_triage_routes.png'}")
-    print(f"report={ROOT / 'reports' / 'surrol_risk_triage_round17_zh.md'}")
+    print(f"report={report_path}")
 
 
 if __name__ == "__main__":

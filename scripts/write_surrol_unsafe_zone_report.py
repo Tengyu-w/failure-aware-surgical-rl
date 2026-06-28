@@ -82,7 +82,7 @@ def main() -> None:
             "- The next step is to define task-specific forbidden regions and include them in learned risk-head labels.",
         ]
     )
-    out = ROOT / "reports" / "surrol_unsafe_zone_round22_zh.md"
+    out = ROOT / "reports" / "surrol_unsafe_zone.md"
     out.write_text("\n".join(lines), encoding="utf-8")
     print(f"summary={table_dir / 'surrol_unsafe_zone_summary.csv'}")
     print(f"report={out}")

@@ -252,11 +252,12 @@ def main() -> None:
     scored.to_csv(table_dir / "surrol_learned_risk_head_scored.csv", index=False)
     thresh.to_csv(table_dir / "surrol_learned_risk_head_thresholds.csv", index=False)
     weights.to_csv(table_dir / "surrol_learned_risk_head_weights.csv", index=False)
-    write_report(metrics, thresh, weights, ROOT / "reports" / "surrol_learned_risk_head_round21_zh.md")
+    report_path = ROOT / "reports" / "surrol_learned_risk_head.md"
+    write_report(metrics, thresh, weights, report_path)
     print(f"scored={table_dir / 'surrol_learned_risk_head_scored.csv'}")
     print(f"thresholds={table_dir / 'surrol_learned_risk_head_thresholds.csv'}")
     print(f"weights={table_dir / 'surrol_learned_risk_head_weights.csv'}")
-    print(f"report={ROOT / 'reports' / 'surrol_learned_risk_head_round21_zh.md'}")
+    print(f"report={report_path}")
 
 
 if __name__ == "__main__":

@@ -63,7 +63,7 @@ def main() -> None:
     gauze_drift = eval_summary(RUNS / "surrol_ppo_eval_gauzeretrieve_bc_3demo_drift_5ep.csv")
 
     REPORTS.mkdir(parents=True, exist_ok=True)
-    out = REPORTS / "surrol_ppo_pseudovision_readiness_round26_zh.md"
+    out = REPORTS / "surrol_ppo_pseudovision_readiness.md"
     lines = [
         "# SurRoL PPO / Pseudo-Vision Readiness",
         "",

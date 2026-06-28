@@ -247,11 +247,12 @@ def main() -> None:
     summary.to_csv(table_dir / "surrol_severity_sweep_summary.csv", index=False)
     paired_df.to_csv(table_dir / "surrol_severity_sweep_paired.csv", index=False)
     plot(paired_df, figure_dir)
-    write_report(paired_df, ROOT / "reports" / "surrol_severity_sweep_round19_zh.md")
+    report_path = ROOT / "reports" / "surrol_severity_sweep.md"
+    write_report(paired_df, report_path)
     print(f"summary={table_dir / 'surrol_severity_sweep_summary.csv'}")
     print(f"paired={table_dir / 'surrol_severity_sweep_paired.csv'}")
     print(f"figures={figure_dir}")
-    print(f"report={ROOT / 'reports' / 'surrol_severity_sweep_round19_zh.md'}")
+    print(f"report={report_path}")
 
 
 if __name__ == "__main__":

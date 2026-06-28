@@ -4,7 +4,7 @@ param(
     [string]$MambaRoot = "external/micromamba",
     [string]$EpisodeOut = "runs/surrol_needlepick_monitor_recovery.csv",
     [string]$StepOut = "runs/surrol_needlepick_monitor_recovery_steps.csv",
-    [string]$Report = "reports/surrol_needlepick_monitor_recovery_zh.md",
+    [string]$Report = "reports/surrol_needlepick_monitor_recovery.md",
     [string]$Task = "NeedlePick",
     [int]$Seeds = 3,
     [int]$Episodes = 1,

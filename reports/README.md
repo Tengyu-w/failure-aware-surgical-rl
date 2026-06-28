@@ -24,5 +24,5 @@ Read these first:
 - `figures/`: plots for recovery, routing, embeddings, and proxy experiments.
 - `media/`: SurRoL rendered rollout GIF/MP4/PNG evidence.
 
-The main research story is the ordered sequence in
-[docs/research_sequence.md](../docs/research_sequence.md).
+The main research story is the stage-ordered report in
+[docs/RESEARCH_REPORT.md](../docs/RESEARCH_REPORT.md).
