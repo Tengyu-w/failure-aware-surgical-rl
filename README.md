@@ -36,6 +36,52 @@ The final GitHub framing is:
 - The strongest claim is internal simulation evidence for runtime reliability
   supervision, not real surgical autonomy.
 
+## Data And Label Boundary
+
+This repository does not use a real surgical demonstration dataset or
+surgeon-labeled action annotations. The action policy is learned inside
+simulation.
+
+The experimental sequence is:
+
+1. A small constrained proxy environment is first built to study the basic
+   idea: a tool moves toward a target while avoiding a forbidden region,
+   force/contact proxy, workspace boundary, and safety-budget exhaustion.
+2. A PPO policy learns actions from simulator reward in that proxy. The policy
+   is not trained from human labels; it learns by interacting with the
+   simulator.
+3. The same reliability-supervision idea is then embedded into SurRoL/PyBullet
+   surgical simulation tasks. In this stage the project uses simulator
+   rollouts, rendered frames, traces, and injected faults, not real patient or
+   robot-hardware data.
+4. Faults such as action noise, action dropout, execution slip, perception
+   bias, depth-scale error, near-target drift, and jaw-stuck behavior are
+   injected to expose failure modes that resemble the kinds of degradation
+   expected when a policy moves from a clean simulator toward a less reliable
+   execution setting.
+5. Those perturbed rollouts produce weak reliability labels from the simulator
+   logs and routing rules. These labels train a review/abort risk head and a
+   four-way mechanism router. They do not train a new surgical action policy
+   from expert demonstrations.
+
+So the project separates three things:
+
+| Component | What it learns | Data source |
+| --- | --- | --- |
+| PPO action policy | continuous simulator actions | simulator reward and rollouts |
+| binary risk head | whether execution should enter review/abort | weak labels from perturbed simulation logs |
+| mechanism router | continue, recover, review, or abort-candidate | injected-failure family, rollout evidence, and routing rules |
+
+This is why the final claim is a simulation reliability-supervision prototype:
+the system studies when a learned policy becomes unreliable under noise,
+perception shift, contact uncertainty, or unsafe recovery conditions, then
+routes execution into correction, recovery, review, or abort-candidate states.
+It does not claim that a real surgical policy has been learned from clinical
+data. This framing is also why the project is relevant to sim-to-real
+reliability: even a policy that works in a clean simulator may fail under
+shifted perception, noisy execution, contact mismatch, or unsafe recovery
+conditions.
+
 ## How The Research Logic Evolved
 
 The project is best read as a staged research story.
