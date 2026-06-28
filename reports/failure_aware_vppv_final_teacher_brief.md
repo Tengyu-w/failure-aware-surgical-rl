@@ -4,9 +4,10 @@
 
 This project adds an ECG-style, mechanism-specific reliability router around the
 VPPV surgical-simulation pipeline: instead of treating every failure as "try
-again", it separates visual-state bias, depth error, policy approach drift,
-action-outcome mismatch, progress loss, and unsafe continuation, then routes the
-episode to continue, re-estimate/recover, review, or abort-candidate behavior.
+again", it separates three VPPV-aligned mechanisms--visual/depth target
+estimation bias, policy approach drift, and near-target occlusion or servo
+failure--then routes the episode to re-observe, re-estimate, low-gain
+correction, human review, or abort/human-takeover behavior.
 
 ## What The Project Does Not Claim
 
@@ -17,7 +18,9 @@ episode to continue, re-estimate/recover, review, or abort-candidate behavior.
 
 The useful claim is narrower: in SurRoL/PyBullet-style surgical simulation, the
 project tests whether runtime evidence can identify why VPPV-style execution is
-becoming unreliable and choose a mechanism-matched correction.
+becoming unreliable and choose a mechanism-matched correction. Depth-scale
+error, action-outcome mismatch, progress loss, and local-neighborhood
+instability are evidence channels or subtypes, not extra headline mechanisms.
 
 ## Why This Fits The VPPV Pain Point
 
@@ -25,8 +28,8 @@ The relevant VPPV failure is not simply "the gripper opens or closes wrong".
 The more important reliability problem is that the visual estimate or
 high-level approach target can be wrong, the policy can move toward a biased
 position, or the near-target handoff can continue unsafely. A uniform retry is
-weak because visual bias, depth-scale error, and approach drift need different
-responses.
+weak because target-estimation bias, approach drift, and near-target
+servo/occlusion failure need different responses.
 
 ## Evidence Ladder
 
@@ -34,11 +37,27 @@ responses.
 |---|---:|---|
 | Step-level mechanism evidence | 10823 rows; composite macro-F1=0.998; missed high-risk=0.000 | Multi-evidence routing preserves mechanism identity better than one signal |
 | Single-evidence ablation | visual=0.367, depth=0.381, policy=0.355, single-score=0.131 macro-F1 | One generic evidence channel is insufficient |
+| Policy-side mechanism separability | PCA/cluster fingerprints from rollout behavior; labels held out until evaluation | Mechanisms are separable enough to support route assignment without direct step-label lookup |
 | Cross-task frozen thresholds | NeedlePick->GauzeRetrieve=1.000; GauzeRetrieve->NeedlePick=0.996 macro-F1 | The route logic transfers across two SurRoL tasks |
 | Severity holdout | boundary router=1.000; uniform retry=0.167 macro-F1 on high severity | Mechanism boundaries survive a held-out severity shift |
 | Offline mixed-priority audit | priority=1.000; max-signal=0.033; uniform=0.000 macro-F1 | Compound faults need priority routing |
 | Behavior-derived route assignment | held-out macro-F1=0.995; missed high-risk=0.000; false alarm=0.025 | Route assignment can be derived from rollout behavior regions |
 | True mixed SurRoL rollouts | clean=40/40; perturbed=0/40; priority-routed=40/40 success | Route-specific re-estimation restores success in smoke-scale PyBullet rollouts |
+
+## Policy-Side Mechanism Separability
+
+The project does include a model-side test, but it should be described
+carefully. It is not a hidden-layer analysis of the teacher's original VPPV
+checkpoint. Instead, it uses policy-proxy evidence, action deviation,
+action-outcome mismatch, local-neighborhood instability, progress regularity,
+and rollout embeddings to ask whether simulator failure mechanisms are
+separable before route assignment.
+
+Mechanism labels are not used to form the PCA/clusters. They are used afterward
+to evaluate whether the discovered behavior regions align with expected
+routes. On held-out episodes this behavior-derived route assignment reaches
+accuracy 0.996, macro-F1 0.995, missed high-risk 0.000, and nominal false alarm
+0.025.
 
 ## Final Result Snapshot
 

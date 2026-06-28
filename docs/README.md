@@ -9,6 +9,7 @@ experiment dump.
 | Time | File | Purpose |
 | --- | --- | --- |
 | 2 min | [Project README](../README.md) | Main contribution, result snapshot, and limitations. |
+| 5 min | [Reliability-supervised VPPV framework](RELIABILITY_SUPERVISED_VPPV_FRAMEWORK.md) | Clean final spine: three VPPV mechanisms, weak-label rollout data, policy-side separability, composite routing, and metrics. |
 | 8 min | [Teacher-facing experiment process](TEACHER_EXPERIMENT_PROCESS.md) | The clearest narrative of what the project actually does and why the VPPV focus changed. |
 | 5 min | [Project index](PROJECT_INDEX.md) | Public entry point and evidence snapshot. |
 | 10 min | [Experiment evidence summary](EXPERIMENT_EVIDENCE_SUMMARY.md) | Compact story of what was tested, why, what worked, and what failed. |
@@ -34,6 +35,10 @@ experiment dump.
 ## Core Documents
 
 - [RESEARCH_REPORT.md](RESEARCH_REPORT.md): full stage-ordered final report.
+- [RELIABILITY_SUPERVISED_VPPV_FRAMEWORK.md](RELIABILITY_SUPERVISED_VPPV_FRAMEWORK.md):
+  cleaned final framework for Reliability-Supervised VPPV, including the
+  three mechanisms, weak-label data, policy-side separability test, routing,
+  and evaluation metrics.
 - [TEACHER_EXPERIMENT_PROCESS.md](TEACHER_EXPERIMENT_PROCESS.md): supervisor-facing
   explanation of the project logic from proxy RL to ECG-style VPPV routing.
 - [EXPERIMENT_EVIDENCE_SUMMARY.md](EXPERIMENT_EVIDENCE_SUMMARY.md): compact

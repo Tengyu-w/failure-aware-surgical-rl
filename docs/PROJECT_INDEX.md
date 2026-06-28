@@ -6,13 +6,21 @@ the longer reports.
 
 ## Summary
 
-This repository studies runtime reliability supervision for surgical robot
-learning in simulation. The project begins with a custom constrained 3D
-surgical-tool proxy for obstacle avoidance, tangent backup control, and safety
-budget testing. The same reliability-routing idea is then migrated into
-SurRoL/PyBullet manipulation tasks. The supervisor decides whether execution
-should continue, recover automatically, request human-style review or
-re-estimation, or stop because recovery may be unsafe.
+This repository studies **Reliability-Supervised VPPV** for surgical
+embodied-intelligence simulation. The final problem is not generic "RL
+recovery" and not low-level gripper learning. The final problem is that VPPV
+can move from visual state estimation to policy movement and then visual
+servoing, but it lacks a mechanism layer that decides whether failure comes
+from visual estimation bias, policy approach drift, or near-target
+occlusion/servo failure.
+
+The supervisor decides whether execution should continue, re-observe,
+re-estimate, perform low-gain correction, pause for review, or stop because
+near-target continuation may be unsafe.
+
+The project began with a custom constrained 3D proxy and tangent backup
+control, but that work is now historical scaffolding: it helped define runtime
+reliability routing before the work was reframed around the VPPV pain point.
 
 The first controller-level result is risk-gated tangent backup: an action-level
 supervisor that decides when the tangent backup controller should be active.
@@ -27,6 +35,7 @@ prototype and from 0.426 to 0.416 on strict.
 
 | Stage | What It Shows | Evidence Type |
 |---|---|---|
+| Reliability-supervised VPPV framework | The final project is reduced to three VPPV mechanisms, weak-label rollout generation, policy-side separability, composite routing, and reliability metrics. | Clean final framework and machine-readable mechanism CSV |
 | Teacher-facing experiment process | The project is explained as a progression from proxy RL to ECG-style mechanism analysis to VPPV reliability routing. | Supervisor-facing narrative document |
 | Self-built proxy simulation | The core safety-control idea works in a simple constrained surgical-tool environment. | PPO/controller logs, prototype/strict trajectories, top-down snapshots |
 | CircleRL recovery media | A biased target estimate can visibly drive the proxy tool off route, then monitor recovery re-estimates the target and returns toward completion. | MP4/GIF recovery demo, selected frames, trace CSV |
@@ -39,7 +48,7 @@ prototype and from 0.426 to 0.416 on strict.
 | Cross-task VPPV check | The step router is calibrated on one SurRoL task and tested with frozen thresholds on another. | Cross-task generalization report, threshold sweep, confusion table |
 | Severity-held-out VPPV check | Low/medium severity conditions define intervention boundaries, then high severity is held out. | Severity holdout report, boundary table, held-out route figure |
 | Mixed-priority VPPV audit | Existing single-mechanism traces are composed to test co-active visual/depth/policy evidence. | Mixed-priority report, scenario table, evidence figure |
-| Behavior-derived VPPV routing | Rollout behavior is embedded, clustered, fingerprinted, and converted into route assignments. | Behavior-derived routing report, cluster table, PCA figure |
+| Policy-side / behavior-derived VPPV routing | Rollout behavior and policy-proxy evidence are embedded, clustered, fingerprinted, and converted into route assignments with labels held out until evaluation. | Behavior-derived routing report, cluster table, PCA figure |
 | True mixed-fault VPPV rollouts | Mixed visual/depth/near-target fault proxies are executed inside SurRoL/PyBullet. | True mixed rollout report, paired table, success/distance figures |
 | Final VPPV evidence package | The VPPV evidence ladder is condensed into a teacher brief, machine-readable matrix, and readiness audit. | Final teacher brief, final evidence matrix, GitHub readiness audit |
 | Four intervention routes | Failures are not treated as one generic failure; they are routed to continue, recover, review, or abort-candidate. | Fault taxonomy, paired recovery tables, route labels |
@@ -50,6 +59,7 @@ prototype and from 0.426 to 0.416 on strict.
 | Time budget | File | Purpose |
 |---|---|---|
 | 2 minutes | [README](../README.md) | Main question, key numbers, setup, limitations |
+| 5 minutes | [Reliability-supervised VPPV framework](RELIABILITY_SUPERVISED_VPPV_FRAMEWORK.md) | Clean final spine: three mechanisms, weak labels, policy-side separability, composite routing, and metrics |
 | 8 minutes | [Teacher-facing experiment process](TEACHER_EXPERIMENT_PROCESS.md) | Best first deep read: why this is VPPV reliability routing, not a collection of gripper-action fixes |
 | 10 minutes | [Research report](RESEARCH_REPORT.md) | ECG-style structured explanation of what was done, why, evidence, and limits |
 | 10 minutes | [Experiment evidence summary](EXPERIMENT_EVIDENCE_SUMMARY.md) | Compact result narrative for a quick supervisor read |
@@ -92,18 +102,22 @@ prototype and from 0.426 to 0.416 on strict.
 | Step-level VPPV routing transfers across two SurRoL tasks. | Thresholds calibrated on NeedlePick reach 1.000 macro-F1 on GauzeRetrieve; thresholds calibrated on GauzeRetrieve reach 0.996 macro-F1 on NeedlePick. | Stronger than within-task consistency; still simulator-derived weak-label evidence |
 | Mechanism boundaries survive held-out high severity. | Boundary router trained on low/medium severity reaches 1.000 macro-F1 on 6 high-severity task/failure conditions, while uniform retry is 0.167. | Lightweight 30-seed aggregate check; not a full external validation |
 | Mixed evidence needs priority routing. | In an offline compositional mixed-perturbation audit, the priority router reaches 1.000 macro-F1, while max-signal routing reaches 0.033 and uniform retry reaches 0.000. | Priority audit over composed evidence; larger learned-policy mixed rollouts remain future work |
-| Routes can be derived from model behavior regions. | PCA/cluster route assignment on held-out episodes reaches 0.995 macro-F1, 0.000 missed high-risk rate, and 0.025 nominal false alarm. | Simulator rollout behavior and weak labels; not real-world discovery |
+| Mechanisms are separable in policy-side rollout evidence. | PCA/cluster route assignment uses policy-proxy evidence, action-outcome mismatch, local-neighborhood instability, and behavior embeddings; held-out macro-F1 is 0.995 with 0.000 missed high-risk rate and 0.025 nominal false alarm. | Simulator rollout behavior and weak labels; not teacher original hidden-layer discovery |
 | True mixed faults have been smoke-tested in SurRoL. | Across 2 tasks, 4 mixed fault combinations, and 5 seeds, perturbed mixed faults are 0/40 success while priority-routed mixed faults are 40/40 success. | Smoke-scale scripted-oracle simulation; not learned-policy or hardware validation |
 | The final VPPV story is now packaged. | The final teacher brief and evidence matrix link each major VPPV claim to its metric, report, table, figure, and rebuild command. | Strong as a GitHub/research-package organization step; it does not add new experimental validation |
 | Privileged-state dependence is being reduced. | Observable jaw-stuck supervisor uses command/progress signals rather than direct phase/contact checks for the decision. | Promising, still partial |
 
 ## What Is Shown
 
-- A working action-level reliability supervisor that gates tangent backup
-  control by interpretable risk, now upgraded into a two-stage
-  mechanism-routed supervisor.
+- A cleaned Reliability-Supervised VPPV problem statement centered on visual
+  estimation bias, policy approach drift, and near-target occlusion/servo
+  failure.
+- A policy-side mechanism separability test using rollout behavior,
+  policy-proxy evidence, KNN/prototype conflict, and cluster fingerprints.
 - A working reliability-supervision research pipeline for simulated surgical
   robot rollouts.
+- A historical action-level reliability supervisor that gates tangent backup
+  control by interpretable risk and helped motivate the current VPPV router.
 - Multi-seed evidence for recovery from several fault families.
 - A clear taxonomy connecting failures to intervention routes.
 - A complete learning-to-routing chain: baseline PPO, weak risk labels,
