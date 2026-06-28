@@ -250,7 +250,7 @@ def make_figures(step_routes: pd.DataFrame, clusters: pd.DataFrame) -> None:
     for route, color in route_colors.items():
         sub = sample[sample["model_derived_route"].eq(route)]
         axes[0].scatter(sub["pca_1"], sub["pca_2"], s=8, alpha=0.35, color=color, label=route)
-    axes[0].set_title("Model-derived routes in behavior/PCA space")
+    axes[0].set_title("Behavior-derived routes in rollout/PCA space")
     axes[0].set_xlabel("PC1")
     axes[0].set_ylabel("PC2")
     axes[0].legend(frameon=False, fontsize=8)
@@ -265,7 +265,7 @@ def make_figures(step_routes: pd.DataFrame, clusters: pd.DataFrame) -> None:
     axes[1].legend(frameon=False, fontsize=8)
     axes[1].grid(alpha=0.25)
 
-    fig.suptitle("Failure-aware VPPV model-derived routing assignment", fontweight="bold")
+    fig.suptitle("Failure-aware VPPV behavior-derived routing assignment", fontweight="bold")
     fig.savefig(PCA_FIG, dpi=180)
     plt.close(fig)
 
@@ -302,14 +302,14 @@ def write_report(summary: pd.DataFrame, clusters: pd.DataFrame, transitions: pd.
     )
 
     top_clusters = clusters.sort_values(["split", "cluster"]).copy()
-    report = f"""# Failure-Aware VPPV Model-Derived Routing Assignment
+    report = f"""# Failure-Aware VPPV Behavior-Derived Routing Assignment
 
 ## Purpose
 
 This experiment addresses the main limitation of a hand-written mechanism
 router. The earlier VPPV router used simulator fault families and weak labels
-to define routes. Here the route assignment is derived from model/rollout
-behavior first: distance, progress, action deviation, perception error,
+to define routes. Here the route assignment is derived from rollout behavior
+first: distance, progress, action deviation, perception error,
 policy-proxy evidence, action-outcome mismatch, and local neighborhood
 instability are embedded, clustered, and converted into routes by cluster
 fingerprints.
@@ -317,6 +317,11 @@ fingerprints.
 The mechanism labels are not used to form the clusters. They are used only at
 the end to evaluate whether the discovered behavior regions align with the
 weak mechanism routes.
+
+This is not a full model-internal analysis of the teacher's original VPPV
+policy. The original checkpoint, training set, hidden activations, and model
+confidence outputs are not available in this repository. The closest available
+substitute is a behavior-representation analysis over simulator rollouts.
 
 ## Method
 
@@ -356,20 +361,21 @@ alarm rate={test['false_alarm_on_nominal_step_rate']:.3f}.
 
 ## Figures
 
-![model-derived PCA](figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png)
+![behavior-derived PCA](figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png)
 
-![model-derived cluster fingerprints](figures/failure_aware_vppv/failure_aware_vppv_model_derived_cluster_fingerprints.png)
+![behavior-derived cluster fingerprints](figures/failure_aware_vppv/failure_aware_vppv_model_derived_cluster_fingerprints.png)
 
 ## Interpretation
 
 This is closer to the ECG logic than the earlier hand-designed route table:
-the system first finds behavior regions in a model/rollout representation, then
+the system first finds behavior regions in a rollout representation, then
 assigns routes from the evidence fingerprint of each region. The result is
-still not a real clinical dataset result. It is a simulator-rollout,
-weak-label validation of model-behavior-derived routing.
+still not a real clinical dataset result, and it is not teacher-model
+hidden-layer analysis. It is a simulator-rollout, weak-label validation of
+behavior-derived routing.
 
 The strongest use of this result is to say: the project now has an explicit
-bridge from policy behavior and representation analysis to route assignment.
+bridge from rollout behavior and representation analysis to route assignment.
 It should not be described as a fully independent discovery of surgical
 failure mechanisms from real-world data.
 

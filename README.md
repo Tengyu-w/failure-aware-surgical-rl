@@ -34,9 +34,9 @@ self-built proxy simulator
   -> migrate the same idea into SurRoL/PyBullet tasks
   -> translate the ECG project's reliability analysis style into robot rollouts
   -> focus the final SurRoL/VPPV claim on visual-state and approach-policy reliability
-  -> derive routes from model/rollout behavior regions rather than only hand-written rules
+  -> derive routes from rollout-behavior regions rather than only hand-written rules
   -> test composite routing under step, cross-task, severity, mixed-priority,
-     model-derived, and true mixed-fault evidence
+     behavior-derived, and true mixed-fault evidence
 ```
 
 The final 5-seed true mixed-fault SurRoL smoke test is:
@@ -52,11 +52,14 @@ weak labels and scripted-oracle PyBullet rollouts. They support a research
 prototype for mechanism-specific reliability routing, not real surgical
 autonomy.
 
-The newest analysis closes the gap with the ECG project's logic more directly:
-it embeds model/rollout behavior, clusters the resulting behavior regions, and
-assigns routes from cluster evidence fingerprints. Mechanism labels are held
-back for evaluation. On held-out episode splits, this model-derived route
-assignment reaches macro-F1 0.995 with 0.000 missed high-risk step rate.
+The newest analysis closes part of the gap with the ECG project's logic, but
+with an important boundary. Because the teacher's original VPPV checkpoint,
+training data, and hidden-layer activations are not available here, the project
+does not claim a full model-internal analysis. Instead, it embeds rollout
+behavior, clusters the resulting behavior regions, and assigns routes from
+cluster evidence fingerprints. Mechanism labels are held back for evaluation.
+On held-out episode splits, this behavior-derived route assignment reaches
+macro-F1 0.995 with 0.000 missed high-risk step rate.
 
 For the full teacher-facing experiment process, read
 [docs/TEACHER_EXPERIMENT_PROCESS.md](docs/TEACHER_EXPERIMENT_PROCESS.md).
@@ -89,9 +92,9 @@ The final GitHub framing is:
 - **Failure-aware VPPV routing** reframes the SurRoL work around the actual
   VPPV bottleneck: visual-state estimation, high-level approach policy,
   near-target servoing handoff, and unsafe continuation, not gripper mechanics.
-- **Model-derived routing assignment** adds the ECG-like loop from model/rollout
-  behavior representation to route assignment, instead of relying only on a
-  hand-written mechanism table.
+- **Behavior-derived routing assignment** adds the ECG-like loop from rollout
+  behavior representation to route assignment, while clearly separating this
+  from full hidden-layer analysis of the teacher's original model.
 - **Final VPPV evidence package** condenses the step, cross-task, severity,
   mixed-priority, and true mixed-rollout results into one teacher-facing brief
   and a machine-readable evidence matrix.
@@ -280,8 +283,8 @@ PyBullet rollouts:
 [reports/failure_aware_vppv_true_mixed_rollouts.md](reports/failure_aware_vppv_true_mixed_rollouts.md)
 and
 [reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_success.png](reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_success.png).
-The model-derived routing follow-up derives route assignments from behavior
-clusters rather than from direct mechanism labels:
+The behavior-derived routing follow-up derives route assignments from rollout
+behavior clusters rather than from direct mechanism labels:
 [reports/failure_aware_vppv_model_derived_routing.md](reports/failure_aware_vppv_model_derived_routing.md)
 and
 [reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png](reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png).
@@ -471,7 +474,7 @@ These are simulator-log supervisor results, not real surgical validation.
 | 14. Failure-aware VPPV cross-task check | Calibrated the step router on NeedlePick and tested on GauzeRetrieve, then reversed. | Checks whether mechanism evidence transfers across SurRoL tasks. | Frozen-threshold cross-task macro-F1 is 1.000 and 0.996, with simulator-derived weak labels. |
 | 15. Failure-aware VPPV severity holdout | Learned intervention boundaries from low/medium severity and tested held-out high severity. | Checks whether mechanism routes remain valid under stronger unseen perturbations. | Boundary router reaches 1.000 macro-F1 on 6 held-out high-severity task/failure conditions; uniform retry is 0.167. |
 | 16. Failure-aware VPPV mixed-priority audit | Composed existing visual/depth/policy step traces to simulate co-active evidence. | Tests whether route priority is preserved when multiple mechanisms fire together. | Priority router reaches 1.000 macro-F1; max-signal router is 0.033 and uniform retry is 0.000. |
-| 17. Model-derived VPPV routing assignment | Embedded model/rollout behavior, clustered behavior regions, and assigned routes from cluster fingerprints. | Connects ECG-style representation analysis to route generation rather than only hand-written rules. | Held-out macro-F1 is 0.995 with 0.000 missed high-risk step rate and 0.025 nominal false alarm. |
+| 17. Behavior-derived VPPV routing assignment | Embedded rollout behavior, clustered behavior regions, and assigned routes from cluster fingerprints. | Connects ECG-style representation analysis to route generation while avoiding claims about unavailable teacher-model hidden layers. | Held-out macro-F1 is 0.995 with 0.000 missed high-risk step rate and 0.025 nominal false alarm. |
 | 18. True mixed-fault SurRoL rollouts | Executed mixed visual/depth/near-target fault proxies inside SurRoL/PyBullet. | Closes the gap between offline priority audit and simulator dynamics. | In a 5-seed smoke run, perturbed mixed faults are 0/40 success and priority-routed mixed faults are 40/40 success. |
 | 19. Final VPPV evidence package | Condensed the VPPV evidence ladder into a teacher brief, evidence matrix, and readiness audit. | Makes the GitHub story traceable and claim-calibrated. | The final package states the strongest claim as simulator-only mechanism-specific runtime routing, with weak-label and scripted-oracle limits. |
 

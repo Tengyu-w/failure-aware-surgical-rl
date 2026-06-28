@@ -39,7 +39,7 @@ prototype and from 0.426 to 0.416 on strict.
 | Cross-task VPPV check | The step router is calibrated on one SurRoL task and tested with frozen thresholds on another. | Cross-task generalization report, threshold sweep, confusion table |
 | Severity-held-out VPPV check | Low/medium severity conditions define intervention boundaries, then high severity is held out. | Severity holdout report, boundary table, held-out route figure |
 | Mixed-priority VPPV audit | Existing single-mechanism traces are composed to test co-active visual/depth/policy evidence. | Mixed-priority report, scenario table, evidence figure |
-| Model-derived VPPV routing | Model/rollout behavior is embedded, clustered, fingerprinted, and converted into route assignments. | Model-derived routing report, cluster table, PCA figure |
+| Behavior-derived VPPV routing | Rollout behavior is embedded, clustered, fingerprinted, and converted into route assignments. | Behavior-derived routing report, cluster table, PCA figure |
 | True mixed-fault VPPV rollouts | Mixed visual/depth/near-target fault proxies are executed inside SurRoL/PyBullet. | True mixed rollout report, paired table, success/distance figures |
 | Final VPPV evidence package | The VPPV evidence ladder is condensed into a teacher brief, machine-readable matrix, and readiness audit. | Final teacher brief, final evidence matrix, GitHub readiness audit |
 | Four intervention routes | Failures are not treated as one generic failure; they are routed to continue, recover, review, or abort-candidate. | Fault taxonomy, paired recovery tables, route labels |
@@ -62,7 +62,7 @@ prototype and from 0.426 to 0.416 on strict.
 | 15 minutes | [Failure-aware VPPV cross-task generalization](../reports/failure_aware_vppv_cross_task_generalization.md) | Frozen-threshold transfer between NeedlePick and GauzeRetrieve |
 | 15 minutes | [Failure-aware VPPV severity holdout](../reports/failure_aware_vppv_severity_holdout.md) | Low/medium intervention-boundary calibration tested on held-out high severity |
 | 15 minutes | [Failure-aware VPPV mixed-priority audit](../reports/failure_aware_vppv_mixed_perturbation_priority.md) | Co-active evidence priority test: depth before visual before policy correction |
-| 15 minutes | [Failure-aware VPPV model-derived routing](../reports/failure_aware_vppv_model_derived_routing.md) | Route assignment derived from model/rollout behavior regions rather than direct mechanism labels |
+| 15 minutes | [Failure-aware VPPV behavior-derived routing](../reports/failure_aware_vppv_model_derived_routing.md) | Route assignment derived from rollout behavior regions rather than direct mechanism labels |
 | 15 minutes | [Failure-aware VPPV true mixed rollouts](../reports/failure_aware_vppv_true_mixed_rollouts.md) | Actual SurRoL/PyBullet mixed-fault rollouts with perturbed and priority-routed controllers |
 | 5 minutes | [Failure-aware VPPV final teacher brief](../reports/failure_aware_vppv_final_teacher_brief.md) | Final evidence ladder, strongest safe claim, and current limitations |
 | 10 minutes | [Failure-aware VPPV final evidence matrix](../reports/tables/failure_aware_vppv_final_evidence_matrix.csv) | Machine-readable claim, metric, report, table, figure, and rebuild-command map |

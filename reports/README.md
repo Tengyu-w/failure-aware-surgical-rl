@@ -19,7 +19,7 @@ Read these first:
 12. [Risk-gated tangent backup](risk_gated_tangent_report.md)
 13. [Failure-aware VPPV final teacher brief](failure_aware_vppv_final_teacher_brief.md)
 14. [Failure-aware VPPV GitHub readiness audit](failure_aware_vppv_github_readiness_audit.md)
-15. [Failure-aware VPPV model-derived routing](failure_aware_vppv_model_derived_routing.md)
+15. [Failure-aware VPPV behavior-derived routing](failure_aware_vppv_model_derived_routing.md)
 
 ## Evidence Folders
 

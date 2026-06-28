@@ -110,7 +110,7 @@ different question.
 | Cross-task transfer | Do thresholds transfer between NeedlePick and GauzeRetrieve? | macro-F1 1.000 and 0.996 with frozen thresholds |
 | Severity holdout | Do low/medium boundaries survive held-out high severity? | boundary router 1.000 macro-F1; uniform retry 0.167 |
 | Mixed-priority audit | What if visual/depth/policy evidence co-activate? | priority router 1.000 macro-F1; max-signal 0.033; uniform retry 0.000 |
-| Model-derived routing | Can routes be generated from model/rollout behavior regions? | held-out macro-F1 0.995; missed high-risk 0.000 |
+| Behavior-derived routing | Can routes be generated from rollout behavior regions? | held-out macro-F1 0.995; missed high-risk 0.000 |
 | True mixed rollouts | Does routing still work when mixed faults execute in PyBullet? | perturbed 0/40 success; priority-routed 40/40 success |
 
 The strongest current evidence is the 5-seed true mixed-fault SurRoL smoke
@@ -150,7 +150,7 @@ the safest causal mechanism. For example, a depth-scale error may create visual
 residuals, but the route should still prioritize depth re-estimation before
 trusting the visual residual.
 
-## 7. Model-Derived Routing Assignment
+## 7. Behavior-Derived Routing Assignment
 
 This is the newest step added to answer the ECG-style concern more directly.
 The earlier composite route was mechanism-informed: we knew which simulator
@@ -159,7 +159,7 @@ useful, but it is not the full ECG logic, because the ECG project starts from a
 trained model and data, analyzes the model's representation and uncertainty,
 then builds routes from the discovered failure regions.
 
-The new model-derived routing experiment moves closer to that pattern:
+The new behavior-derived routing experiment moves closer to that pattern:
 
 ```text
 SurRoL/VPPV rollout steps
@@ -176,7 +176,7 @@ SurRoL/VPPV rollout steps
 The important detail is that `mechanism_label` is not used to form the behavior
 clusters. It is held back for evaluation. In other words, the system first asks:
 
-> What behavior regions does the model/rollout data naturally expose?
+> What behavior regions does the rollout data naturally expose?
 
 Only after those regions are found does the experiment ask:
 
@@ -204,11 +204,12 @@ nominal false alarm rate 0.025
 ```
 
 This still does not equal the ECG project, because the surgical project uses
-simulator rollouts and weak labels rather than a real clinical dataset. But it
-does add the missing logical bridge:
+simulator rollouts and weak labels rather than a real clinical dataset. It also
+does not inspect the teacher's original hidden-layer activations or training
+data. But it does add the missing logical bridge:
 
 ```text
-model behavior / representation
+rollout behavior / representation
   -> discovered risky regions
   -> route assignment
   -> held-out verification
@@ -243,7 +244,7 @@ The repository is careful about the boundary:
 - It is simulator-only.
 - The labels are weak labels from injected faults and routing rules.
 - The true mixed rollout is scripted-oracle PyBullet evidence.
-- The model-derived routing clusters are derived from simulator behavior
+- The behavior-derived routing clusters are derived from simulator behavior
   features, not from a real surgical dataset or the teacher's original hidden
   policy representation.
 - It is not hardware validation.
@@ -260,7 +261,7 @@ The repository is careful about the boundary:
   [reports/tables/failure_aware_vppv_final_evidence_matrix.csv](../reports/tables/failure_aware_vppv_final_evidence_matrix.csv)
 - True mixed rollout report:
   [reports/failure_aware_vppv_true_mixed_rollouts.md](../reports/failure_aware_vppv_true_mixed_rollouts.md)
-- Model-derived routing report:
+- Behavior-derived routing report:
   [reports/failure_aware_vppv_model_derived_routing.md](../reports/failure_aware_vppv_model_derived_routing.md)
 - VPPV multi-evidence framework:
   [docs/FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md](FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md)

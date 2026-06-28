@@ -42,7 +42,7 @@ tables, figures, scripts, and a final evidence matrix.
 - Frozen thresholds transfer between NeedlePick and GauzeRetrieve with
   macro-F1 1.000 and
   0.996.
-- Model-derived route assignment reaches held-out macro-F1
+- Behavior-derived route assignment reaches held-out macro-F1
   0.995 over
   3351 step rows without using mechanism labels
   to form the route clusters.
