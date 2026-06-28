@@ -2,11 +2,11 @@
 
 ## One-Sentence Contribution
 
-This project adds an ECG-style, mechanism-specific reliability router around the
-VPPV surgical-simulation pipeline: instead of treating every failure as "try
-again", it separates three VPPV-aligned mechanisms--visual/depth target
+This project adds an ECG-style, mechanism-specific reliability router around
+the VPPV surgical-simulation pipeline. Rather than applying a uniform retry
+policy, it separates three VPPV-aligned mechanisms--visual/depth target
 estimation bias, policy approach drift, and near-target occlusion or servo
-failure--then routes the episode to re-observe, re-estimate, low-gain
+failure--and routes the episode to re-observe, re-estimate, low-gain
 correction, human review, or abort/human-takeover behavior.
 
 ## What The Project Does Not Claim
@@ -22,7 +22,7 @@ becoming unreliable and choose a mechanism-matched correction. Depth-scale
 error, action-outcome mismatch, progress loss, and local-neighborhood
 instability are evidence channels or subtypes, not extra headline mechanisms.
 
-## Why This Fits The VPPV Pain Point
+## Why This Fits The VPPV Reliability Problem
 
 The relevant VPPV failure is not simply "the gripper opens or closes wrong".
 The more important reliability problem is that the visual estimate or
@@ -33,18 +33,18 @@ servo/occlusion failure need different responses.
 
 ## How The Project Is Structured
 
-The project is a staged chain, not a single recovery demo:
+The project is organized as a staged evidence chain:
 
 | Stage | Role |
 |---|---|
-| VPPV/RL problem discovery | Identify that offset, biased target estimates, and approach drift are the useful pain points. |
+| VPPV/RL problem identification | Identify that offset, biased target estimates, and approach drift are the relevant reliability failures. |
 | Self-built proxy simulator | Isolate biased-target and unsafe-movement failures in a small controllable RL setting. |
-| Proxy recovery/routing | Show that mechanism evidence can trigger recovery/re-estimation rather than blind retry. |
+| Proxy recovery/routing | Show that mechanism evidence can trigger recovery/re-estimation rather than uniform retry. |
 | SurRoL migration | Move the same reliability idea into rendered surgical simulation. |
-| Small policy/actor proxy | Build the closest available policy-side rollout model because the teacher's original checkpoint and hidden activations are unavailable. |
+| Policy/actor surrogate | Build a policy-side rollout representation because the teacher's original checkpoint and hidden activations are unavailable. |
 | Internal separability analysis | Use rollout embeddings, PCA, KNN/prototype conflict, action-outcome mismatch, and visual uncertainty to test whether mechanisms are separable. |
 | Three-level routing | Map visual target bias, policy approach drift, and near-target servo failure to different intervention routes. |
-| Route self-verification | Audit the router with ablations, cross-task transfer, severity holdout, mixed-priority checks, behavior-derived clusters, early warning, false alarms, and true mixed SurRoL rollouts. |
+| Route validation | Audit the router with ablations, cross-task transfer, severity holdout, mixed-priority checks, behavior-derived clusters, early warning, false alarms, and true mixed SurRoL rollouts. |
 
 ## Evidence Ladder
 

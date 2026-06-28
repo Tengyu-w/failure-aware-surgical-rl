@@ -18,37 +18,36 @@ Core problem:
 > failure comes from and when it should re-observe, re-estimate, recover, or
 > request human takeover.
 
-The contribution is not "make the robot better at grasping." The contribution
-is to let the system recognize when its own visual estimate, approach movement,
-or near-target servoing has become unreliable.
+The contribution is not a new low-level grasp controller. The contribution is
+a reliability-supervision layer that detects when visual estimation, approach
+movement, or near-target servoing has become unreliable.
 
 ## 2. Full Project Structure
 
-The project is not a single final table. It is a sequence of increasingly
-realistic checks:
+The project is organized as a sequence of increasingly realistic checks:
 
 | Step | Role in the project |
 | --- | --- |
-| VPPV/RL problem discovery | identify that the key failure is unreliable target estimation, approach movement, or near-target servoing, not low-level jaw learning |
+| VPPV/RL problem identification | identify that the key failure is unreliable target estimation, approach movement, or near-target servoing, not low-level jaw learning |
 | self-built proxy simulator | isolate the failure mechanism in a small environment where biased targets, obstacle risk, and recovery can be controlled |
-| proxy recovery/routing | show that the system can detect biased movement and route to recovery/re-estimation instead of blind retry |
+| proxy recovery/routing | show that the system can detect biased movement and route to recovery/re-estimation instead of uniform retry |
 | SurRoL migration | move the same reliability idea into rendered surgical-simulation rollouts |
-| small policy/actor proxy | create a policy-side rollout model when the teacher's original checkpoint and hidden activations are unavailable |
+| policy/actor surrogate | create a policy-side rollout representation when the teacher's original checkpoint and hidden activations are unavailable |
 | mechanism perturbation dataset | generate weak labels through controlled perturbations rather than manual action labels |
 | internal separability analysis | test whether actor/rollout embeddings, PCA, KNN/prototype conflict, and action-outcome evidence separate mechanisms |
 | three-level route design | map visual bias, approach drift, and near-target servo failure to different interventions |
-| route self-verification | check ablation, transfer, severity holdout, mixed-priority behavior, early warning, false alarms, and true mixed SurRoL rollouts |
+| route validation | check ablation, transfer, severity holdout, mixed-priority behavior, early warning, false alarms, and true mixed SurRoL rollouts |
 
-The important story is:
+Research sequence:
 
 ```text
 problem discovery
   -> proxy mechanism proof
   -> SurRoL migration
-  -> small policy/actor-proxy evidence
+  -> policy/actor-surrogate evidence
   -> internal mechanism separability
   -> three-level routing
-  -> multi-angle self-verification
+  -> multi-angle validation
 ```
 
 ## 3. Three Mechanisms
@@ -126,8 +125,8 @@ boundary.
 
 It is not a hidden-layer audit of the teacher's original VPPV model. The
 teacher checkpoint, training data, raw hidden activations, and confidence
-outputs are not available. Instead, the project uses the closest available
-policy-side evidence:
+outputs are not available. Instead, the project uses policy-side surrogate
+evidence derived from simulator rollouts:
 
 - policy-proxy evidence;
 - action deviation;
@@ -185,21 +184,21 @@ The router is mechanism-specific and has three levels plus a safety override:
 | override | unsafe near-target | abort / human takeover |
 | normal | no high-risk evidence | continue |
 
-This should be described as compound routing, not retry. A generic retry is
-weak because different mechanisms need different interventions.
+This should be described as compound routing rather than uniform retry,
+because different mechanisms imply different interventions.
 
 ## 8. Route Self-Verification
 
-The route is not self-proven by a single success video. The current project
-uses several checks:
+The route is not validated by a single qualitative example. The current
+project uses several complementary checks:
 
-| Check | What it proves |
+| Check | Evidence supported |
 | --- | --- |
-| step-level mechanism evidence | per-step signals can identify the expected route |
+| step-level mechanism evidence | per-step signals identify the expected route |
 | single-evidence ablation | one signal is weaker than composite evidence |
 | cross-task frozen thresholds | route thresholds are not only tuned to one task |
 | severity holdout | route boundaries survive stronger unseen perturbations |
-| mixed-priority audit | compound failures need route priority, not max-score or uniform retry |
+| mixed-priority audit | compound failures require route priority rather than max-score or uniform retry |
 | behavior-derived clustering | route assignment can come from policy/trajectory regions rather than direct label lookup |
 | early-warning and false-alarm checks | risk is useful only if it warns early without over-interrupting normal rollouts |
 | true mixed SurRoL rollouts | route logic still helps when mixed fault proxies execute in PyBullet |
