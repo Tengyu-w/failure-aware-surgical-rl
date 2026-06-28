@@ -287,25 +287,27 @@ def write_report(routes: pd.DataFrame, summary: pd.DataFrame, out_path: Path) ->
     lines = [
         "# SurRoL Risk-Aware Intervention Routing",
         "",
-        "## 一句话结论",
+        "## Takeaway",
         "",
         (
-            "这一步把 SurRoL 结果从“检测到异常就恢复”升级为“先判断是否允许自动恢复”。"
-            "在已有 NeedlePick、GauzeRetrieve、NeedleReach 日志上，动作噪声、dropout、slip、freeze "
-            "主要被路由为 `auto_recovery`，而 silent jaw-stuck 这类夹爪结果不确定的失败被路由为 "
-            "`human_review`。这更接近 ECG 项目里的自动放行/复查/人工分流逻辑。"
+            "This analysis upgrades the SurRoL recovery logs from a generic "
+            "recover-on-anomaly rule to route-first decision making. In the "
+            "NeedlePick, GauzeRetrieve, and NeedleReach logs, action noise, "
+            "dropout, slip, and freeze are mainly routed to `auto_recovery`, "
+            "while visually uncertain or grasp-outcome-uncertain failures such "
+            "as silent jaw-stuck are routed to `human_review`."
         ),
         "",
-        "## 路由定义",
+        "## Route Definitions",
         "",
-        "| Route | 含义 | 当前触发依据 |",
+        "| Route | Meaning | Current trigger evidence |",
         "|---|---|---|",
-        "| `auto_execute` | 低风险正常执行 | nominal episode 且无明显风险报警 |",
-        "| `auto_recovery` | 可逆异常，允许短窗自动恢复 | action anomaly、clip、monitor trigger，但没有视觉状态或夹爪结果不确定信号 |",
-        "| `human_review` | 不应盲目恢复，需要暂停/复核 | 视觉/深度状态估计不确定，或多次闭合夹爪后目标距离仍远、停滞或无进展 |",
-        "| `abort_candidate` | 中止候选 | 持续高风险、长时间无进展且距离仍远；当前日志里主要作为规则预留 |",
+        "| `auto_execute` | Low-risk normal execution | nominal episode with no salient risk alarm |",
+        "| `auto_recovery` | Reversible anomaly where short-window automatic recovery is allowed | action anomaly, clipping, or monitor trigger without visual-state or grasp-outcome uncertainty |",
+        "| `human_review` | Pause/re-estimate rather than blindly retry | visual/depth state uncertainty, grasp-outcome uncertainty, repeated jaw close commands with remaining distance, or stagnation |",
+        "| `abort_candidate` | Candidate unsafe continuation | persistent high risk, no progress, and far-from-goal state; currently a conservative reserved rule |",
         "",
-        "## 路由计数",
+        "## Route Counts",
         "",
         "| Route | Episodes |",
         "|---|---:|",
@@ -316,7 +318,7 @@ def write_report(routes: pd.DataFrame, summary: pd.DataFrame, out_path: Path) ->
     lines.extend(
         [
             "",
-            "## 关键故障分流结果",
+            "## Key Failure Routing Results",
             "",
             "| Suite | Task | Failure | Controller | Route | Episodes | Success | Mean Risk | First Review Step |",
             "|---|---|---|---|---|---:|---:|---:|---:|",
@@ -347,20 +349,20 @@ def write_report(routes: pd.DataFrame, summary: pd.DataFrame, out_path: Path) ->
     lines.extend(
         [
             "",
-            "## 研究解释",
+            "## Research Interpretation",
             "",
-            "- 现在可以更准确地说：SurRoL 原型已经有了风险分流雏形，而不只是 recovery demo。",
-            "- `auto_recovery` 对应低后果、可逆的执行异常；`human_review` 对应夹爪结果不确定、盲目 retry 可能不合理的异常。",
-            "- 新增 perception-state 代理后，视觉/深度/状态估计错误会优先进入 `human_review`，near-target drift 才进入 `auto_recovery`。",
-            "- 当前 `abort_candidate` 仍是代理规则，因为 SurRoL 日志还没有真实组织损伤、力反馈或 forbidden-zone 接触证据。",
+            "- The SurRoL prototype now has an initial risk-triage layer, not only recovery demonstrations.",
+            "- `auto_recovery` corresponds to low-consequence, reversible execution anomalies; `human_review` corresponds to uncertain grasp or visual-state outcomes where blind retry is not appropriate.",
+            "- After adding perception-state proxies, visual/depth/state-estimation errors route to `human_review`, while near-target drift remains `auto_recovery` when recoverable.",
+            "- `abort_candidate` remains a proxy rule because these logs do not include real tissue-damage, force-feedback, or hardware-level unsafe-contact evidence.",
             "",
-            "## 局限",
+            "## Limitations",
             "",
-            "- 这是离线重放已有日志，不是在线中止控制。",
-            "- 风险分数是规则型 proxy，不是 learned uncertainty/risk head。",
-            "- 还没有视觉、力觉或组织危险区，所以不能宣称检测到了真实手术损伤风险。",
+            "- This is offline replay of existing logs, not online abort control.",
+            "- The risk score is a transparent proxy, not a validated learned uncertainty model.",
+            "- The current setup does not include real vision, force sensing, or tissue-damage labels, so it should not be described as detecting real surgical harm.",
             "",
-            "## 输出文件",
+            "## Output Files",
             "",
             "- `reports/tables/surrol_risk_triage_episode_routes.csv`",
             "- `reports/tables/surrol_risk_triage_summary.csv`",

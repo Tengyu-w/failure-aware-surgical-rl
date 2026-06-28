@@ -184,14 +184,17 @@ def write_report(paired_df: pd.DataFrame, out: Path) -> None:
     lines = [
         "# SurRoL Severity Sweep For Visual-State Error And Near-Target Drift",
         "",
-        "## 一句话结论",
+        "## Takeaway",
         "",
         (
-            "这一步完成了 error/drift severity sweep：在 NeedlePick 和 GauzeRetrieve 上分别测试低、中、高三档 "
-            "perception bias、depth scale error 和 near-target drift。结果支持一个更细的分流边界："
-            "视觉/深度状态错误一旦造成失败，短窗 recovery 基本不能解决，应进入视觉状态重估或人工复核；"
-            "near-target drift 在中高强度下可以被 monitor 自动恢复，但低强度 drift 在 NeedlePick 上存在漏触发，"
-            "说明阈值还需要校准。"
+            "This sweep tests low, medium, and high severity levels for "
+            "perception bias, depth-scale error, and near-target drift on "
+            "NeedlePick and GauzeRetrieve. It supports a route boundary: "
+            "visual/depth state errors that cause task failure should be routed "
+            "to state re-estimation or review, while recoverable near-target "
+            "drift can be handled by automatic monitor recovery. Low-severity "
+            "NeedlePick drift still has missed triggers, indicating that the "
+            "monitor threshold needs calibration."
         ),
         "",
         "## Paired Severity Results",
@@ -209,22 +212,21 @@ def write_report(paired_df: pd.DataFrame, out: Path) -> None:
     lines.extend(
         [
             "",
-            "## 边界解读",
+            "## Boundary Interpretation",
             "",
-            "- `perception_bias`: GauzeRetrieve 低强度仍可承受，但中高强度失败；NeedlePick 低强度已有 2/5 失败，中高强度 0/5。",
-            "- `depth_scale_error`: 两个任务即使低强度也较脆弱，说明深度/三维状态误差是更高优先级的复核对象。",
-            "- `near_target_drift`: 中高强度漂移可由 monitor 恢复到 5/5；低强度下 GauzeRetrieve 本身成功，NeedlePick 存在漏触发，应调低 near-target drift 的检测阈值或增加终点误差监测。",
+            "- `perception_bias`: GauzeRetrieve tolerates low severity but fails at medium/high severity; NeedlePick already shows failures at low severity and 0/5 success at medium/high severity.",
+            "- `depth_scale_error`: both tasks are fragile even at low severity, suggesting that depth/3D-state error should be high-priority review evidence.",
+            "- `near_target_drift`: medium/high drift can be recovered to 5/5 by the monitor; low drift succeeds naturally on GauzeRetrieve but has missed triggers on NeedlePick, so endpoint-error monitoring or threshold calibration is needed.",
             "",
-            "## 和初衷的关系",
+            "## Relation To The Project",
             "",
-            "这组实验没有改变主流手术机器人工作流，而是在现有视觉状态估计与 final control 交接处增加可靠性边界：",
-            "可逆漂移允许自动恢复，视觉/深度状态不可靠则进入复核或重估。",
+            "This experiment does not replace the mainstream surgical robot workflow. It adds a reliability boundary at the handoff between visual-state estimation and final control: reversible drift can enter automatic recovery, while unreliable visual/depth state should enter review or re-estimation.",
             "",
-            "## 局限",
+            "## Limitations",
             "",
-            "- Severity 是状态空间代理，不是真实 FastSAM/IGEV 图像错误。",
-            "- 每个任务每档 5 seed，仍然是轻量研究原型证据。",
-            "- Monitor 阈值仍是规则型，下一步应把漏触发样本用于校准。",
+            "- Severity is a state-space proxy, not a real FastSAM/IGEV image error.",
+            "- Each task/severity condition uses 5 seeds, so the result remains lightweight prototype evidence.",
+            "- The monitor threshold is rule-based; missed-trigger cases should be used for calibration.",
             "",
             "## Outputs",
             "",

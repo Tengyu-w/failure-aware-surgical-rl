@@ -93,12 +93,16 @@ def write_report(paired_df: pd.DataFrame, out: Path) -> None:
     lines = [
         "# SurRoL Human-Review Re-Estimation Closed-Loop Experiment",
         "",
-        "## 一句话结论",
+        "## Takeaway",
         "",
         (
-            "这一步把前面的 `human_review` 从离线路由变成了可验证的闭环：当 SurRoL 中出现 perception bias "
-            "或 depth scale error 时，盲目 oracle override 不能恢复；但如果触发 review/re-estimation，"
-            "即停止使用错误视觉状态并重新估计状态，NeedlePick 和 GauzeRetrieve 都能从 0/5 恢复到 5/5。"
+            "This experiment turns the previous `human_review` route from "
+            "offline triage into a closed-loop proxy. When SurRoL rollouts "
+            "contain perception bias or depth-scale error, blind oracle override "
+            "does not recover the task; when review/re-estimation is triggered, "
+            "the system stops using the corrupted visual state and re-estimates "
+            "state, recovering NeedlePick and GauzeRetrieve from 0/5 to 5/5 in "
+            "this simulator setting."
         ),
         "",
         "## Paired Results",

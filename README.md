@@ -275,12 +275,23 @@ real-robot recovery or end-to-end learned autonomy.
 
 ## Visual Evidence
 
-| Evidence family | Example |
-| --- | --- |
-| SurRoL rendered rollout | ![NeedlePick rendered rollout](reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_040.png) |
-| Risk-gated tangent result | ![Risk-gated tangent aggregate](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png) |
-| Mechanism-routed tangent result | ![Mechanism-routed tangent metrics](reports/figures/mechanism_routed_tangent_v5d/mechanism_router_metrics.png) |
-| Embedding-risk training pilot | ![Embedding-risk multi-seed pilot](reports/figures/embedding_risk_training_pilot/multiseed_curriculum_metrics.png) |
+The repository separates rendered SurRoL/PyBullet evidence from proxy
+controller plots. The first group shows that the project migrated beyond the
+custom 2D/3D proxy setting; the second group explains the runtime reliability
+mechanisms.
+
+| Research question | Visual evidence | Scope boundary |
+| --- | --- | --- |
+| Did the project run inside rendered SurRoL tasks? | ![GauzeRetrieve rendered frame](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_034.png) | Rendered simulation evidence, not real-robot footage. |
+| Are there task-level rollout media? | [NeedleReach GIF](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif), [NeedlePick GIF](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif), [GauzeRetrieve GIF](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) | Oracle rollout media used as visual migration evidence. |
+| Does risk gating preserve safety while reducing intervention? | ![Risk-gated tangent aggregate](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png) | Custom constrained surgical-tool proxy, not SurRoL. |
+| When and where does the risk gate activate? | ![Strict risk timeline](reports/figures/risk_gated_tangent_visuals/risk_timeline_strict.png) | Controller-level diagnostic plot. |
+| Does the router separate boundary risk from residual review risk? | ![Mechanism router stage split](reports/figures/mechanism_routed_tangent_v5d/mechanism_router_stage_split.png) | Mechanism routing distilled from simulation evidence. |
+| Can automatic recovery handle injected execution faults? | ![Phase-aware recovery success](reports/figures/surrol_phase_aware/success_rate_by_failure.png) | Route-specific recovery in simulation. |
+| Can observable signals recover jaw-stuck failures? | ![Observable jaw-stuck recovery](reports/figures/surrol_cross_task_observable_jaw_stuck_10seed/cross_task_jaw_stuck_recovery.png) | Observable proxy recovery, still scripted. |
+| Which visual-state errors should be reviewed instead of blindly recovered? | ![NeedlePick severity sweep](reports/figures/surrol_severity_sweep/needlepick_severity_sweep.png) | State-space proxy for perception/depth error. |
+| How broad is the reliability analysis beyond embedding alone? | ![ECG-style RL reliability suite](reports/figures/ecg_style_rl_reliability_suite/ecg_style_rl_reliability_suite.png) | Offline reliability diagnostics over simulated failures. |
+| Did the multi-signal upgrade improve interpretability of risk routing? | ![Multi-signal reliability upgrade](reports/figures/multisignal_reliability_upgrade/multisignal_reliability_upgrade.png) | Mechanism-level evidence, not clinical validation. |
 
 ## What Was Learned
 

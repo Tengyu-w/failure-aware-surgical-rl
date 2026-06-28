@@ -170,12 +170,16 @@ def main() -> None:
     lines = [
         "# SurRoL Risk-Level Calibration",
         "",
-        "## 一句话结论",
+        "## Takeaway",
         "",
         (
-            "这一步把原来的 recovery/abort 二分思路改成四档风险路由：auto_execute、auto_recovery、"
-            "human_review、abort_candidate。它更接近 ECG 项目里的分级处理逻辑：低风险自动执行，"
-            "可恢复漂移自动恢复，视觉/状态不确定交给复查，接近 forbidden zone 或 unsafe abort 的片段进入候选中止。"
+            "This step converts the previous recovery/abort split into four "
+            "risk routes: `auto_execute`, `auto_recovery`, `human_review`, and "
+            "`abort_candidate`. The logic matches selective reliability "
+            "handling: low-risk execution continues automatically, recoverable "
+            "drift enters automatic recovery, visual/state uncertainty enters "
+            "review, and forbidden-zone or unsafe-abort-like evidence is "
+            "escalated as an abort candidate."
         ),
         "",
         "## Risk-Level Summary",

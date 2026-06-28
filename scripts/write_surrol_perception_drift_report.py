@@ -82,13 +82,17 @@ def write_report(summary: pd.DataFrame, paired_df: pd.DataFrame, out: Path) -> N
     lines = [
         "# SurRoL Visual-State Error And Near-Target Drift Experiment",
         "",
-        "## 一句话结论",
+        "## Takeaway",
         "",
         (
-            "这组 5-seed 实验把项目重新收束到 VPPV 论文的核心局限：视觉/深度状态估计错误，以及 RL policy "
-            "接近目标后的 final-control drift。结果显示，perception/depth 错误会让 NeedlePick 和 GauzeRetrieve "
-            "都失败，且短窗 oracle override 不能可靠恢复，因此应进入人工复核或重新估计；near-target drift 则是可逆的执行偏差，"
-            "monitor 可以从 perturbed 失败恢复到 5/5 成功。"
+            "This 5-seed experiment targets a core VPPV-style limitation: "
+            "visual/depth state-estimation error and final-control drift near "
+            "the target. Perception/depth errors make NeedlePick and "
+            "GauzeRetrieve fail, and a short-window oracle override does not "
+            "reliably recover them; these cases should be routed to human "
+            "review or state re-estimation. Near-target drift behaves like a "
+            "reversible execution deviation and can be recovered by the monitor "
+            "from perturbed failure to 5/5 success."
         ),
         "",
         "## Paired Results",

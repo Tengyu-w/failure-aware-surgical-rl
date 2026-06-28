@@ -43,13 +43,16 @@ def main() -> None:
     lines = [
         "# SurRoL Unsafe-Zone / Abort-Candidate Proxy",
         "",
-        "## 一句话结论",
+        "## Takeaway",
         "",
         (
-            "这一步给 SurRoL 增加了一个不可逆风险代理：在目标附近放置 forbidden/danger zone，"
-            "如果 near-target drift 的恢复轨迹进入危险半径，risk-aware policy 不再继续 recovery，"
-            "而是触发 abort_candidate。当前 NeedlePick 5-seed 中，正常轨迹 0/5 中止，near-target drift "
-            "在 monitor 下 2/5 中止、3/5 安全恢复。"
+            "This step adds an irreversible-risk proxy to SurRoL: a "
+            "forbidden/danger zone near the target. If near-target-drift "
+            "recovery enters the danger radius, the risk-aware policy stops "
+            "recovery and routes the episode to `abort_candidate`. In the "
+            "current NeedlePick run, nominal trajectories do not abort, while "
+            "near-target drift is split between safe recovery and "
+            "abort-candidate routing."
         ),
         "",
         "## Summary",

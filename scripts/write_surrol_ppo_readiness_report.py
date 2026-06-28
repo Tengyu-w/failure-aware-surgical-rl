@@ -67,13 +67,17 @@ def main() -> None:
     lines = [
         "# SurRoL PPO / Pseudo-Vision Readiness",
         "",
-        "## 一句话结论",
+        "## Takeaway",
         "",
         (
-            "本轮已经把 SurRoL RL 环境接入一个 failure-aware PPO wrapper：它支持 state/pseudo_vision 两种观测、"
-            "render_pseudo_vision 图像压缩观测、action_noise/action_dropout/near_target_drift 训练扰动、"
-            "forbidden-zone 风险惩罚和 success bonus。目前 NeedlePickRL 和 PickAndPlaceRL 都通过了环境级 smoke；"
-            "NeedlePickRL 还完成了一个最小 PPO 训练 smoke、保存 checkpoint，并跑通了 checkpoint 评估入口。"
+            "This round connects the SurRoL RL environment to a failure-aware "
+            "PPO wrapper. The wrapper supports state and pseudo-vision "
+            "observations, compressed RGB-derived pseudo-vision features, "
+            "action-noise/action-dropout/near-target-drift training "
+            "perturbations, forbidden-zone risk penalties, and success bonuses. "
+            "NeedlePickRL and PickAndPlaceRL pass environment-level smoke "
+            "checks; NeedlePickRL also completes a minimal PPO training smoke, "
+            "saves a checkpoint, and runs the checkpoint evaluation entry point."
         ),
         "",
         "## Smoke Evidence",
