@@ -22,7 +22,36 @@ The contribution is not "make the robot better at grasping." The contribution
 is to let the system recognize when its own visual estimate, approach movement,
 or near-target servoing has become unreliable.
 
-## 2. Three Mechanisms
+## 2. Full Project Structure
+
+The project is not a single final table. It is a sequence of increasingly
+realistic checks:
+
+| Step | Role in the project |
+| --- | --- |
+| VPPV/RL problem discovery | identify that the key failure is unreliable target estimation, approach movement, or near-target servoing, not low-level jaw learning |
+| self-built proxy simulator | isolate the failure mechanism in a small environment where biased targets, obstacle risk, and recovery can be controlled |
+| proxy recovery/routing | show that the system can detect biased movement and route to recovery/re-estimation instead of blind retry |
+| SurRoL migration | move the same reliability idea into rendered surgical-simulation rollouts |
+| small policy/actor proxy | create a policy-side rollout model when the teacher's original checkpoint and hidden activations are unavailable |
+| mechanism perturbation dataset | generate weak labels through controlled perturbations rather than manual action labels |
+| internal separability analysis | test whether actor/rollout embeddings, PCA, KNN/prototype conflict, and action-outcome evidence separate mechanisms |
+| three-level route design | map visual bias, approach drift, and near-target servo failure to different interventions |
+| route self-verification | check ablation, transfer, severity holdout, mixed-priority behavior, early warning, false alarms, and true mixed SurRoL rollouts |
+
+The important story is:
+
+```text
+problem discovery
+  -> proxy mechanism proof
+  -> SurRoL migration
+  -> small policy/actor-proxy evidence
+  -> internal mechanism separability
+  -> three-level routing
+  -> multi-angle self-verification
+```
+
+## 3. Three Mechanisms
 
 The current version keeps three mechanisms because they are closest to the
 VPPV pipeline.
@@ -39,7 +68,7 @@ Safety override:
 | --- | --- |
 | unsafe near-target continuation | abort / human takeover |
 
-## 3. Weak-Label Data Generation
+## 4. Weak-Label Data Generation
 
 The project does not require manual action labels. Labels come from controlled
 perturbations:
@@ -65,7 +94,7 @@ Each trajectory should expose:
 These are weak labels from simulator perturbations. They are useful for
 research evidence, but they are not independent surgeon annotations.
 
-## 4. Evidence And Embedding Analysis
+## 5. Evidence And Embedding Analysis
 
 The ECG-style part of the project is the analysis-to-routing loop:
 
@@ -90,7 +119,7 @@ rollout behavior
   -> held-out verification
 ```
 
-## 5. Policy-Side Mechanism Separability Test
+## 6. Policy-Side Mechanism Separability Test
 
 The project does include a model-side separability test, with a careful
 boundary.
@@ -144,22 +173,47 @@ It should not be described as:
 > full hidden-layer discovery of failure mechanisms in the teacher's original
 > VPPV model.
 
-## 6. Composite Routing
+## 7. Three-Level Composite Routing
 
-The router is mechanism-specific:
+The router is mechanism-specific and has three levels plus a safety override:
 
-| Mechanism | Route |
-| --- | --- |
-| `visual_estimation_bias` | re-observe / re-estimate |
-| `policy_approach_drift` | low-gain corrective movement / replan |
-| `near_target_occlusion_or_servo_failure` | pause / camera reposition / human review |
-| unsafe near-target | abort / human takeover |
-| normal | continue |
+| Level | Mechanism | Route |
+| --- | --- | --- |
+| 1 | `visual_estimation_bias` | re-observe / re-estimate |
+| 2 | `policy_approach_drift` | low-gain corrective movement / replan |
+| 3 | `near_target_occlusion_or_servo_failure` | pause / camera reposition / human review |
+| override | unsafe near-target | abort / human takeover |
+| normal | no high-risk evidence | continue |
 
 This should be described as compound routing, not retry. A generic retry is
 weak because different mechanisms need different interventions.
 
-## 7. Evaluation Metrics
+## 8. Route Self-Verification
+
+The route is not self-proven by a single success video. The current project
+uses several checks:
+
+| Check | What it proves |
+| --- | --- |
+| step-level mechanism evidence | per-step signals can identify the expected route |
+| single-evidence ablation | one signal is weaker than composite evidence |
+| cross-task frozen thresholds | route thresholds are not only tuned to one task |
+| severity holdout | route boundaries survive stronger unseen perturbations |
+| mixed-priority audit | compound failures need route priority, not max-score or uniform retry |
+| behavior-derived clustering | route assignment can come from policy/trajectory regions rather than direct label lookup |
+| early-warning and false-alarm checks | risk is useful only if it warns early without over-interrupting normal rollouts |
+| true mixed SurRoL rollouts | route logic still helps when mixed fault proxies execute in PyBullet |
+
+Current headline results:
+
+| Evidence | Result |
+| --- | --- |
+| step-level composite | 10,823 rows; macro-F1 0.998; missed high-risk 0.000 |
+| behavior-derived routing | 3,351 held-out rows; macro-F1 0.995; nominal false alarm 0.025 |
+| mixed-priority | priority 1.000 macro-F1; max-signal 0.033; uniform retry 0.000 |
+| true mixed rollouts | perturbed 0/40 success; priority-routed 40/40 success |
+
+## 9. Evaluation Metrics
 
 The main metrics should be reliability metrics, not only success rate:
 
@@ -172,7 +226,7 @@ The main metrics should be reliability metrics, not only success rate:
 | early warning lead time | how early risk is detected before terminal failure |
 | false alarm rate on normal rollouts | whether normal behavior is interrupted too often |
 
-## 8. Current Minimal Experiment
+## 10. Current Minimal Experiment
 
 The most valuable next experiment is:
 

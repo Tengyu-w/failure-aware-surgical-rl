@@ -31,6 +31,21 @@ position, or the near-target handoff can continue unsafely. A uniform retry is
 weak because target-estimation bias, approach drift, and near-target
 servo/occlusion failure need different responses.
 
+## How The Project Is Structured
+
+The project is a staged chain, not a single recovery demo:
+
+| Stage | Role |
+|---|---|
+| VPPV/RL problem discovery | Identify that offset, biased target estimates, and approach drift are the useful pain points. |
+| Self-built proxy simulator | Isolate biased-target and unsafe-movement failures in a small controllable RL setting. |
+| Proxy recovery/routing | Show that mechanism evidence can trigger recovery/re-estimation rather than blind retry. |
+| SurRoL migration | Move the same reliability idea into rendered surgical simulation. |
+| Small policy/actor proxy | Build the closest available policy-side rollout model because the teacher's original checkpoint and hidden activations are unavailable. |
+| Internal separability analysis | Use rollout embeddings, PCA, KNN/prototype conflict, action-outcome mismatch, and visual uncertainty to test whether mechanisms are separable. |
+| Three-level routing | Map visual target bias, policy approach drift, and near-target servo failure to different intervention routes. |
+| Route self-verification | Audit the router with ablations, cross-task transfer, severity holdout, mixed-priority checks, behavior-derived clusters, early warning, false alarms, and true mixed SurRoL rollouts. |
+
 ## Evidence Ladder
 
 | Stage | Key result | What it supports |
