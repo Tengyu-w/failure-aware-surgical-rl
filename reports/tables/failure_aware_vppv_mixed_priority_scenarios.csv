@@ -1,0 +1,9 @@
+task,mixed_components,steps,expected_route,mean_visual_evidence,mean_depth_evidence,mean_policy_evidence,priority_router_match,max_signal_match,uniform_retry_match
+GauzeRetrieve,depth_scale_error+policy_approach_drift,180,depth_reestimate_or_cautious_approach,1.0,1.0,0.6854239766081872,1.0,0.0,0.0
+GauzeRetrieve,visual_estimation_bias+depth_scale_error,180,depth_reestimate_or_cautious_approach,1.0,1.0,0.2857894736842105,1.0,0.0,0.0
+GauzeRetrieve,visual_estimation_bias+depth_scale_error+policy_approach_drift,180,depth_reestimate_or_cautious_approach,1.0,1.0,0.6892397660818714,1.0,0.0,0.0
+GauzeRetrieve,visual_estimation_bias+policy_approach_drift,180,reobserve_reestimate,0.7593434954626931,0.07810249675906647,0.6876608187134504,1.0,0.17777777777777778,0.0
+NeedlePick,depth_scale_error+policy_approach_drift,180,depth_reestimate_or_cautious_approach,1.0,1.0,0.6717543859649123,1.0,0.0,0.0
+NeedlePick,visual_estimation_bias+depth_scale_error,180,depth_reestimate_or_cautious_approach,1.0,1.0,0.20414473684210524,1.0,0.0,0.0
+NeedlePick,visual_estimation_bias+depth_scale_error+policy_approach_drift,180,depth_reestimate_or_cautious_approach,1.0,1.0,0.6721162280701755,1.0,0.0,0.0
+NeedlePick,visual_estimation_bias+policy_approach_drift,180,reobserve_reestimate,0.7593434954626931,0.07810249675906647,0.6709320175438597,1.0,0.23333333333333334,0.0

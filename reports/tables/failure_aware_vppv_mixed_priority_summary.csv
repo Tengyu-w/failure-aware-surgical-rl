@@ -1,0 +1,5 @@
+model,rows,scenarios,accuracy,macro_f1,missed_intervention_rate,wrong_priority_rate,route_diversity
+priority_router,1440,8,1.0,1.0,0.0,0.0,2
+max_signal_router,1440,8,0.05138888888888889,0.03258476442095993,0.0,0.9486111111111111,2
+uniform_retry,1440,8,0.0,0.0,0.0,1.0,1
+single_score_retry,1440,8,0.0,0.0,0.25,1.0,2

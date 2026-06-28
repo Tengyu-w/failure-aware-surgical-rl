@@ -1,0 +1,5 @@
+split,rows,threshold_visual,threshold_depth,threshold_policy,threshold_action,accuracy,macro_f1,missed_high_risk_step_rate,false_alarm_on_continue_rate,route_diversity,train_task,test_task
+calibrate_on_NeedlePick,5362,0.45,0.45,0.35,0.45,1.0,1.0,0.0,0.0,4,NeedlePick,NeedlePick
+test_on_GauzeRetrieve,5365,0.45,0.45,0.35,0.45,1.0,1.0,0.0,0.0,4,NeedlePick,GauzeRetrieve
+calibrate_on_GauzeRetrieve,5365,0.45,0.45,0.35,0.25,1.0,1.0,0.0,0.0,4,GauzeRetrieve,GauzeRetrieve
+test_on_NeedlePick,5362,0.45,0.45,0.35,0.25,0.9973890339425587,0.9955510421505462,0.0,0.009427609427609427,4,GauzeRetrieve,NeedlePick

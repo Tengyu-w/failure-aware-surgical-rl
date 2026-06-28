@@ -1,0 +1,7 @@
+expected_route,continue,reobserve_reestimate,depth_reestimate_or_cautious_approach,pause_reobserve_or_camera_reposition,low_gain_correction_or_replan,human_review_or_servo_reset,abort_candidate_or_takeover
+abort_candidate_or_takeover,0,0,0,0,0,0,2
+continue,99,0,0,0,1,0,0
+depth_reestimate_or_cautious_approach,10,0,20,0,0,0,0
+human_review_or_servo_reset,20,0,0,0,0,40,0
+low_gain_correction_or_replan,53,0,0,0,90,0,5
+reobserve_reestimate,10,20,0,0,0,0,0

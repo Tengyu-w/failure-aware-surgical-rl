@@ -1,0 +1,7 @@
+task,failure,learned_min_intervention_rank,learned_min_intervention_severity
+GauzeRetrieve,depth_scale_error,0,low
+GauzeRetrieve,near_target_drift,1,medium
+GauzeRetrieve,perception_bias,1,medium
+NeedlePick,depth_scale_error,0,low
+NeedlePick,near_target_drift,0,low
+NeedlePick,perception_bias,0,low

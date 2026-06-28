@@ -27,10 +27,20 @@ prototype and from 0.426 to 0.416 on strict.
 
 | Stage | What It Shows | Evidence Type |
 |---|---|---|
+| Teacher-facing experiment process | The project is explained as a progression from proxy RL to ECG-style mechanism analysis to VPPV reliability routing. | Supervisor-facing narrative document |
 | Self-built proxy simulation | The core safety-control idea works in a simple constrained surgical-tool environment. | PPO/controller logs, prototype/strict trajectories, top-down snapshots |
 | CircleRL recovery media | A biased target estimate can visibly drive the proxy tool off route, then monitor recovery re-estimates the target and returns toward completion. | MP4/GIF recovery demo, selected frames, trace CSV |
 | SurRoL migration | The same reliability-supervision idea is embedded into surgical simulation tasks. | Rendered NeedleReach, NeedlePick, and GauzeRetrieve GIF/MP4 rollouts |
 | Task-specific SurRoL upgrade framework | The proxy idea is expanded into NeedleReach, NeedlePick, GauzeRetrieve, PickAndPlace, and unsafe-zone near-target settings. | Task-failure-route matrix and machine-readable CSV |
+| ECG-style SurRoL mechanism routing | The reliable-ECG method is adapted into SurRoL failure families, evidence signals, and v5d-style boundary/residual routing. | Mechanism-routing blueprint and machine-readable map |
+| Failure-aware VPPV reframing | The project is reframed around VPPV visual-state estimation, high-level approach policy, final servoing handoff, and unsafe continuation. | Multi-evidence framework, composite router report, route-summary CSV |
+| VPPV supervisor brief | The VPPV pain point, mechanism-specific routes, evidence, and scope boundary are condensed for a quick teacher read. | One-page brief and supervisor-pack figure |
+| Step-level VPPV evidence | The VPPV reframing is tested on per-step SurRoL traces for nominal, visual bias, depth-scale error, and policy approach drift. | Step dataset, single-evidence ablation, early-warning table, mechanism evidence figure |
+| Cross-task VPPV check | The step router is calibrated on one SurRoL task and tested with frozen thresholds on another. | Cross-task generalization report, threshold sweep, confusion table |
+| Severity-held-out VPPV check | Low/medium severity conditions define intervention boundaries, then high severity is held out. | Severity holdout report, boundary table, held-out route figure |
+| Mixed-priority VPPV audit | Existing single-mechanism traces are composed to test co-active visual/depth/policy evidence. | Mixed-priority report, scenario table, evidence figure |
+| True mixed-fault VPPV rollouts | Mixed visual/depth/near-target fault proxies are executed inside SurRoL/PyBullet. | True mixed rollout report, paired table, success/distance figures |
+| Final VPPV evidence package | The VPPV evidence ladder is condensed into a teacher brief, machine-readable matrix, and readiness audit. | Final teacher brief, final evidence matrix, GitHub readiness audit |
 | Four intervention routes | Failures are not treated as one generic failure; they are routed to continue, recover, review, or abort-candidate. | Fault taxonomy, paired recovery tables, route labels |
 | Final reliability results | SurRoL recovery is stress-tested, and the proxy tangent controller is changed from always-on to risk-gated, then to ECG-style mechanism-routed supervision. | Multi-seed SurRoL results, learned route classifier, observable proxy audit, risk-gated tangent report, mechanism-routed tangent report |
 
@@ -39,10 +49,21 @@ prototype and from 0.426 to 0.416 on strict.
 | Time budget | File | Purpose |
 |---|---|---|
 | 2 minutes | [README](../README.md) | Main question, key numbers, setup, limitations |
+| 8 minutes | [Teacher-facing experiment process](TEACHER_EXPERIMENT_PROCESS.md) | Best first deep read: why this is VPPV reliability routing, not a collection of gripper-action fixes |
 | 10 minutes | [Research report](RESEARCH_REPORT.md) | ECG-style structured explanation of what was done, why, evidence, and limits |
 | 10 minutes | [Experiment evidence summary](EXPERIMENT_EVIDENCE_SUMMARY.md) | Compact result narrative for a quick supervisor read |
 | 15 minutes | [Learning-to-routing flow](LEARNING_TO_ROUTING_FLOW.md) | How PPO training, weak labels, embedding/KNN, visual risk, failed retraining, and runtime routing connect |
 | 15 minutes | [SurRoL task upgrade framework](SURROL_TASK_UPGRADE_FRAMEWORK.md) | Task-level framework beyond CircleRL: NeedleReach, NeedlePick, GauzeRetrieve, PickAndPlace, unsafe-zone recovery |
+| 15 minutes | [SurRoL ECG-style mechanism routing](SURROL_ECG_STYLE_MECHANISM_ROUTING.md) | How ECG-style boundary/residual mechanism routing becomes SurRoL failure diagnosis and intervention routing |
+| 15 minutes | [Failure-aware VPPV framework](FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md) | Why the project targets VPPV visual-state, approach-policy, handoff, and unsafe-continuation reliability rather than gripper mechanics |
+| 5 minutes | [Failure-aware VPPV supervisor brief](../reports/failure_aware_vppv_supervisor_brief.md) | One-page explanation plus the VPPV supervisor-pack figure |
+| 15 minutes | [Failure-aware VPPV step evidence](../reports/failure_aware_vppv_step_evidence.md) | Step-level evidence, early warning, and single-family versus composite route comparison |
+| 15 minutes | [Failure-aware VPPV cross-task generalization](../reports/failure_aware_vppv_cross_task_generalization.md) | Frozen-threshold transfer between NeedlePick and GauzeRetrieve |
+| 15 minutes | [Failure-aware VPPV severity holdout](../reports/failure_aware_vppv_severity_holdout.md) | Low/medium intervention-boundary calibration tested on held-out high severity |
+| 15 minutes | [Failure-aware VPPV mixed-priority audit](../reports/failure_aware_vppv_mixed_perturbation_priority.md) | Co-active evidence priority test: depth before visual before policy correction |
+| 15 minutes | [Failure-aware VPPV true mixed rollouts](../reports/failure_aware_vppv_true_mixed_rollouts.md) | Actual SurRoL/PyBullet mixed-fault rollouts with perturbed and priority-routed controllers |
+| 5 minutes | [Failure-aware VPPV final teacher brief](../reports/failure_aware_vppv_final_teacher_brief.md) | Final evidence ladder, strongest safe claim, and current limitations |
+| 10 minutes | [Failure-aware VPPV final evidence matrix](../reports/tables/failure_aware_vppv_final_evidence_matrix.csv) | Machine-readable claim, metric, report, table, figure, and rebuild-command map |
 | 15 minutes | [ECG-style RL upgrade](ECG_STYLE_RL_UPGRADE.md) | Broad ECG-style diagnostics and model upgrade beyond embedding alone |
 | 15 minutes | [Method overview](METHOD_OVERVIEW.md) | Reliability signal families, routing logic, and scope boundary |
 | Visual | [Figure atlas](FIGURE_ATLAS.md) | Visual evidence inventory across proxy and SurRoL stages |
@@ -64,6 +85,13 @@ prototype and from 0.426 to 0.416 on strict.
 | Route prediction is learnable. | Held-out route classifier: 460 episodes, 84.6% accuracy, 82.8% macro-F1, 0.0 missed review-or-abort rate. | Moderate; labels are distilled |
 | Embedding/KNN can be connected to training but does not solve policy robustness. | Multi-seed embedding-risk PPO improves return/distance in some settings but not robust success or budget exhaustion. | Preliminary; useful as a negative result |
 | ECG-style broad reliability analysis is now present. | Representation quality, centroid/prototype/KNN diagnostics, uncertainty scores, injected-failure robustness, and multi-signal risk-head/router tables. | Stronger internal research evidence; still simulator-only |
+| VPPV-specific composite routing is now explicit. | Composite router over 370 weak-labeled SurRoL episodes reaches 0.732 weak-label accuracy and 0.713 macro-F1 while separating visual, depth, policy, handoff, and unsafe routes. | Prototype-level; labels are simulator-derived |
+| Step-level evidence is now present. | 10,823 VPPV-style step rows cover nominal, visual-estimation bias, depth-scale error, and policy-approach drift; composite route consistency reaches 0.999 against weak mechanism rules with 0.005 nominal false-alert rate. | Strong as weak-label consistency evidence; not an independent expert-label benchmark |
+| Step-level VPPV routing transfers across two SurRoL tasks. | Thresholds calibrated on NeedlePick reach 1.000 macro-F1 on GauzeRetrieve; thresholds calibrated on GauzeRetrieve reach 0.996 macro-F1 on NeedlePick. | Stronger than within-task consistency; still simulator-derived weak-label evidence |
+| Mechanism boundaries survive held-out high severity. | Boundary router trained on low/medium severity reaches 1.000 macro-F1 on 6 high-severity task/failure conditions, while uniform retry is 0.167. | Lightweight 30-seed aggregate check; not a full external validation |
+| Mixed evidence needs priority routing. | In an offline compositional mixed-perturbation audit, the priority router reaches 1.000 macro-F1, while max-signal routing reaches 0.033 and uniform retry reaches 0.000. | Priority audit over composed evidence; larger learned-policy mixed rollouts remain future work |
+| True mixed faults have been smoke-tested in SurRoL. | Across 2 tasks, 4 mixed fault combinations, and 5 seeds, perturbed mixed faults are 0/40 success while priority-routed mixed faults are 40/40 success. | Smoke-scale scripted-oracle simulation; not learned-policy or hardware validation |
+| The final VPPV story is now packaged. | The final teacher brief and evidence matrix link each major VPPV claim to its metric, report, table, figure, and rebuild command. | Strong as a GitHub/research-package organization step; it does not add new experimental validation |
 | Privileged-state dependence is being reduced. | Observable jaw-stuck supervisor uses command/progress signals rather than direct phase/contact checks for the decision. | Promising, still partial |
 
 ## What Is Shown

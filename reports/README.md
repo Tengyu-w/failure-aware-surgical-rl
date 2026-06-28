@@ -17,6 +17,8 @@ Read these first:
 10. [Learned route classifier](surrol_learned_route_classifier_step3.md)
 11. [Observable supervisor](surrol_observable_supervisor_step4.md)
 12. [Risk-gated tangent backup](risk_gated_tangent_report.md)
+13. [Failure-aware VPPV final teacher brief](failure_aware_vppv_final_teacher_brief.md)
+14. [Failure-aware VPPV GitHub readiness audit](failure_aware_vppv_github_readiness_audit.md)
 
 ## Evidence Folders
 

@@ -12,6 +12,52 @@ recover automatically, request review, or stop.
 > Research prototype only. This repository is not a deployed surgical robot
 > safety system and does not claim clinical, hardware, or real-robot validation.
 
+## Teacher Quick Read
+
+This repository should be read as a reliability-supervision project around a
+surgical RL/VPPV pipeline, not as a project that tries to relearn every
+low-level surgical motion.
+
+The practical bottleneck is narrow and concrete: the learned policy or VPPV
+module can move the tool toward a target, but under visual-state bias,
+depth-scale error, approach drift, or near-target handoff error, the tool may
+move toward the wrong target estimate or continue when the state is unreliable.
+The contribution here is a mechanism-aware runtime layer that detects the
+failure source and routes the episode to the right response.
+
+The current project story is:
+
+```text
+self-built proxy simulator
+  -> define the reliability problem in a small controllable RL setting
+  -> build risk-gated and mechanism-routed recovery logic
+  -> migrate the same idea into SurRoL/PyBullet tasks
+  -> translate the ECG project's reliability analysis style into robot rollouts
+  -> focus the final SurRoL/VPPV claim on visual-state and approach-policy reliability
+  -> test composite routing under step, cross-task, severity, mixed-priority,
+     and true mixed-fault rollouts
+```
+
+The final 5-seed true mixed-fault SurRoL smoke test is:
+
+| Controller | What it means | Success | Mean final distance |
+| --- | --- | ---: | ---: |
+| clean | no injected mixed fault | 40/40 | 0.015 |
+| perturbed | mixed visual/depth/near-target faults, no route response | 0/40 | 0.224 |
+| priority-routed | same mixed faults plus mechanism-priority recovery | 40/40 | 0.016 |
+
+The most important limitation is also explicit: these are simulator-derived
+weak labels and scripted-oracle PyBullet rollouts. They support a research
+prototype for mechanism-specific reliability routing, not real surgical
+autonomy.
+
+For the full teacher-facing experiment process, read
+[docs/TEACHER_EXPERIMENT_PROCESS.md](docs/TEACHER_EXPERIMENT_PROCESS.md).
+For the final evidence ladder, read
+[reports/failure_aware_vppv_final_teacher_brief.md](reports/failure_aware_vppv_final_teacher_brief.md)
+and the machine-readable evidence matrix
+[reports/tables/failure_aware_vppv_final_evidence_matrix.csv](reports/tables/failure_aware_vppv_final_evidence_matrix.csv).
+
 ## Project In One Sentence
 
 This project starts from a simple constrained surgical-tool RL proxy, migrates
@@ -33,6 +79,12 @@ The final GitHub framing is:
 - **ECG-style RL reliability suite** expands the analysis beyond embedding:
   representation geometry, uncertainty, trajectory structure, perturbation
   robustness, multi-signal risk-head training, and mechanism routing.
+- **Failure-aware VPPV routing** reframes the SurRoL work around the actual
+  VPPV bottleneck: visual-state estimation, high-level approach policy,
+  near-target servoing handoff, and unsafe continuation, not gripper mechanics.
+- **Final VPPV evidence package** condenses the step, cross-task, severity,
+  mixed-priority, and true mixed-rollout results into one teacher-facing brief
+  and a machine-readable evidence matrix.
 - The strongest claim is internal simulation evidence for runtime reliability
   supervision, not real surgical autonomy.
 
@@ -182,6 +234,51 @@ For the full framework, see
 [docs/SURROL_TASK_UPGRADE_FRAMEWORK.md](docs/SURROL_TASK_UPGRADE_FRAMEWORK.md)
 and the machine-readable table
 [reports/tables/surgical_task_upgrade_framework.csv](reports/tables/surgical_task_upgrade_framework.csv).
+For the ECG-style mechanism-routing translation, see
+[docs/SURROL_ECG_STYLE_MECHANISM_ROUTING.md](docs/SURROL_ECG_STYLE_MECHANISM_ROUTING.md)
+and the machine-readable map
+[reports/tables/surrol_ecg_style_mechanism_map.csv](reports/tables/surrol_ecg_style_mechanism_map.csv).
+For the VPPV-specific multi-evidence reframing and composite router, see
+[docs/FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md](docs/FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md),
+[reports/failure_aware_vppv_composite_router.md](reports/failure_aware_vppv_composite_router.md),
+and
+[reports/tables/failure_aware_vppv_route_summary.csv](reports/tables/failure_aware_vppv_route_summary.csv).
+The step-level follow-up evidence is in
+[reports/failure_aware_vppv_step_evidence.md](reports/failure_aware_vppv_step_evidence.md),
+with the step dataset
+[reports/tables/failure_aware_vppv_step_dataset.csv](reports/tables/failure_aware_vppv_step_dataset.csv)
+and mechanism evidence figure
+[reports/figures/failure_aware_vppv/failure_aware_vppv_step_evidence.png](reports/figures/failure_aware_vppv/failure_aware_vppv_step_evidence.png).
+The cross-task follow-up freezes thresholds on one SurRoL task and tests them
+on the other:
+[reports/failure_aware_vppv_cross_task_generalization.md](reports/failure_aware_vppv_cross_task_generalization.md)
+and
+[reports/tables/failure_aware_vppv_cross_task_summary.csv](reports/tables/failure_aware_vppv_cross_task_summary.csv).
+The severity-held-out follow-up calibrates intervention boundaries on low/medium
+severity and evaluates held-out high severity:
+[reports/failure_aware_vppv_severity_holdout.md](reports/failure_aware_vppv_severity_holdout.md)
+and
+[reports/figures/failure_aware_vppv/failure_aware_vppv_severity_holdout.png](reports/figures/failure_aware_vppv/failure_aware_vppv_severity_holdout.png).
+The mixed-perturbation priority audit combines existing mechanism traces to
+test whether co-active evidence is routed by priority rather than by a generic
+retry score:
+[reports/failure_aware_vppv_mixed_perturbation_priority.md](reports/failure_aware_vppv_mixed_perturbation_priority.md)
+and
+[reports/figures/failure_aware_vppv/failure_aware_vppv_mixed_priority_evidence.png](reports/figures/failure_aware_vppv/failure_aware_vppv_mixed_priority_evidence.png).
+The true mixed-fault SurRoL follow-up executes those combined fault proxies in
+PyBullet rollouts:
+[reports/failure_aware_vppv_true_mixed_rollouts.md](reports/failure_aware_vppv_true_mixed_rollouts.md)
+and
+[reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_success.png](reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_success.png).
+The final packaged evidence is summarized in
+[reports/failure_aware_vppv_final_teacher_brief.md](reports/failure_aware_vppv_final_teacher_brief.md),
+[reports/tables/failure_aware_vppv_final_evidence_matrix.csv](reports/tables/failure_aware_vppv_final_evidence_matrix.csv),
+and the GitHub readiness audit
+[reports/failure_aware_vppv_github_readiness_audit.md](reports/failure_aware_vppv_github_readiness_audit.md).
+For a one-page supervisor-facing explanation, see
+[reports/failure_aware_vppv_supervisor_brief.md](reports/failure_aware_vppv_supervisor_brief.md)
+and the summary figure
+[reports/figures/failure_aware_vppv/failure_aware_vppv_supervisor_pack.png](reports/figures/failure_aware_vppv/failure_aware_vppv_supervisor_pack.png).
 
 | Task | Failure mechanism being tested | Route decision | Recovery / response |
 | --- | --- | --- | --- |
@@ -356,6 +453,11 @@ These are simulator-log supervisor results, not real surgical validation.
 | 11. ECG-style broad diagnostics | Added centroid/prototype/kNN, uncertainty, trajectory, and perturbation analyses. | Mirrors the ECG project's broader reliability audit. | Internal simulator labels only. |
 | 12. Multi-signal model upgrade | Trained a review/abort risk head and four-way mechanism router. | Turns analysis signals into a new reliability model. | Strong held-out internal metrics, but not external validation. |
 | 13. Runtime routing conclusion | Interpreted limited policy improvement as evidence for a supervisor around the policy. | Surgical autonomy needs execution-time reliability, not only better offline learning. | The final contribution is a policy-plus-supervisor system. |
+| 14. Failure-aware VPPV cross-task check | Calibrated the step router on NeedlePick and tested on GauzeRetrieve, then reversed. | Checks whether mechanism evidence transfers across SurRoL tasks. | Frozen-threshold cross-task macro-F1 is 1.000 and 0.996, with simulator-derived weak labels. |
+| 15. Failure-aware VPPV severity holdout | Learned intervention boundaries from low/medium severity and tested held-out high severity. | Checks whether mechanism routes remain valid under stronger unseen perturbations. | Boundary router reaches 1.000 macro-F1 on 6 held-out high-severity task/failure conditions; uniform retry is 0.167. |
+| 16. Failure-aware VPPV mixed-priority audit | Composed existing visual/depth/policy step traces to simulate co-active evidence. | Tests whether route priority is preserved when multiple mechanisms fire together. | Priority router reaches 1.000 macro-F1; max-signal router is 0.033 and uniform retry is 0.000. |
+| 17. True mixed-fault SurRoL rollouts | Executed mixed visual/depth/near-target fault proxies inside SurRoL/PyBullet. | Closes the gap between offline priority audit and simulator dynamics. | In a 5-seed smoke run, perturbed mixed faults are 0/40 success and priority-routed mixed faults are 40/40 success. |
+| 18. Final VPPV evidence package | Condensed the VPPV evidence ladder into a teacher brief, evidence matrix, and readiness audit. | Makes the GitHub story traceable and claim-calibrated. | The final package states the strongest claim as simulator-only mechanism-specific runtime routing, with weak-label and scripted-oracle limits. |
 
 For the full stage-ordered report, see
 [docs/RESEARCH_REPORT.md](docs/RESEARCH_REPORT.md).
@@ -406,12 +508,17 @@ mechanisms.
 | How does the proxy recovery action look in motion? | [CircleRL recovery MP4](reports/media/circlerl_recovery_demo/circlerl_bias_recovery.mp4), [GIF preview](reports/media/circlerl_recovery_demo/circlerl_bias_recovery.gif) | Custom proxy visualization showing biased-state drift followed by monitor recovery; not SurRoL. |
 | Did the project run inside rendered SurRoL tasks? | ![GauzeRetrieve rendered frame](reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_034.png) | Rendered simulation evidence, not real-robot footage. |
 | Are there task-level rollout media? | [NeedleReach GIF](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif), [NeedlePick GIF](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif), [GauzeRetrieve GIF](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) | Oracle rollout media used as visual migration evidence. |
+| Is there a SurRoL fault-to-recovery video? | [NeedlePick recovery MP4](reports/media/surrol_recovery_demo/surrol_needlepick_action_freeze_monitor_recovery.mp4), [GIF preview](reports/media/surrol_recovery_demo/surrol_needlepick_action_freeze_monitor_recovery.gif), [trace CSV](reports/media/surrol_recovery_demo/surrol_needlepick_action_freeze_monitor_recovery_trace.csv) | SurRoL/PyBullet NeedlePick action-freeze fault followed by monitor recovery override; scripted recovery, not learned autonomy. |
 | Does risk gating preserve safety while reducing intervention? | ![Risk-gated tangent aggregate](reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png) | Custom constrained surgical-tool proxy, not SurRoL. |
 | When and where does the risk gate activate? | ![Strict risk timeline](reports/figures/risk_gated_tangent_visuals/risk_timeline_strict.png) | Controller-level diagnostic plot. |
 | Does the router separate boundary risk from residual review risk? | ![Mechanism router stage split](reports/figures/mechanism_routed_tangent_v5d/mechanism_router_stage_split.png) | Mechanism routing distilled from simulation evidence. |
 | Can automatic recovery handle injected execution faults? | ![Phase-aware recovery success](reports/figures/surrol_phase_aware/success_rate_by_failure.png) | Route-specific recovery in simulation. |
 | Can observable signals recover jaw-stuck failures? | ![Observable jaw-stuck recovery](reports/figures/surrol_cross_task_observable_jaw_stuck_10seed/cross_task_jaw_stuck_recovery.png) | Observable proxy recovery, still scripted. |
 | Which visual-state errors should be reviewed instead of blindly recovered? | ![NeedlePick severity sweep](reports/figures/surrol_severity_sweep/needlepick_severity_sweep.png) | State-space proxy for perception/depth error. |
+| What is the VPPV-specific mechanism-routing story? | ![Failure-aware VPPV supervisor pack](reports/figures/failure_aware_vppv/failure_aware_vppv_supervisor_pack.png) | SurRoL rendered frames plus evidence curves, route decisions, ablation, and cross-task transfer. |
+| Do mechanism boundaries survive held-out high severity? | ![Failure-aware VPPV severity holdout](reports/figures/failure_aware_vppv/failure_aware_vppv_severity_holdout.png) | Low/medium severity calibrates intervention boundaries; high severity is held out. |
+| What happens when visual, depth, and policy evidence co-activate? | ![Failure-aware VPPV mixed priority](reports/figures/failure_aware_vppv/failure_aware_vppv_mixed_priority_evidence.png) | Offline compositional priority audit; not a new mixed-fault rollout. |
+| Do mixed faults hold under true SurRoL dynamics? | ![Failure-aware VPPV true mixed success](reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_success.png) | Actual SurRoL/PyBullet mixed-fault rollout with scripted priority routing. |
 | How broad is the reliability analysis beyond embedding alone? | ![ECG-style RL reliability suite](reports/figures/ecg_style_rl_reliability_suite/ecg_style_rl_reliability_suite.png) | Offline reliability diagnostics over simulated failures. |
 | Did the multi-signal upgrade improve interpretability of risk routing? | ![Multi-signal reliability upgrade](reports/figures/multisignal_reliability_upgrade/multisignal_reliability_upgrade.png) | Mechanism-level evidence, not clinical validation. |
 
@@ -474,4 +581,7 @@ python scripts\build_surrol_observable_supervisor_step4.py
 
 # Embedding-risk PPO pilot
 python scripts\run_embedding_risk_multiseed_curriculum.py --seeds 0,1,2 --timesteps 8192 --episodes 50 --penalty-scale 0.25 --risk-threshold 0.55 --curriculum-probability 0.35 --curriculum-candidates 8
+
+# Final VPPV evidence package
+python scripts\build_failure_aware_vppv_final_package.py
 ```

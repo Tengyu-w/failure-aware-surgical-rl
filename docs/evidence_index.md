@@ -44,6 +44,14 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | Stage 7 | Test whether embedding/KNN risk can become a training signal | [embedding-risk training pilot](../reports/embedding_risk_training_pilot.md), [reward-only pilot comparison](../outputs/embedding_risk_training_pilot_comparison.csv), [curriculum fine-tune summary](../outputs/embedding_risk_curriculum_finetune_pilot_summary.csv), [multi-seed aggregate](../outputs/embedding_risk_multiseed_curriculum_aggregate_summary.csv), [multi-seed figure](../reports/figures/embedding_risk_training_pilot/multiseed_curriculum_metrics.png) |
 | Stage 8 | Explain the complete learning-to-routing chain | [learning-to-routing flow](LEARNING_TO_ROUTING_FLOW.md), [risk dataset](../outputs/risk_dataset/risk_dataset.csv), [visual action risk head script](../scripts/train_surrol_visual_action_risk_head.py), [visual recovery memory script](../scripts/train_surrol_visual_recovery_memory.py) |
 | Stage 9 | Run ECG-style broad reliability suite and model upgrade | [ECG-style RL upgrade](ECG_STYLE_RL_UPGRADE.md), [suite report](../reports/ecg_style_rl_reliability_suite.md), [multi-signal report](../reports/multisignal_reliability_upgrade.md), [suite figure](../reports/figures/ecg_style_rl_reliability_suite/ecg_style_rl_reliability_suite.png), [multi-signal figure](../reports/figures/multisignal_reliability_upgrade/multisignal_reliability_upgrade.png) |
+| Stage 10 | Reframe the work around the real VPPV bottleneck and run a composite mechanism router | [failure-aware VPPV framework](FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md), [composite router report](../reports/failure_aware_vppv_composite_router.md), [route summary](../reports/tables/failure_aware_vppv_route_summary.csv) |
+| Stage 11 | Condense the VPPV pain point, route logic, and evidence into a supervisor-facing brief | [VPPV supervisor brief](../reports/failure_aware_vppv_supervisor_brief.md), [VPPV supervisor-pack figure](../reports/figures/failure_aware_vppv/failure_aware_vppv_supervisor_pack.png) |
+| Stage 12 | Build step-level VPPV evidence for early warning and single-evidence ablation | [step evidence report](../reports/failure_aware_vppv_step_evidence.md), [step dataset](../reports/tables/failure_aware_vppv_step_dataset.csv), [step evidence figure](../reports/figures/failure_aware_vppv/failure_aware_vppv_step_evidence.png) |
+| Stage 13 | Test whether VPPV mechanism evidence transfers across SurRoL tasks | [cross-task VPPV report](../reports/failure_aware_vppv_cross_task_generalization.md), [cross-task summary](../reports/tables/failure_aware_vppv_cross_task_summary.csv), [cross-task confusion](../reports/tables/failure_aware_vppv_cross_task_confusion.csv) |
+| Stage 14 | Test whether low/medium severity boundaries survive held-out high severity | [severity holdout report](../reports/failure_aware_vppv_severity_holdout.md), [severity holdout summary](../reports/tables/failure_aware_vppv_severity_holdout_summary.csv), [severity holdout figure](../reports/figures/failure_aware_vppv/failure_aware_vppv_severity_holdout.png) |
+| Stage 15 | Audit whether mixed visual/depth/policy evidence follows the intended priority order | [mixed-priority report](../reports/failure_aware_vppv_mixed_perturbation_priority.md), [mixed-priority summary](../reports/tables/failure_aware_vppv_mixed_priority_summary.csv), [mixed-priority evidence figure](../reports/figures/failure_aware_vppv/failure_aware_vppv_mixed_priority_evidence.png) |
+| Stage 16 | Execute true mixed visual/depth/near-target fault proxies inside SurRoL/PyBullet | [true mixed rollout report](../reports/failure_aware_vppv_true_mixed_rollouts.md), [true mixed paired table](../reports/tables/failure_aware_vppv_true_mixed_rollout_paired.csv), [true mixed success figure](../reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_success.png) |
+| Stage 17 | Package the final VPPV evidence ladder and claim boundaries | [final teacher brief](../reports/failure_aware_vppv_final_teacher_brief.md), [final evidence matrix](../reports/tables/failure_aware_vppv_final_evidence_matrix.csv), [GitHub readiness audit](../reports/failure_aware_vppv_github_readiness_audit.md) |
 
 ## Key Result Tables
 
@@ -66,6 +74,26 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [ecg_style_rl_robustness_by_failure.csv](../reports/tables/ecg_style_rl_robustness_by_failure.csv) | injected-failure risk ranking |
 | [multisignal_review_ablation.csv](../reports/tables/multisignal_review_ablation.csv) | single-family versus multi-signal review/abort risk-head ablation |
 | [multisignal_mechanism_router_summary.csv](../reports/tables/multisignal_mechanism_router_summary.csv) | four-way mechanism-router held-out summary |
+| [failure_aware_vppv_multievidence_framework.csv](../reports/tables/failure_aware_vppv_multievidence_framework.csv) | VPPV-specific problem, mechanism, evidence-family, and route map |
+| [failure_aware_vppv_route_summary.csv](../reports/tables/failure_aware_vppv_route_summary.csv) | composite VPPV router compared with uniform retry, single-score, embedding-only, and visual-only baselines |
+| [failure_aware_vppv_mechanism_fingerprints.csv](../reports/tables/failure_aware_vppv_mechanism_fingerprints.csv) | evidence fingerprints for visual, depth, approach-policy, handoff, nominal, and unsafe mechanisms |
+| [failure_aware_vppv_step_dataset.csv](../reports/tables/failure_aware_vppv_step_dataset.csv) | VPPV-style step-level dataset for nominal, visual bias, depth-scale error, and policy approach drift |
+| [failure_aware_vppv_step_route_summary.csv](../reports/tables/failure_aware_vppv_step_route_summary.csv) | step-route single-evidence and composite weak-label consistency comparison |
+| [failure_aware_vppv_step_early_warning_summary.csv](../reports/tables/failure_aware_vppv_step_early_warning_summary.csv) | mechanism-wise alert rate and lead-time summary |
+| [failure_aware_vppv_cross_task_summary.csv](../reports/tables/failure_aware_vppv_cross_task_summary.csv) | frozen-threshold cross-task router metrics between NeedlePick and GauzeRetrieve |
+| [failure_aware_vppv_cross_task_evidence_transfer.csv](../reports/tables/failure_aware_vppv_cross_task_evidence_transfer.csv) | budgeted evidence capture for visual, depth, policy-proxy, action-outcome, and composite scores |
+| [failure_aware_vppv_cross_task_confusion.csv](../reports/tables/failure_aware_vppv_cross_task_confusion.csv) | route confusion matrices for the two cross-task transfer directions |
+| [failure_aware_vppv_severity_holdout_summary.csv](../reports/tables/failure_aware_vppv_severity_holdout_summary.csv) | low/medium calibration and high-severity held-out route metrics |
+| [failure_aware_vppv_severity_holdout_boundaries.csv](../reports/tables/failure_aware_vppv_severity_holdout_boundaries.csv) | learned first intervention severity for each task/failure pair |
+| [failure_aware_vppv_severity_holdout_confusion.csv](../reports/tables/failure_aware_vppv_severity_holdout_confusion.csv) | route confusion tables for severity holdout baselines |
+| [failure_aware_vppv_mixed_priority_summary.csv](../reports/tables/failure_aware_vppv_mixed_priority_summary.csv) | priority-router, max-signal, uniform-retry, and single-score comparison on composed mixed evidence |
+| [failure_aware_vppv_mixed_priority_scenarios.csv](../reports/tables/failure_aware_vppv_mixed_priority_scenarios.csv) | scenario-level route matching for visual+depth, visual+policy, depth+policy, and all-three mixtures |
+| [failure_aware_vppv_mixed_priority_confusion.csv](../reports/tables/failure_aware_vppv_mixed_priority_confusion.csv) | route confusion tables for mixed-priority baselines |
+| [failure_aware_vppv_true_mixed_rollout_summary.csv](../reports/tables/failure_aware_vppv_true_mixed_rollout_summary.csv) | true SurRoL/PyBullet mixed-fault rollout summary by task, fault combination, and controller |
+| [failure_aware_vppv_true_mixed_rollout_paired.csv](../reports/tables/failure_aware_vppv_true_mixed_rollout_paired.csv) | paired clean, perturbed, and priority-routed mixed-fault results |
+| [failure_aware_vppv_true_mixed_rollout_steps.csv](../reports/tables/failure_aware_vppv_true_mixed_rollout_steps.csv) | step-signal summary for priority-routed true mixed-fault episodes |
+| [failure_aware_vppv_final_evidence_matrix.csv](../reports/tables/failure_aware_vppv_final_evidence_matrix.csv) | final VPPV claim-to-evidence matrix with reports, tables, figures, limitations, and rebuild commands |
+| [failure_aware_vppv_final_key_numbers.csv](../reports/tables/failure_aware_vppv_final_key_numbers.csv) | compact key-number table used to generate the final teacher brief and readiness audit |
 
 ## Important Reports
 
@@ -75,6 +103,15 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [EXPERIMENT_EVIDENCE_SUMMARY.md](EXPERIMENT_EVIDENCE_SUMMARY.md) | compact evidence narrative for explaining the main upgrades quickly |
 | [METHOD_OVERVIEW.md](METHOD_OVERVIEW.md) | mechanism diagram, evidence families, and routing policy |
 | [LEARNING_TO_ROUTING_FLOW.md](LEARNING_TO_ROUTING_FLOW.md) | explains how baseline RL, weak risk labels, embedding/KNN analysis, risk-aware retraining, visual reliability, and runtime routing connect |
+| [FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md](FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md) | reframes the project around VPPV visual-state, high-level approach-policy, handoff, and unsafe-continuation reliability |
+| [failure_aware_vppv_supervisor_brief.md](../reports/failure_aware_vppv_supervisor_brief.md) | one-page VPPV pain-point, mechanism-routing, evidence, and limitation summary |
+| [failure_aware_vppv_step_evidence.md](../reports/failure_aware_vppv_step_evidence.md) | step-level VPPV evidence, early warning, and mechanism evidence figure |
+| [failure_aware_vppv_cross_task_generalization.md](../reports/failure_aware_vppv_cross_task_generalization.md) | cross-task frozen-threshold check for the VPPV mechanism router |
+| [failure_aware_vppv_severity_holdout.md](../reports/failure_aware_vppv_severity_holdout.md) | low/medium-to-high severity holdout check for VPPV mechanism boundaries |
+| [failure_aware_vppv_mixed_perturbation_priority.md](../reports/failure_aware_vppv_mixed_perturbation_priority.md) | offline mixed-perturbation priority audit for co-active evidence |
+| [failure_aware_vppv_true_mixed_rollouts.md](../reports/failure_aware_vppv_true_mixed_rollouts.md) | true SurRoL/PyBullet mixed-fault rollout report |
+| [failure_aware_vppv_final_teacher_brief.md](../reports/failure_aware_vppv_final_teacher_brief.md) | final teacher-facing VPPV evidence ladder, strongest safe claim, and current limitations |
+| [failure_aware_vppv_github_readiness_audit.md](../reports/failure_aware_vppv_github_readiness_audit.md) | public-repository readiness check for framing, evidence traceability, reproducibility, and claim calibration |
 | [ECG_STYLE_RL_UPGRADE.md](ECG_STYLE_RL_UPGRADE.md) | explains the broad ECG-style analysis and model upgrade now added to the RL project |
 | [FIGURE_ATLAS.md](FIGURE_ATLAS.md) | visual evidence inventory separating proxy snapshots from SurRoL renders |
 | [surrol_master_results.md](../reports/surrol_master_results.md) | overview of paired SurRoL recovery evidence |
@@ -100,6 +137,15 @@ python scripts\offline_risk_gated_intervention.py
 python scripts\evaluate_risk_gated_tangent.py --policy ppo --model runs\pilot_3d_50k_prototype_conditioned_seed0\model.zip --episodes 100 --seeds 0,1,2 --presets prototype,strict --threshold 0.5 --deterministic --risk-model-mode default_rule --out-dir outputs\risk_gated_tangent
 python scripts\generate_risk_gated_visuals.py
 python scripts\run_embedding_risk_training_pilot.py --timesteps 8192 --episodes 40 --penalty-scale 0.25 --risk-threshold 0.55 --curriculum-probability 0.35 --curriculum-candidates 8 --out-dir outputs\embedding_risk_curriculum_finetune_pilot
+python scripts\build_failure_aware_vppv_composite_router.py
+python scripts\build_failure_aware_vppv_step_evidence.py
+python scripts\evaluate_failure_aware_vppv_cross_task.py
+python scripts\evaluate_failure_aware_vppv_severity_holdout.py
+python scripts\evaluate_failure_aware_vppv_mixed_priority.py
+.\scripts\run_surrol_true_mixed_faults.ps1 -Seeds 5 -Episodes 1 -MaxSteps 180
+python scripts\build_failure_aware_vppv_true_mixed_rollout_report.py
+python scripts\generate_failure_aware_vppv_supervisor_pack.py
+python scripts\build_failure_aware_vppv_final_package.py
 ```
 
 Run lightweight tests:

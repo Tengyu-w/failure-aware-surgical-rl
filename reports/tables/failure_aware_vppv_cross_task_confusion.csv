@@ -1,0 +1,9 @@
+comparison,expected_route,continue,reobserve_reestimate,depth_reestimate_or_cautious_approach,low_gain_correction_or_replan
+NeedlePick_to_GauzeRetrieve,continue,1018,0,0,0
+NeedlePick_to_GauzeRetrieve,depth_reestimate_or_cautious_approach,0,0,1800,0
+NeedlePick_to_GauzeRetrieve,low_gain_correction_or_replan,0,0,0,747
+NeedlePick_to_GauzeRetrieve,reobserve_reestimate,0,1800,0,0
+GauzeRetrieve_to_NeedlePick,continue,1471,0,0,14
+GauzeRetrieve_to_NeedlePick,depth_reestimate_or_cautious_approach,0,0,1673,0
+GauzeRetrieve_to_NeedlePick,low_gain_correction_or_replan,0,0,0,529
+GauzeRetrieve_to_NeedlePick,reobserve_reestimate,0,1675,0,0

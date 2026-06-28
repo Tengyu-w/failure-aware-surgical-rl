@@ -1,0 +1,9 @@
+model,expected,continue,reobserve_reestimate,depth_reestimate_or_cautious_approach,low_gain_correction_or_replan
+priority_router,depth_reestimate_or_cautious_approach,0,0,1080,0
+priority_router,reobserve_reestimate,0,360,0,0
+max_signal_router,depth_reestimate_or_cautious_approach,0,1080,0,0
+max_signal_router,reobserve_reestimate,0,74,0,286
+uniform_retry,depth_reestimate_or_cautious_approach,0,0,0,1080
+uniform_retry,reobserve_reestimate,0,0,0,360
+single_score_retry,depth_reestimate_or_cautious_approach,0,0,0,1080
+single_score_retry,reobserve_reestimate,360,0,0,0
