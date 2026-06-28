@@ -82,6 +82,95 @@ reliability: even a policy that works in a clean simulator may fail under
 shifted perception, noisy execution, contact mismatch, or unsafe recovery
 conditions.
 
+## CircleRL Proxy Logic: Task, Errors, Explanation, And Routing
+
+The first experiment is a deliberately small proxy, referred to in project
+notes as CircleRL and implemented as the custom constrained tool-navigation
+environment. It is not a real surgical dataset. It is a controlled simulator
+used to make the reliability question concrete before moving the idea into
+SurRoL.
+
+### Task Definition
+
+The proxy task asks a tool tip to move from a start region to a target region
+while avoiding a forbidden circular/spherical zone. The policy observes tool
+position, target position, forbidden-zone position, distance-to-goal,
+force/contact proxy, task phase, time, and remaining safety budget. PPO learns
+continuous actions from reward:
+
+```text
+tool state
+  -> PPO action
+  -> simulator step
+  -> distance reward, success bonus, force/boundary penalties
+  -> safety-budget termination if cumulative risk becomes too high
+```
+
+The learned policy therefore tries to reach the target, but it can still become
+unreliable when the state estimate, action execution, or safety geometry is
+perturbed.
+
+### Injected Failure Modes
+
+| Failure mode | What is perturbed | What it represents | Typical symptom |
+| --- | --- | --- | --- |
+| `target_drift` | the true target moves after execution begins | target shift or changed task condition | policy continues along an outdated path |
+| `state_target_bias` | the policy observes a biased target location | perception/state-estimation bias | action is reasonable for the wrong target |
+| `state_dropout` | target observation is dropped or zeroed | missing visual/state signal | policy loses task direction |
+| `execution_slip` | the executed action is scaled down | actuator slip or action-outcome mismatch | progress stalls despite policy commands |
+| forbidden-zone proximity | proposed action moves near the forbidden zone | geometric safety risk | force proxy and violation risk increase |
+| safety-budget exhaustion | cumulative risk exceeds the episode budget | unsafe or inefficient execution | episode terminates before reliable completion |
+
+These failures are not class labels supplied by a human annotator. They are
+controlled perturbations used to create weak reliability labels from simulator
+logs.
+
+### Error Explanation Signals
+
+The project explains proxy failures with interpretable runtime evidence rather
+than only with success/failure:
+
+| Evidence signal | Reliability question |
+| --- | --- |
+| `distance_to_goal` and short-window progress | Is the tool still moving toward the target? |
+| `distance_to_forbidden` | Is the current state close to the forbidden zone? |
+| `proposed_distance_to_forbidden` | Would the next action move into a risky region? |
+| `force_proxy` | Is contact/penetration-like risk increasing? |
+| `remaining_budget` | Is safe execution capacity being depleted? |
+| `action_norm` | Is the policy asking for unusually large motion? |
+| `risk_reasons` | Which mechanism triggered the risk gate? |
+
+This converts a vague failure statement such as "the policy failed" into a
+mechanism-level explanation: boundary risk, stalled progress, low safety
+budget, state-estimation error, or action-execution mismatch.
+
+### Routing And Recovery Logic
+
+The proxy then tests whether those explanations can control runtime behavior:
+
+```text
+policy action
+  -> reliability evidence
+  -> route decision
+  -> execute, tangent backup, monitor recovery, review, or abort-candidate
+```
+
+| Route or controller | When it is used | Runtime behavior |
+| --- | --- | --- |
+| `auto_execute` | no strong risk signal | execute the PPO action |
+| tangent backup | action would approach the forbidden zone | replace the action with a tangential motion around the forbidden zone |
+| risk-gated tangent | risk score is high enough | activate tangent backup only on high-risk steps |
+| mechanism-routed tangent | boundary risk is separated from residual risk | Stage 1 handles forbidden-zone risk; Stage 2 logs budget/stagnation/action-risk evidence |
+| monitor recovery | drift/slip/dropout is detected as recoverable | temporarily use a heuristic recovery action to regain progress |
+| `human_review` | state or target estimate is unreliable | do not blindly retry; flag review or re-estimation |
+| `abort_candidate` | recovery itself may enter an unsafe region or exhaust budget | stop or flag the rollout as unsafe to continue |
+
+The key proxy result is therefore not simply that a controller can recover a
+trajectory. The result is that the project can define a small RL task, induce
+specific failure mechanisms, explain why the policy becomes unreliable, and
+route each case to a different intervention. This is the logic later migrated
+to SurRoL recovery, observable supervision, and multi-signal mechanism routing.
+
 ## How The Research Logic Evolved
 
 The project is best read as a staged research story.
