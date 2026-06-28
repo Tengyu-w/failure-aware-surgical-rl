@@ -37,6 +37,7 @@ responses.
 | Cross-task frozen thresholds | NeedlePick->GauzeRetrieve=1.000; GauzeRetrieve->NeedlePick=0.996 macro-F1 | The route logic transfers across two SurRoL tasks |
 | Severity holdout | boundary router=1.000; uniform retry=0.167 macro-F1 on high severity | Mechanism boundaries survive a held-out severity shift |
 | Offline mixed-priority audit | priority=1.000; max-signal=0.033; uniform=0.000 macro-F1 | Compound faults need priority routing |
+| Model-derived route assignment | held-out macro-F1=0.995; missed high-risk=0.000; false alarm=0.025 | Route assignment can be derived from model/rollout behavior regions |
 | True mixed SurRoL rollouts | clean=40/40; perturbed=0/40; priority-routed=40/40 success | Route-specific re-estimation restores success in smoke-scale PyBullet rollouts |
 
 ## Final Result Snapshot
@@ -53,6 +54,9 @@ evidence, but it remains scripted-oracle PyBullet evidence.
 
 - Labels and expected routes are weak labels from simulator perturbations and
   routing rules.
+- The model-derived routing analysis uses policy/rollout behavior features, but
+  it is still evaluated against simulator weak labels rather than independent
+  expert labels.
 - The true mixed rollout is a smoke-scale scripted-oracle run, not a deployment
   of a learned VPPV policy.
 - The evidence is internal simulation evidence over NeedlePick and

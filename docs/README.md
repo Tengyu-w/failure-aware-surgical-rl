@@ -22,6 +22,7 @@ experiment dump.
 | 15 min | [Failure-aware VPPV cross-task generalization](../reports/failure_aware_vppv_cross_task_generalization.md) | Freezes mechanism-router thresholds on one SurRoL task and tests whether they transfer to another. |
 | 15 min | [Failure-aware VPPV severity holdout](../reports/failure_aware_vppv_severity_holdout.md) | Calibrates intervention boundaries on low/medium severity and tests held-out high severity. |
 | 15 min | [Failure-aware VPPV mixed-priority audit](../reports/failure_aware_vppv_mixed_perturbation_priority.md) | Tests whether co-active visual/depth/policy evidence follows the intended route priority instead of a generic retry rule. |
+| 15 min | [Failure-aware VPPV model-derived routing](../reports/failure_aware_vppv_model_derived_routing.md) | Derives route assignment from model/rollout behavior clusters and evaluates it on held-out episodes. |
 | 15 min | [Failure-aware VPPV true mixed rollouts](../reports/failure_aware_vppv_true_mixed_rollouts.md) | Executes mixed visual/depth/near-target fault proxies in SurRoL/PyBullet and compares perturbed versus priority-routed controllers. |
 | 5 min | [Failure-aware VPPV final teacher brief](../reports/failure_aware_vppv_final_teacher_brief.md) | Final VPPV evidence ladder, strongest claim, and limitations for a supervisor. |
 | 10 min | [Failure-aware VPPV final evidence matrix](../reports/tables/failure_aware_vppv_final_evidence_matrix.csv) | Machine-readable claim-to-evidence matrix for reports, figures, tables, and rebuild commands. |
@@ -57,6 +58,8 @@ experiment dump.
   low/medium-to-high severity holdout check for mechanism boundaries.
 - [failure_aware_vppv_mixed_perturbation_priority.md](../reports/failure_aware_vppv_mixed_perturbation_priority.md):
   offline mixed-perturbation priority audit over composed step evidence.
+- [failure_aware_vppv_model_derived_routing.md](../reports/failure_aware_vppv_model_derived_routing.md):
+  model/rollout behavior clustering and route assignment analysis.
 - [failure_aware_vppv_true_mixed_rollouts.md](../reports/failure_aware_vppv_true_mixed_rollouts.md):
   true SurRoL/PyBullet mixed-fault rollout report.
 - [failure_aware_vppv_final_teacher_brief.md](../reports/failure_aware_vppv_final_teacher_brief.md):

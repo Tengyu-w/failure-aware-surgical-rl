@@ -30,6 +30,7 @@ tables, figures, scripts, and a final evidence matrix.
 - `reports/failure_aware_vppv_cross_task_generalization.md`
 - `reports/failure_aware_vppv_severity_holdout.md`
 - `reports/failure_aware_vppv_mixed_perturbation_priority.md`
+- `reports/failure_aware_vppv_model_derived_routing.md`
 
 ## Claims That Are Safe To Make
 
@@ -41,6 +42,10 @@ tables, figures, scripts, and a final evidence matrix.
 - Frozen thresholds transfer between NeedlePick and GauzeRetrieve with
   macro-F1 1.000 and
   0.996.
+- Model-derived route assignment reaches held-out macro-F1
+  0.995 over
+  3351 step rows without using mechanism labels
+  to form the route clusters.
 - In smoke-scale true mixed SurRoL rollouts, priority routing recovers
   40/40 cases while the perturbed controller recovers
   0/40.

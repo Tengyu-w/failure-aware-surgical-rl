@@ -110,6 +110,7 @@ different question.
 | Cross-task transfer | Do thresholds transfer between NeedlePick and GauzeRetrieve? | macro-F1 1.000 and 0.996 with frozen thresholds |
 | Severity holdout | Do low/medium boundaries survive held-out high severity? | boundary router 1.000 macro-F1; uniform retry 0.167 |
 | Mixed-priority audit | What if visual/depth/policy evidence co-activate? | priority router 1.000 macro-F1; max-signal 0.033; uniform retry 0.000 |
+| Model-derived routing | Can routes be generated from model/rollout behavior regions? | held-out macro-F1 0.995; missed high-risk 0.000 |
 | True mixed rollouts | Does routing still work when mixed faults execute in PyBullet? | perturbed 0/40 success; priority-routed 40/40 success |
 
 The strongest current evidence is the 5-seed true mixed-fault SurRoL smoke
@@ -149,7 +150,71 @@ the safest causal mechanism. For example, a depth-scale error may create visual
 residuals, but the route should still prioritize depth re-estimation before
 trusting the visual residual.
 
-## 7. What A Supervisor Should Take Away
+## 7. Model-Derived Routing Assignment
+
+This is the newest step added to answer the ECG-style concern more directly.
+The earlier composite route was mechanism-informed: we knew which simulator
+fault was injected, then checked whether evidence and routes matched. That is
+useful, but it is not the full ECG logic, because the ECG project starts from a
+trained model and data, analyzes the model's representation and uncertainty,
+then builds routes from the discovered failure regions.
+
+The new model-derived routing experiment moves closer to that pattern:
+
+```text
+SurRoL/VPPV rollout steps
+  -> model/trajectory behavior features
+     distance, progress, action deviation, perception error,
+     policy proxy, action-outcome mismatch, local instability
+  -> PCA behavior representation
+  -> k-means behavior clusters on training episodes
+  -> cluster evidence fingerprints
+  -> route assignment from cluster fingerprint priority
+  -> held-out episode evaluation against weak route labels
+```
+
+The important detail is that `mechanism_label` is not used to form the behavior
+clusters. It is held back for evaluation. In other words, the system first asks:
+
+> What behavior regions does the model/rollout data naturally expose?
+
+Only after those regions are found does the experiment ask:
+
+> Does this region look like visual-state failure, depth failure, policy drift,
+> or nominal execution?
+
+This produces a route assignment:
+
+| Discovered region fingerprint | Assigned route |
+| --- | --- |
+| low-risk behavior cluster | continue |
+| depth-dominant fingerprint | depth re-estimate / cautious approach |
+| visual-state fingerprint | reobserve / re-estimate |
+| policy or action-outcome fingerprint | low-gain correction / replan |
+
+Held-out episode result:
+
+```text
+3351 held-out step rows
+26 held-out episodes
+accuracy 0.996
+macro-F1 0.995
+missed high-risk step rate 0.000
+nominal false alarm rate 0.025
+```
+
+This still does not equal the ECG project, because the surgical project uses
+simulator rollouts and weak labels rather than a real clinical dataset. But it
+does add the missing logical bridge:
+
+```text
+model behavior / representation
+  -> discovered risky regions
+  -> route assignment
+  -> held-out verification
+```
+
+## 8. What A Supervisor Should Take Away
 
 The project's cleanest positioning is:
 
@@ -171,20 +236,23 @@ The key contribution is the mechanism mapping:
 | compound visual-depth-policy faults | co-active evidence | priority route: depth before visual before policy |
 | unsafe recovery | risk remains high during correction | abort-candidate or review |
 
-## 8. What Remains Unproven
+## 9. What Remains Unproven
 
 The repository is careful about the boundary:
 
 - It is simulator-only.
 - The labels are weak labels from injected faults and routing rules.
 - The true mixed rollout is scripted-oracle PyBullet evidence.
+- The model-derived routing clusters are derived from simulator behavior
+  features, not from a real surgical dataset or the teacher's original hidden
+  policy representation.
 - It is not hardware validation.
 - It is not clinical validation.
 - It is not an end-to-end learned surgical autonomy system.
 - It has not yet replaced the scripted route with the teacher's original
   learned VPPV policy path.
 
-## 9. Where To Read The Evidence
+## 10. Where To Read The Evidence
 
 - Final teacher brief:
   [reports/failure_aware_vppv_final_teacher_brief.md](../reports/failure_aware_vppv_final_teacher_brief.md)
@@ -192,8 +260,9 @@ The repository is careful about the boundary:
   [reports/tables/failure_aware_vppv_final_evidence_matrix.csv](../reports/tables/failure_aware_vppv_final_evidence_matrix.csv)
 - True mixed rollout report:
   [reports/failure_aware_vppv_true_mixed_rollouts.md](../reports/failure_aware_vppv_true_mixed_rollouts.md)
+- Model-derived routing report:
+  [reports/failure_aware_vppv_model_derived_routing.md](../reports/failure_aware_vppv_model_derived_routing.md)
 - VPPV multi-evidence framework:
   [docs/FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md](FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md)
 - Claim-to-evidence index:
   [docs/evidence_index.md](evidence_index.md)
-

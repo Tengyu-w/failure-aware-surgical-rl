@@ -17,6 +17,7 @@ loose folder of PNG files.
 | Embedding-risk PPO | `reports/figures/embedding_risk_training_pilot/` | Reward shaping and hard-negative curriculum training summaries. |
 | ECG-style RL reliability suite | `reports/figures/ecg_style_rl_reliability_suite/` | Representation PCA, injected-failure risk ranking, and review-score separation. |
 | Multi-signal reliability upgrade | `reports/figures/multisignal_reliability_upgrade/` | Single-family versus multi-signal risk ablation and mechanism-router metrics. |
+| Failure-aware VPPV evidence | `reports/figures/failure_aware_vppv/` | VPPV step evidence, severity holdout, mixed-priority audit, model-derived route assignment, and true mixed-fault rollout figures. |
 
 ## Representative Visual Evidence
 
@@ -33,6 +34,8 @@ loose folder of PNG files.
 | Which perception-like errors should route to review or re-estimation? | [NeedlePick severity sweep](../reports/figures/surrol_severity_sweep/needlepick_severity_sweep.png), [GauzeRetrieve severity sweep](../reports/figures/surrol_severity_sweep/gauzeretrieve_severity_sweep.png) | Visual-state and depth-scale errors behave differently from recoverable near-target drift. | State-space proxy for perception error, not direct segmentation/depth output. |
 | Is there representation-level reliability evidence? | [Embedding by route](../reports/figures/surrol_reliability_memory/embedding_by_route.png), [embedding by failure family](../reports/figures/surrol_reliability_memory/embedding_by_family.png) | Failure families and recovery routes can be inspected in a learned reliability-memory space. | Offline diagnostic analysis. |
 | Did the ECG-style upgrade go beyond embedding alone? | [ECG-style RL reliability suite](../reports/figures/ecg_style_rl_reliability_suite/ecg_style_rl_reliability_suite.png), [multi-signal reliability upgrade](../reports/figures/multisignal_reliability_upgrade/multisignal_reliability_upgrade.png) | The analysis combines representation, uncertainty, robustness, prototype, KNN, and route evidence. | Research prototype; not clinical validation. |
+| Can routes be derived from model behavior regions? | [Model-derived PCA](../reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png), [cluster fingerprints](../reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_cluster_fingerprints.png) | Behavior clusters are mapped to route assignments before held-out weak-label evaluation. | Simulator rollout representation, not real clinical data. |
+| Does VPPV mixed-fault routing recover in SurRoL? | [True mixed success](../reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_success.png), [distance traces](../reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_distance_traces.png) | Perturbed mixed faults fail while priority-routed mixed faults recover in the 5-seed smoke run. | Scripted-oracle PyBullet simulation. |
 | Did risk-informed training improve the policy? | [Multi-seed curriculum metrics](../reports/figures/embedding_risk_training_pilot/multiseed_curriculum_metrics.png), [curriculum fine-tune metrics](../reports/figures/embedding_risk_training_pilot/curriculum_finetune_metrics.png) | Embedding-risk signals were connected to the training loop and evaluated. | Preliminary; not the main claimed improvement. |
 
 ## Recommended Reading Order
@@ -50,6 +53,8 @@ loose folder of PNG files.
    evidence, not as the main project claim.
 6. Use ECG-style and multi-signal reliability figures to show the broader
    upgrade beyond embedding alone.
+7. Use `reports/figures/failure_aware_vppv/` for the final VPPV route story:
+   step evidence, model-derived route assignment, and true mixed-fault rollout.
 
 ## Interpretation Notes
 

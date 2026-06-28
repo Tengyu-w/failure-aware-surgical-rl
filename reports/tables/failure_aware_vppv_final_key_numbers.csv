@@ -7,6 +7,12 @@ mixed_priority_macro_f1,1.000
 mixed_rows,1440
 mixed_scenarios,8
 mixed_uniform_macro_f1,0.000
+model_derived_test_accuracy,0.996
+model_derived_test_episodes,26
+model_derived_test_false_alarm,0.025
+model_derived_test_macro_f1,0.995
+model_derived_test_missed_high_risk,0.000
+model_derived_test_rows,3351
 severity_high_macro_f1,1.000
 severity_high_rows,6
 severity_high_seeds,30

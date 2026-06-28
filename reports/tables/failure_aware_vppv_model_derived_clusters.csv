@@ -1,0 +1,11 @@
+split,cluster,rows,episodes,model_derived_route,assignment_reason,visual_state_evidence,depth_scale_evidence,policy_embedding_proxy_evidence,action_outcome_mismatch_evidence,progress_regularity_evidence,local_neighborhood_proxy_evidence
+train_fingerprint,0,331,14,depth_reestimate_or_cautious_approach,depth fingerprint dominates,1.0,1.0,0.16385156622674507,0.0006042296072507553,0.6065898791540786,0.5278470841946256
+train_fingerprint,1,1108,14,reobserve_reestimate,visual-state fingerprint dominates,0.6873840486905066,0.07070108686763871,0.19764808569257072,0.02003610108303249,0.9193535649819494,0.6508329820207105
+train_fingerprint,2,2062,14,depth_reestimate_or_cautious_approach,depth fingerprint dominates,1.0,1.0,0.20486976109040783,0.0,0.9962627303588748,0.6806398600617694
+train_fingerprint,3,144,27,continue,low model-state risk,0.0,0.0,0.0,0.03472222222222223,0.0,0.043402777777777776
+train_fingerprint,4,274,31,continue,low model-state risk,0.0,0.0,0.0509988474836726,0.0,0.22682481751824815,0.1718685170956588
+train_fingerprint,5,569,14,low_gain_correction_or_replan,policy/action-outcome fingerprint dominates,0.0,0.0,0.7954479234113405,0.6035149384885764,0.1999890158172232,0.6381753249005643
+train_fingerprint,6,496,34,continue,low model-state risk,0.01684027913324521,0.001732111823285749,0.1085287563667232,0.04959677419354838,0.5866683467741934,0.35207203682088273
+train_fingerprint,7,1079,30,continue,below route threshold,0.0,0.0,0.13989378566899172,0.006116774791473587,0.9790836422613531,0.47834021816008965
+train_fingerprint,8,1080,7,reobserve_reestimate,visual-state fingerprint dominates,0.7593434954626932,0.07810249675906648,0.29961622807017535,0.0,0.9963541666666667,0.7185704495614034
+train_fingerprint,9,329,21,reobserve_reestimate,visual-state fingerprint dominates,0.6947185171254427,0.07145547575829488,0.17332426811710122,0.0,0.6148176291793312,0.5345158774596064

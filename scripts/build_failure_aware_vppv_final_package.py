@@ -50,6 +50,7 @@ def build_numbers() -> dict[str, str]:
     cross = read_csv("failure_aware_vppv_cross_task_summary.csv")
     severity = read_csv("failure_aware_vppv_severity_holdout_summary.csv")
     mixed = read_csv("failure_aware_vppv_mixed_priority_summary.csv")
+    model_derived = read_csv("failure_aware_vppv_model_derived_summary.csv")
     true = read_csv("failure_aware_vppv_true_mixed_rollout_summary.csv")
 
     composite_step = metric_lookup(step, model="composite_step_route")
@@ -67,6 +68,7 @@ def build_numbers() -> dict[str, str]:
     mixed_priority = metric_lookup(mixed, model="priority_router")
     mixed_max = metric_lookup(mixed, model="max_signal_router")
     mixed_uniform = metric_lookup(mixed, model="uniform_retry")
+    model_derived_test = metric_lookup(model_derived, split="test")
 
     true_weighted = true.copy()
     true_weighted["success_count"] = (
@@ -111,6 +113,12 @@ def build_numbers() -> dict[str, str]:
         "mixed_priority_macro_f1": f3(mixed_priority["macro_f1"]),
         "mixed_max_signal_macro_f1": f3(mixed_max["macro_f1"]),
         "mixed_uniform_macro_f1": f3(mixed_uniform["macro_f1"]),
+        "model_derived_test_rows": str(int(model_derived_test["step_rows"])),
+        "model_derived_test_episodes": str(int(model_derived_test["episodes"])),
+        "model_derived_test_accuracy": f3(model_derived_test["accuracy"]),
+        "model_derived_test_macro_f1": f3(model_derived_test["macro_f1"]),
+        "model_derived_test_missed_high_risk": f3(model_derived_test["missed_high_risk_step_rate"]),
+        "model_derived_test_false_alarm": f3(model_derived_test["false_alarm_on_nominal_step_rate"]),
         "true_total_episodes": str(total_true),
         "true_clean_success": pct_success(int(true_clean["success"]), int(true_clean["episodes"])),
         "true_perturbed_success": pct_success(int(true_perturbed["success"]), int(true_perturbed["episodes"])),
@@ -215,6 +223,24 @@ def write_evidence_matrix(numbers: dict[str, str]) -> None:
             "reproduction_command": "python scripts\\evaluate_failure_aware_vppv_mixed_priority.py",
         },
         {
+            "stage": "Model-derived routing assignment",
+            "research_question": "Can routes be derived from policy/rollout behavior regions rather than pre-written mechanism labels?",
+            "evidence_type": "episode-split PCA/cluster route assignment",
+            "task_scope": f"{numbers['model_derived_test_rows']} held-out step rows over {numbers['model_derived_test_episodes']} episodes",
+            "key_result": (
+                f"Held-out macro-F1={numbers['model_derived_test_macro_f1']}; "
+                f"accuracy={numbers['model_derived_test_accuracy']}; "
+                f"missed high-risk={numbers['model_derived_test_missed_high_risk']}; "
+                f"nominal false alarm={numbers['model_derived_test_false_alarm']}."
+            ),
+            "claim_supported": "The ECG-style loop now connects model/rollout representation regions to route assignment.",
+            "limitation": "Still simulator rollout data and weak labels; not independent real-world discovery.",
+            "primary_report": "reports/failure_aware_vppv_model_derived_routing.md",
+            "primary_table": "reports/tables/failure_aware_vppv_model_derived_summary.csv",
+            "primary_figure_or_media": "reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png",
+            "reproduction_command": "python scripts\\build_failure_aware_vppv_model_derived_routing.py",
+        },
+        {
             "stage": "True mixed-fault SurRoL rollouts",
             "research_question": "Does the priority route recover when mixed faults are actually executed in PyBullet?",
             "evidence_type": "SurRoL/PyBullet smoke rollout",
@@ -277,6 +303,7 @@ responses.
 | Cross-task frozen thresholds | NeedlePick->GauzeRetrieve={numbers['cross_np_to_g_macro_f1']}; GauzeRetrieve->NeedlePick={numbers['cross_g_to_np_macro_f1']} macro-F1 | The route logic transfers across two SurRoL tasks |
 | Severity holdout | boundary router={numbers['severity_high_macro_f1']}; uniform retry={numbers['severity_uniform_high_macro_f1']} macro-F1 on high severity | Mechanism boundaries survive a held-out severity shift |
 | Offline mixed-priority audit | priority={numbers['mixed_priority_macro_f1']}; max-signal={numbers['mixed_max_signal_macro_f1']}; uniform={numbers['mixed_uniform_macro_f1']} macro-F1 | Compound faults need priority routing |
+| Model-derived route assignment | held-out macro-F1={numbers['model_derived_test_macro_f1']}; missed high-risk={numbers['model_derived_test_missed_high_risk']}; false alarm={numbers['model_derived_test_false_alarm']} | Route assignment can be derived from model/rollout behavior regions |
 | True mixed SurRoL rollouts | clean={numbers['true_clean_success']}; perturbed={numbers['true_perturbed_success']}; priority-routed={numbers['true_routed_success']} success | Route-specific re-estimation restores success in smoke-scale PyBullet rollouts |
 
 ## Final Result Snapshot
@@ -293,6 +320,9 @@ evidence, but it remains scripted-oracle PyBullet evidence.
 
 - Labels and expected routes are weak labels from simulator perturbations and
   routing rules.
+- The model-derived routing analysis uses policy/rollout behavior features, but
+  it is still evaluated against simulator weak labels rather than independent
+  expert labels.
 - The true mixed rollout is a smoke-scale scripted-oracle run, not a deployment
   of a learned VPPV policy.
 - The evidence is internal simulation evidence over NeedlePick and
@@ -345,6 +375,7 @@ tables, figures, scripts, and a final evidence matrix.
 - `reports/failure_aware_vppv_cross_task_generalization.md`
 - `reports/failure_aware_vppv_severity_holdout.md`
 - `reports/failure_aware_vppv_mixed_perturbation_priority.md`
+- `reports/failure_aware_vppv_model_derived_routing.md`
 
 ## Claims That Are Safe To Make
 
@@ -356,6 +387,10 @@ tables, figures, scripts, and a final evidence matrix.
 - Frozen thresholds transfer between NeedlePick and GauzeRetrieve with
   macro-F1 {numbers['cross_np_to_g_macro_f1']} and
   {numbers['cross_g_to_np_macro_f1']}.
+- Model-derived route assignment reaches held-out macro-F1
+  {numbers['model_derived_test_macro_f1']} over
+  {numbers['model_derived_test_rows']} step rows without using mechanism labels
+  to form the route clusters.
 - In smoke-scale true mixed SurRoL rollouts, priority routing recovers
   {numbers['true_routed_success']} cases while the perturbed controller recovers
   {numbers['true_perturbed_success']}.
