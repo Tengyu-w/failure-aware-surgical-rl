@@ -154,6 +154,10 @@ Main lesson: embedding risk can affect training behavior.
 Limitation: multi-seed results do not show robust success-rate or
 safety-budget improvement. This is preliminary.
 
+This is why the project does not claim that representation analysis alone
+"fixes" RL training. In this repository, embedding evidence is useful, but it
+is only one part of a larger reliability pipeline.
+
 ## 10. Visual Reliability Evidence
 
 The SurRoL branch also tests visual-side reliability. Rendered or pseudo-visual
@@ -170,7 +174,57 @@ also building pieces for perception-to-action reliability monitoring.
 Limitation: these visual modules are still lightweight proxies, not full
 surgical scene segmentation or clinical visual validation.
 
-## 11. Final Interpretation
+## 11. ECG-Style Broad RL Reliability Upgrade
+
+The newest upgrade mirrors the ECG project's broader structure. It does not
+stop at embedding. It checks multiple evidence families:
+
+| Evidence family | Surgical RL implementation |
+| --- | --- |
+| representation structure | PCA, centroid distance, normalized centroid distance, silhouette, Davies-Bouldin |
+| prototype/kNN evidence | nearest route prototype, prototype conflict, kNN distance, entropy, local purity, route mixing |
+| confidence and boundary evidence | MSP, entropy, inverse margin, route-error AUROC, review-risk score |
+| trajectory structure | progress, stagnation, final distance, monitor triggers, recovery replans, unsafe events |
+| perturbation/OOD evidence | action noise/dropout/slip, perception bias, depth error, jaw-stuck, near-target drift |
+| model intervention | multi-signal review/abort risk head and four-way mechanism router |
+
+Main diagnostics:
+
+| Metric | Value |
+| --- | ---: |
+| silhouette | 0.412 |
+| mean local purity | 0.969 |
+| kNN route conflict rate | 0.019 |
+| review-score AUROC for review/abort | 1.000 |
+
+The important discovery is that ordinary route softmax uncertainty is not
+enough for review/abort decisions:
+
+| Score | Route-error AUROC | Review/abort AUROC |
+| --- | ---: | ---: |
+| MSP | 0.993 | 0.079 |
+| entropy | 0.993 | 0.089 |
+| inverse margin | 0.993 | 0.065 |
+| review score | 0.118 | 1.000 |
+
+So the project trains a separate multi-signal reliability model instead of
+trusting one classifier confidence score.
+
+Model-side result:
+
+| Component | Held-out result |
+| --- | --- |
+| all multi-signal review head | AUROC 1.000, AUPRC 1.000, recall 0.941, FPR 0.000 |
+| four-way mechanism router | accuracy 0.973, macro-F1 0.981, missed review-or-abort 0.000 |
+
+Main lesson: broad reliability analysis can be converted into a learned
+supervisor. It improves the system by deciding the runtime route, even though
+the current evidence does not prove a robust end-to-end PPO policy improvement.
+
+Limitation: labels are weak/proxy labels from simulator logs and injected
+failures, and some features are episode-level summaries.
+
+## 12. Final Interpretation
 
 The project should be presented as a runtime reliability-supervision system:
 
@@ -189,8 +243,9 @@ The most honest experimental arc is:
 ```text
 train baseline RL
   -> collect errors and weak labels
-  -> run embedding/KNN analysis
+  -> run embedding, confidence, trajectory, visual, and perturbation analysis
   -> try risk-aware retraining
   -> find that retraining alone is not robust
-  -> use multi-mechanism runtime routing
+  -> train multi-signal risk and mechanism-route models
+  -> use multi-mechanism runtime recovery and review routing
 ```

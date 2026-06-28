@@ -1,0 +1,2 @@
+accuracy,macro_f1,missed_review_or_abort_rate,false_review_or_abort_rate,mean_confidence,test_rows,threshold_review_or_abort
+0.972972972972973,0.9811507936507936,0.0,0.0,0.9386040726337491,74,0.95

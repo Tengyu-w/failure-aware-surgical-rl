@@ -43,6 +43,7 @@ flowchart TD
 | Visual/perception state | perception bias, depth scale error, review/re-estimation triggers | Is the visual state reliable enough for autonomous execution? |
 | Grasp/contact state | jaw-stuck command count, jaw progress, object progress | Is the manipulation state physically plausible? |
 | Embedding instability | PCA/kNN risk, hard-negative curriculum risk | Does the state resemble known failure or high-risk regions? |
+| Multi-signal mechanism evidence | progress, action, visual, contact, boundary, representation-proxy features | Which route mechanism should control the next decision? |
 
 ## Controller-Level Policy
 
@@ -85,6 +86,23 @@ This distinction matters. The claim is not that embedding/KNN alone fixes RL.
 The claim is that embedding/KNN reveals failure neighborhoods, can be connected
 to training, and motivates a safer policy-plus-supervisor architecture when
 training alone is not robust.
+
+## ECG-Style Broad Suite
+
+The latest upgrade mirrors the ECG workflow more directly:
+
+```text
+route-feature space
+  -> centroid / normalized centroid / silhouette / Davies-Bouldin
+  -> prototype ambiguity and kNN entropy / purity
+  -> MSP, entropy, margin, and review-risk diagnostics
+  -> injected-failure robustness ranking
+  -> multi-signal risk head and mechanism router
+```
+
+The key lesson is similar to the ECG project: representation analysis is useful
+for diagnosis, but the final system should act through a trained reliability
+head and mechanism-separated router.
 
 ## SurRoL Route Policy
 

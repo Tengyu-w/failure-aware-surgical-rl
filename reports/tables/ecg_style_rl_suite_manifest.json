@@ -1,0 +1,12 @@
+{
+  "centroid": "E:\\RL_projects\\constraint_surgical_rl\\reports\\tables\\ecg_style_rl_centroid_distances.csv",
+  "quality": "E:\\RL_projects\\constraint_surgical_rl\\reports\\tables\\ecg_style_rl_representation_quality.csv",
+  "prototype": "E:\\RL_projects\\constraint_surgical_rl\\reports\\tables\\ecg_style_rl_prototype_diagnostics.csv",
+  "knn": "E:\\RL_projects\\constraint_surgical_rl\\reports\\tables\\ecg_style_rl_knn_diagnostics.csv",
+  "uncertainty": "E:\\RL_projects\\constraint_surgical_rl\\reports\\tables\\ecg_style_rl_uncertainty_diagnostics.csv",
+  "trajectory": "E:\\RL_projects\\constraint_surgical_rl\\reports\\tables\\ecg_style_rl_trajectory_structure.csv",
+  "robustness": "E:\\RL_projects\\constraint_surgical_rl\\reports\\tables\\ecg_style_rl_robustness_by_failure.csv",
+  "router": "E:\\RL_projects\\constraint_surgical_rl\\reports\\tables\\ecg_style_rl_mechanism_router_summary.csv",
+  "figure": "E:\\RL_projects\\constraint_surgical_rl\\reports\\figures\\ecg_style_rl_reliability_suite\\ecg_style_rl_reliability_suite.png",
+  "report": "E:\\RL_projects\\constraint_surgical_rl\\reports\\ecg_style_rl_reliability_suite.md"
+}

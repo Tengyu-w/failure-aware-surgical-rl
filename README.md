@@ -30,6 +30,9 @@ The final GitHub framing is:
 - **Learning-to-routing flow** explains why the project first tries to improve
   the policy and then moves to runtime supervision when retraining is not
   robust enough.
+- **ECG-style RL reliability suite** expands the analysis beyond embedding:
+  representation geometry, uncertainty, trajectory structure, perturbation
+  robustness, multi-signal risk-head training, and mechanism routing.
 - The strongest claim is internal simulation evidence for runtime reliability
   supervision, not real surgical autonomy.
 
@@ -57,7 +60,12 @@ The project is best read as a staged research story.
 8. Train and audit learned/observable route supervisors.
 9. Test whether embedding/KNN instability signals can feed back into PPO
    training through reward shaping and hard-negative curriculum.
-10. Treat the limited training gains as evidence that a stronger runtime
+10. Run ECG-style broad reliability analysis: centroid distances, silhouette,
+    prototype ambiguity, kNN entropy/purity, MSP/entropy/margin, trajectory
+    structure, and injected-failure robustness.
+11. Train a multi-signal review/abort risk head and a four-way mechanism
+    router.
+12. Treat the limited training gains as evidence that a stronger runtime
     supervisor is still needed.
 
 The resulting chain is:
@@ -152,6 +160,18 @@ train a baseline policy
 For the detailed version, see
 [docs/LEARNING_TO_ROUTING_FLOW.md](docs/LEARNING_TO_ROUTING_FLOW.md).
 
+For the ECG-style broad reliability upgrade, see
+[docs/ECG_STYLE_RL_UPGRADE.md](docs/ECG_STYLE_RL_UPGRADE.md).
+
+The newest model-side upgrade produces:
+
+| Component | Held-out internal result |
+| --- | --- |
+| multi-signal review/abort risk head | AUROC 1.000, AUPRC 1.000, recall 0.941, FPR 0.000 |
+| four-way mechanism router | accuracy 0.973, macro-F1 0.981, missed review-or-abort 0.000 |
+
+These are simulator-log supervisor results, not real surgical validation.
+
 ## Method And Evidence Chain
 
 | Stage | What was done | Why it mattered | Main conclusion |
@@ -166,7 +186,9 @@ For the detailed version, see
 | 8. Learned route classifier | Trained a safety-biased route classifier. | Tests whether route decisions can be learned from evidence. | Held-out accuracy is 0.846 with 0.000 missed review-or-abort rate in the current split. |
 | 9. Observable supervisor | Replaced privileged jaw-stuck trigger evidence with observable command/progress signals. | Reduces dependence on internal simulator state. | Jaw-stuck perturbations are detected in 10/10 episodes for both core tasks. |
 | 10. Embedding-risk PPO | Fed embedding/KNN risk into reward shaping and hard-negative curriculum. | Tests whether explanation signals can improve training. | It changes learned behavior and improves some return/distance metrics, but not robust success/safety outcomes. |
-| 11. Runtime routing conclusion | Interpreted the limited PPO improvement as evidence for a supervisor around the policy. | Surgical autonomy needs execution-time reliability, not only better offline learning. | The final contribution is a policy-plus-supervisor system. |
+| 11. ECG-style broad diagnostics | Added centroid/prototype/kNN, uncertainty, trajectory, and perturbation analyses. | Mirrors the ECG project's broader reliability audit. | Internal simulator labels only. |
+| 12. Multi-signal model upgrade | Trained a review/abort risk head and four-way mechanism router. | Turns analysis signals into a new reliability model. | Strong held-out internal metrics, but not external validation. |
+| 13. Runtime routing conclusion | Interpreted limited policy improvement as evidence for a supervisor around the policy. | Surgical autonomy needs execution-time reliability, not only better offline learning. | The final contribution is a policy-plus-supervisor system. |
 
 For the full stage-ordered report, see
 [docs/RESEARCH_REPORT.md](docs/RESEARCH_REPORT.md).

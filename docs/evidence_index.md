@@ -43,6 +43,7 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | Stage 6 | Upgrade the proxy controller to ECG-style mechanism-separated routing | [mechanism-routed tangent report](../reports/mechanism_routed_tangent_v5d_report.md), [mechanism aggregate](../outputs/mechanism_routed_tangent_v5d_aggregate_summary.csv), [mechanism figures](../reports/figures/mechanism_routed_tangent_v5d/) |
 | Stage 7 | Test whether embedding/KNN risk can become a training signal | [embedding-risk training pilot](../reports/embedding_risk_training_pilot.md), [reward-only pilot comparison](../outputs/embedding_risk_training_pilot_comparison.csv), [curriculum fine-tune summary](../outputs/embedding_risk_curriculum_finetune_pilot_summary.csv), [multi-seed aggregate](../outputs/embedding_risk_multiseed_curriculum_aggregate_summary.csv), [multi-seed figure](../reports/figures/embedding_risk_training_pilot/multiseed_curriculum_metrics.png) |
 | Stage 8 | Explain the complete learning-to-routing chain | [learning-to-routing flow](LEARNING_TO_ROUTING_FLOW.md), [risk dataset](../outputs/risk_dataset/risk_dataset.csv), [visual action risk head script](../scripts/train_surrol_visual_action_risk_head.py), [visual recovery memory script](../scripts/train_surrol_visual_recovery_memory.py) |
+| Stage 9 | Run ECG-style broad reliability suite and model upgrade | [ECG-style RL upgrade](ECG_STYLE_RL_UPGRADE.md), [suite report](../reports/ecg_style_rl_reliability_suite.md), [multi-signal report](../reports/multisignal_reliability_upgrade.md), [suite figure](../reports/figures/ecg_style_rl_reliability_suite/ecg_style_rl_reliability_suite.png), [multi-signal figure](../reports/figures/multisignal_reliability_upgrade/multisignal_reliability_upgrade.png) |
 
 ## Key Result Tables
 
@@ -60,6 +61,11 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [mechanism_routed_tangent_v5d_route_summary.csv](../outputs/mechanism_routed_tangent_v5d_route_summary.csv) | Stage 1 boundary versus Stage 2 residual route activity for the mechanism router |
 | [embedding_risk_training_pilot_comparison.csv](../outputs/embedding_risk_training_pilot_comparison.csv) | one-seed PPO pilot comparing baseline training against embedding-risk reward shaping |
 | [embedding_risk_curriculum_finetune_pilot_summary.csv](../outputs/embedding_risk_curriculum_finetune_pilot_summary.csv) | one-seed PPO pilot comparing reward shaping, hard-negative curriculum, and curriculum fine-tuning |
+| [ecg_style_rl_representation_quality.csv](../reports/tables/ecg_style_rl_representation_quality.csv) | silhouette, Davies-Bouldin, and PCA variance for the multi-signal route space |
+| [ecg_style_rl_uncertainty_diagnostics.csv](../reports/tables/ecg_style_rl_uncertainty_diagnostics.csv) | MSP, entropy, margin, and review-score AUROC diagnostics |
+| [ecg_style_rl_robustness_by_failure.csv](../reports/tables/ecg_style_rl_robustness_by_failure.csv) | injected-failure risk ranking |
+| [multisignal_review_ablation.csv](../reports/tables/multisignal_review_ablation.csv) | single-family versus multi-signal review/abort risk-head ablation |
+| [multisignal_mechanism_router_summary.csv](../reports/tables/multisignal_mechanism_router_summary.csv) | four-way mechanism-router held-out summary |
 
 ## Important Reports
 
@@ -69,6 +75,7 @@ visualizations from the proxy simulator; they are not SurRoL screenshots.
 | [EXPERIMENT_EVIDENCE_SUMMARY.md](EXPERIMENT_EVIDENCE_SUMMARY.md) | compact evidence narrative for explaining the main upgrades quickly |
 | [METHOD_OVERVIEW.md](METHOD_OVERVIEW.md) | mechanism diagram, evidence families, and routing policy |
 | [LEARNING_TO_ROUTING_FLOW.md](LEARNING_TO_ROUTING_FLOW.md) | explains how baseline RL, weak risk labels, embedding/KNN analysis, risk-aware retraining, visual reliability, and runtime routing connect |
+| [ECG_STYLE_RL_UPGRADE.md](ECG_STYLE_RL_UPGRADE.md) | explains the broad ECG-style analysis and model upgrade now added to the RL project |
 | [FIGURE_ATLAS.md](FIGURE_ATLAS.md) | visual evidence inventory separating proxy snapshots from SurRoL renders |
 | [research_sequence.md](research_sequence.md) | recommended reading order for the whole project |
 | [surrol_master_results.md](../reports/surrol_master_results.md) | overview of paired SurRoL recovery evidence |

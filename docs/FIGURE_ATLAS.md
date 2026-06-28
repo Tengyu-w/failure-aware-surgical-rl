@@ -15,6 +15,8 @@ loose folder of PNG files.
 | Observable supervisor | `reports/figures/observable_proxy_risk/` and related observable folders | Threshold behavior and observable jaw-stuck recovery evidence. |
 | Learned route classifier | `reports/tables/surrol_learned_route_classifier_*.csv` and report tables | Route prediction metrics, confusion table, and feature weights. |
 | Embedding-risk PPO | `reports/figures/embedding_risk_training_pilot/` | Reward shaping and hard-negative curriculum training summaries. |
+| ECG-style RL reliability suite | `reports/figures/ecg_style_rl_reliability_suite/` | Representation PCA, injected-failure risk ranking, and review-score separation. |
+| Multi-signal reliability upgrade | `reports/figures/multisignal_reliability_upgrade/` | Single-family versus multi-signal risk ablation and mechanism-router metrics. |
 
 ## Recommended Reading Order
 
@@ -29,6 +31,8 @@ loose folder of PNG files.
    `reports/surrol_master_results.md`.
 5. Use embedding-risk training figures only as preliminary training-loop
    evidence, not as the main project claim.
+6. Use ECG-style and multi-signal reliability figures to show the broader
+   upgrade beyond embedding alone.
 
 ## Interpretation Notes
 

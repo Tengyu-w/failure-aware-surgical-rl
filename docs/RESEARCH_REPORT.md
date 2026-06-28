@@ -24,6 +24,10 @@ For final GitHub interpretation, use the following hierarchy:
   a mechanism-separated reliability router;
 - SurRoL recovery tables show route-specific recovery under injected faults;
 - learned and observable supervisors are reliability-routing prototypes;
+- the ECG-style RL reliability suite is the broad upgrade beyond embedding:
+  representation geometry, decision uncertainty, trajectory/failure
+  structure, perturbation robustness, a multi-signal risk head, and a
+  four-way mechanism router;
 - embedding-risk PPO is preliminary training-loop evidence and should not be
   used as the main claim.
 - the full experimental arc is a learning-to-routing pipeline: train, label
@@ -71,10 +75,17 @@ training. Embedding/KNN risk was fed into PPO through reward shaping and
 hard-negative curriculum. This changed learned behavior and improved some
 return/distance metrics, but did not yet produce robust success/safety gains.
 
-That negative result is part of the final argument. The project does not stop
-at "make the RL model better." It shows that risk-aware retraining alone is not
-enough in the present setup, so the stronger design is to add runtime routing
-around the learned policy.
+The final upgrade then widened the ECG-style analysis beyond embedding. The
+project now checks multi-signal representation geometry, prototype conflict,
+kNN purity, route uncertainty, trajectory regularity, injected-failure
+robustness, and then trains a multi-signal review/abort risk head plus a
+four-way mechanism router. That result is the main bridge from analysis to a
+usable model component.
+
+The negative PPO result is still part of the final argument. The project does
+not stop at "make the RL model better." It shows that risk-aware retraining
+alone is not enough in the present setup, while a learned reliability model can
+route execution into continue, recover, review, or abort-candidate decisions.
 
 This is the final project narrative:
 
@@ -87,6 +98,7 @@ constrained surgical proxy
   -> route-specific recovery and review
   -> learned / observable route supervision
   -> preliminary embedding-risk-guided PPO training
+  -> ECG-style broad reliability suite and multi-signal route model
   -> runtime routing after retraining limits are observed
 ```
 
@@ -100,6 +112,8 @@ constrained surgical proxy
 | Learned route classifier | Held-out accuracy 0.846, macro-F1 0.828, missed review-or-abort 0.000. | Route decisions are learnable from episode features. | Labels are distilled from current rules. |
 | Observable supervisor | Jaw-stuck perturbations detected in 10/10 episodes for NeedlePick and GauzeRetrieve. | Privileged-state dependence is reduced for the decision trigger. | Recovery execution remains scripted. |
 | Embedding-risk PPO | Curriculum fine-tuning improves return and strict final distance but not success/budget outcomes. | Instability analysis can enter training. | Preliminary and not robust policy improvement. |
+| ECG-style RL suite | Silhouette 0.412, mean local purity 0.969, kNN route conflict 0.019, review-score AUROC 1.000 for review-or-abort states. | Broad reliability analysis now covers representation, confidence, trajectory, and injected-failure evidence. | Internal simulator labels and episode-level summaries. |
+| Multi-signal mechanism router | Accuracy 0.973, macro-F1 0.981, missed review-or-abort 0.000, false review-or-abort 0.000. | Reliability evidence can train a route model, not only explain errors after the fact. | Rare abort-candidate support remains small. |
 | Learning-to-routing flow | PPO is trained from reward; reliability labels are built afterward from rollout logs and failure design. | The project explains how labels, embeddings, failed retraining, and routing connect. | Labels remain weak/proxy labels, not expert clinical annotations. |
 
 ## How RL, Labels, And Error Classes Connect
@@ -144,6 +158,25 @@ policy-vs-oracle action-gap labels for a visual action-risk head. These modules
 are closer to surgical embodied-intelligence concerns because they ask whether
 visual parsing and perception-to-action behavior remain reliable under
 occlusion, noise, brightness shift, frame lag, or corrupted rendered features.
+
+### Broad ECG-Style Reliability Signals
+
+The ECG project did not rely on one embedding plot. It combined representation
+geometry, confidence, signal structure, perturbation response, model
+interventions, and final risk routing. The RL upgrade mirrors that structure:
+
+| ECG evidence family | Surgical RL equivalent |
+| --- | --- |
+| embedding geometry | route-space PCA, centroid distance, normalized centroid distance, silhouette, Davies-Bouldin |
+| prototype and kNN diagnostics | nearest route prototype, prototype conflict, kNN distance, kNN entropy, local purity, route mixing |
+| decision uncertainty | MSP, entropy, inverse margin, route-error AUROC, review-risk score |
+| signal structure | progress, final distance, distance reduction, stagnation, monitor triggers, replans, unsafe events |
+| OOD/corruption | injected action noise/dropout/slip, perception bias, depth error, jaw-stuck, near-target drift |
+| model intervention | multi-signal review/abort risk head and four-way mechanism router |
+
+This makes the analysis useful for model behavior. The output is no longer only
+"this rollout looks unstable"; it becomes "this rollout should be executed,
+recovered, reviewed, or marked as an abort candidate."
 
 ## Stage 1: Custom Constrained Surgical Proxy
 
@@ -432,15 +465,86 @@ Embedding risk has become a training signal, not only an explanation tool.
 
 This is preliminary. It should not be claimed as robust model improvement.
 
-## Stage 11: Why Runtime Routing Remains Necessary
+## Stage 11: ECG-Style Broad Reliability Suite
+
+### What Was Done
+
+The ECG-style upgrade broadens instability analysis from embedding-only
+diagnostics into a multi-family reliability suite. It measures:
+
+- representation structure with PCA, centroid distance, normalized centroid
+  distance, silhouette, Davies-Bouldin, prototype conflict, and kNN purity;
+- decision-boundary uncertainty with MSP, entropy, inverse margin, and
+  review-risk scoring;
+- trajectory and task-structure signals such as progress, stagnation, final
+  distance, monitor triggers, recovery replans, and unsafe events;
+- injected-failure robustness under action, perception, depth, jaw, and
+  near-target perturbations.
+
+Those signals are then used to train two model components:
+
+- a binary `review_or_abort` risk head;
+- a four-way mechanism router over `auto_execute`, `auto_recovery`,
+  `human_review`, and `abort_candidate`.
+
+### Evidence
+
+Representation diagnostics show a usable but imperfect route structure:
+
+| Metric | Value |
+| --- | ---: |
+| silhouette | 0.412 |
+| Davies-Bouldin | 1.368 |
+| mean kNN label entropy | 0.034 |
+| mean local purity | 0.969 |
+| kNN route conflict rate | 0.019 |
+
+Decision-boundary diagnostics show why a separate risk head is needed:
+
+| Score | Route-error AUROC | Review/abort AUROC |
+| --- | ---: | ---: |
+| MSP | 0.993 | 0.079 |
+| entropy | 0.993 | 0.089 |
+| inverse margin | 0.993 | 0.065 |
+| review score | 0.118 | 1.000 |
+
+The standard route softmax uncertainty finds route-classifier errors, but it
+does not identify review/abort states. The multi-signal review score does.
+
+The model intervention gives:
+
+| Component | Main held-out result |
+| --- | --- |
+| all multi-signal review head | AUROC 1.000, AUPRC 1.000, recall 0.941, FPR 0.000 |
+| handcrafted multi-signal review head | AUROC 1.000, AUPRC 1.000, recall 0.706, FPR 0.000 |
+| four-way mechanism router | accuracy 0.973, macro-F1 0.981, missed review-or-abort 0.000 |
+
+### Interpretation
+
+This answers the main "what does embedding and instability analysis improve?"
+question. In the current project, the strongest improvement is not a better
+end-to-end PPO policy yet. The improvement is a learned reliability supervisor:
+analysis signals become features for a risk head and a route model. That route
+model can decide when ordinary policy execution is acceptable, when automatic
+recovery is appropriate, and when the system should request review or flag an
+abort candidate.
+
+### Limitation
+
+The suite uses internal simulator rollouts, injected-failure labels, and some
+episode-level summary features. It is strong evidence for a research
+reliability pipeline, not clinical validation or a fully online surgical
+controller.
+
+## Stage 12: Why Runtime Routing Remains Necessary
 
 ### What Was Done
 
 The project interprets the embedding-risk PPO result as a training-loop test,
-not as the final system. Because risk-aware reward shaping and hard-negative
-curriculum do not reliably improve success rate or safety-budget exhaustion,
-the final architecture keeps a runtime reliability supervisor around the
-policy.
+and the ECG-style suite as a reliability-model test. Because risk-aware reward
+shaping and hard-negative curriculum do not reliably improve success rate or
+safety-budget exhaustion, the final architecture keeps a runtime reliability
+supervisor around the policy.
 
 ### Why It Matters
 
@@ -473,8 +577,9 @@ The strongest safe claim is:
 > into mechanism-specific execution routes in simulation.
 
 The project supports this through proxy controller evidence, SurRoL recovery
-evidence, learned route classification, observable supervision, and preliminary
-embedding-risk training experiments.
+evidence, learned route classification, observable supervision, preliminary
+embedding-risk training experiments, and the ECG-style multi-signal reliability
+suite.
 
 ## What Remains Unproven
 

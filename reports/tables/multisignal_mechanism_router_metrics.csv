@@ -1,0 +1,5 @@
+route,support,precision,recall,f1,tp,fp,fn
+auto_execute,37,1.0,0.9459459459459459,0.9722222222222222,35,0,2
+auto_recovery,20,0.9090909090909091,1.0,0.9523809523809523,20,2,0
+human_review,16,1.0,1.0,1.0,16,0,0
+abort_candidate,1,1.0,1.0,1.0,1,0,0
