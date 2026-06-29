@@ -1,22 +1,25 @@
-# Reliability-Supervised VPPV Framework
+# Reliability-Supervised Surgical Embodied AI Framework
 
 This document is the cleaned project spine. It turns the project away from a
 generic "RL recovery" story and into a mechanism-aware reliability-supervision
-story for VPPV-style surgical embodied intelligence.
+story for surgical embodied intelligence. A VPPV-style
+perception-policy-servoing loop is used as one motivating case study, but the
+framework is not tied to a private or unreleased model.
 
 ## 1. Project Problem
 
-New title:
+Public-facing title:
 
-> Reliability-Supervised VPPV: Mechanism-Aware Failure Detection and Routing
-> for Surgical Embodied Intelligence
+> Reliability-Supervised Surgical Embodied AI: Mechanism-Aware Failure
+> Detection and Routing
 
 Core problem:
 
-> VPPV can move from visual state estimation to policy movement and then to
-> visual servoing, but the system lacks a mechanism layer that decides where a
-> failure comes from and when it should re-observe, re-estimate, recover, or
-> request human takeover.
+> A surgical embodied-AI pipeline can move from visual state estimation to
+> policy-level movement and then to visual servoing or controller execution,
+> but the system lacks a mechanism layer that decides where a failure comes
+> from and when it should re-observe, re-estimate, recover, pause for review,
+> or request human takeover.
 
 The contribution is not a new low-level grasp controller. The contribution is
 a reliability-supervision layer that detects when visual estimation, approach
@@ -28,11 +31,11 @@ The project is organized as a sequence of increasingly realistic checks:
 
 | Step | Role in the project |
 | --- | --- |
-| VPPV/RL problem identification | identify that the key failure is unreliable target estimation, approach movement, or near-target servoing, not low-level jaw learning |
+| perception-policy problem identification | identify that the key failure is unreliable target estimation, approach movement, or near-target servoing, not low-level jaw learning |
 | self-built proxy simulator | isolate the failure mechanism in a small environment where biased targets, obstacle risk, and recovery can be controlled |
 | proxy recovery/routing | show that the system can detect biased movement and route to recovery/re-estimation instead of uniform retry |
 | SurRoL migration | move the same reliability idea into rendered surgical-simulation rollouts |
-| policy/actor surrogate | create a policy-side rollout representation when the teacher's original checkpoint and hidden activations are unavailable |
+| policy/actor surrogate | create a policy-side rollout representation when the upstream reference checkpoint and hidden activations are unavailable |
 | mechanism perturbation dataset | generate weak labels through controlled perturbations rather than manual action labels |
 | internal separability analysis | test whether actor/rollout embeddings, PCA, KNN/prototype conflict, and action-outcome evidence separate mechanisms |
 | three-level route design | map visual bias, approach drift, and near-target servo failure to different interventions |
@@ -53,7 +56,8 @@ problem discovery
 ## 3. Three Mechanisms
 
 The current version keeps three mechanisms because they are closest to the
-VPPV pipeline.
+common perception-policy-servoing pipeline used in many surgical simulation
+and robot-learning systems.
 
 | Mechanism | Controlled perturbation | Evidence symptom | Route |
 | --- | --- | --- | --- |
@@ -105,7 +109,7 @@ The ECG-style part of the project is the analysis-to-routing loop:
 | KNN / prototype conflict | is the current rollout atypical compared with normal or known mechanism prototypes? |
 | composite risk score | can risk alarm earlier than final success/failure? |
 
-Because the teacher's original checkpoint, training data, and hidden
+Because the upstream reference checkpoint, training data, and hidden
 activations are not available, the current implementation uses
 behavior-derived rollout representations. This is weaker than full
 model-internal ECG-style analysis, but it preserves the logic:
@@ -123,8 +127,8 @@ rollout behavior
 The project does include a model-side separability test, with a careful
 boundary.
 
-It is not a hidden-layer audit of the teacher's original VPPV model. The
-teacher checkpoint, training data, raw hidden activations, and confidence
+It is not a hidden-layer audit of an upstream private surgical policy model.
+The reference checkpoint, training data, raw hidden activations, and confidence
 outputs are not available. Instead, the project uses policy-side surrogate
 evidence derived from simulator rollouts:
 
@@ -169,8 +173,8 @@ This result should be described as:
 
 It should not be described as:
 
-> full hidden-layer discovery of failure mechanisms in the teacher's original
-> VPPV model.
+> full hidden-layer discovery of failure mechanisms in an upstream private
+> surgical policy model.
 
 ## 7. Three-Level Composite Routing
 
@@ -230,7 +234,7 @@ The main metrics should be reliability metrics, not only success rate:
 The most valuable next experiment is:
 
 ```text
-SurRoL / VPPV NeedlePick or GauzeRetrieve
+SurRoL NeedlePick or GauzeRetrieve with a VPPV-style perception-policy case study
   -> generate normal, visual bias, policy drift, near-target failure rollouts
   -> extract state-action-progress behavior features
   -> train a light mechanism classifier and router

@@ -1,30 +1,30 @@
-# Failure-Aware VPPV Final Teacher Brief
+# Failure-Aware Surgical Embodied AI Final Supervisor Brief
 
 ## One-Sentence Contribution
 
-This project adds an ECG-style, mechanism-specific reliability router around
-the VPPV surgical-simulation pipeline. Rather than applying a uniform retry
-policy, it separates three VPPV-aligned mechanisms--visual/depth target
-estimation bias, policy approach drift, and near-target occlusion or servo
-failure--and routes the episode to re-observe, re-estimate, low-gain
+This project adds an ECG-style, mechanism-specific reliability router around a
+surgical embodied-AI simulation pipeline. Rather than applying a uniform retry
+policy, it separates three perception-policy-servoing mechanisms--visual/depth
+target estimation bias, policy approach drift, and near-target occlusion or
+servo failure--and routes the episode to re-observe, re-estimate, low-gain
 correction, human review, or abort/human-takeover behavior.
 
 ## What The Project Does Not Claim
 
 - It does not claim a real surgical robot policy trained from clinical data.
 - It does not claim that low-level jaw or gripper mechanics are the main learned
-  component in VPPV.
+  component in the motivating VPPV-style case study.
 - It does not claim hardware, clinical, or real-patient validation.
 
 The useful claim is narrower: in SurRoL/PyBullet-style surgical simulation, the
-project tests whether runtime evidence can identify why VPPV-style execution is
+project tests whether runtime evidence can identify why surgical embodied-AI execution is
 becoming unreliable and choose a mechanism-matched correction. Depth-scale
 error, action-outcome mismatch, progress loss, and local-neighborhood
 instability are evidence channels or subtypes, not extra headline mechanisms.
 
-## Why This Fits The VPPV Reliability Problem
+## Why This Fits The Surgical Reliability Problem
 
-The relevant VPPV failure is not simply "the gripper opens or closes wrong".
+The relevant reliability failure is not simply "the gripper opens or closes wrong".
 The more important reliability problem is that the visual estimate or
 high-level approach target can be wrong, the policy can move toward a biased
 position, or the near-target handoff can continue unsafely. A uniform retry is
@@ -37,11 +37,11 @@ The project is organized as a staged evidence chain:
 
 | Stage | Role |
 |---|---|
-| VPPV/RL problem identification | Identify that offset, biased target estimates, and approach drift are the relevant reliability failures. |
+| Perception-policy problem identification | Identify that offset, biased target estimates, and approach drift are the relevant reliability failures. |
 | Self-built proxy simulator | Isolate biased-target and unsafe-movement failures in a small controllable RL setting. |
 | Proxy recovery/routing | Show that mechanism evidence can trigger recovery/re-estimation rather than uniform retry. |
 | SurRoL migration | Move the same reliability idea into rendered surgical simulation. |
-| Policy/actor surrogate | Build a policy-side rollout representation because the teacher's original checkpoint and hidden activations are unavailable. |
+| Policy/actor surrogate | Build a policy-side rollout representation because the upstream reference checkpoint and hidden activations are unavailable. |
 | Internal separability analysis | Use rollout embeddings, PCA, KNN/prototype conflict, action-outcome mismatch, and visual uncertainty to test whether mechanisms are separable. |
 | Three-level routing | Map visual target bias, policy approach drift, and near-target servo failure to different intervention routes. |
 | Route validation | Audit the router with ablations, cross-task transfer, severity holdout, mixed-priority checks, behavior-derived clusters, early warning, false alarms, and true mixed SurRoL rollouts. |
@@ -62,8 +62,8 @@ The project is organized as a staged evidence chain:
 ## Policy-Side Mechanism Separability
 
 The project does include a model-side test, but it should be described
-carefully. It is not a hidden-layer analysis of the teacher's original VPPV
-checkpoint. Instead, it uses policy-proxy evidence, action deviation,
+carefully. It is not a hidden-layer analysis of an upstream private surgical
+policy checkpoint. Instead, it uses policy-proxy evidence, action deviation,
 action-outcome mismatch, local-neighborhood instability, progress regularity,
 and rollout embeddings to ask whether simulator failure mechanisms are
 separable before route assignment.
@@ -89,11 +89,11 @@ evidence, but it remains scripted-oracle PyBullet evidence.
 - Labels and expected routes are weak labels from simulator perturbations and
   routing rules.
 - The behavior-derived routing analysis uses policy/rollout behavior features.
-  It is not a hidden-layer analysis of the teacher's original VPPV model and is
+  It is not a hidden-layer analysis of an upstream private surgical policy model and is
   still evaluated against simulator weak labels rather than independent expert
   labels.
 - The true mixed rollout is a smoke-scale scripted-oracle run, not a deployment
-  of a learned VPPV policy.
+  of a learned surgical policy.
 - The evidence is internal simulation evidence over NeedlePick and
   GauzeRetrieve, not external clinical or hardware validation.
 - Visual media and figures demonstrate failure/recovery behavior, but they do
@@ -103,7 +103,7 @@ evidence, but it remains scripted-oracle PyBullet evidence.
 
 1. Scale true mixed rollouts beyond the current 5-seed smoke run.
 2. Replace the scripted oracle in the true mixed run with the closest available
-   learned or teacher-provided VPPV policy path.
+   learned or externally provided policy path.
 3. Add camera/image corruptions and state-estimation perturbations that more
-   closely match VPPV's visual module.
+   closely match a real visual module.
 4. Report confidence intervals and failure cases, not only success means.

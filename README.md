@@ -1,4 +1,4 @@
-# Reliability-Supervised VPPV: Mechanism-Aware Failure Detection and Routing for Surgical Embodied Intelligence
+# Reliability-Supervised Surgical Embodied AI: Mechanism-Aware Failure Detection and Routing
 
 Research code and public evidence for a simulator-only surgical embodied-AI
 reliability project.
@@ -6,32 +6,35 @@ reliability project.
 The central problem is not whether the robot can simply retry after a failed
 rollout. The central problem is:
 
-> VPPV can move from visual state estimation to policy movement and then to
-> visual servoing, but the system lacks a mechanism layer that decides where a
-> failure comes from and when it should re-observe, re-estimate, recover, or
-> request human takeover.
+> A surgical embodied-AI pipeline can move from visual state estimation to
+> policy-level motion and then to local servoing or controller execution, but it
+> often lacks a mechanism layer that decides where a failure comes from and
+> when it should re-observe, re-estimate, recover, request review, or stop.
 
 This repository studies that missing mechanism layer in SurRoL/PyBullet-style
 surgical simulation. It is a research prototype, not a deployed surgical robot
 safety system, and it does not claim clinical, hardware, or real-patient
 validation.
 
-## Teacher Quick Read
+## Quick Read
 
-The final project should be read as a reliability-supervision layer around a
-VPPV/RL surgical-simulation pipeline.
+The project should be read as a reliability-supervision layer for surgical
+embodied AI and robot-learning pipelines. A VPPV-style
+perception-policy-servoing loop is used as a motivating case study because it
+makes target estimation, approach-policy, and near-target handoff failures
+concrete; the method itself is broader than one named model.
 
 It is not mainly about learning jaw opening, grasp mechanics, or every
 low-level surgical action. After reviewing the RM and surgical-robot notes, the
 project was reframed away from generic recovery for grasp-stage failures and
-toward the VPPV reliability problem: visual-state estimates and high-level
-approach policies may become biased even when the simulator can execute the
-available motion primitives.
+toward a more general reliability problem: visual-state estimates and
+high-level approach policies may become biased even when the simulator can
+execute the available motion primitives.
 
 The resulting contribution is:
 
 ```text
-VPPV / policy rollout
+visual-state / policy rollout
   -> mechanism evidence
   -> failure-source detection
   -> route-specific response
@@ -47,7 +50,7 @@ mixed-fault SurRoL smoke run:
 | perturbed | mixed visual/depth/near-target faults, no route response | 0/40 | 0.224 |
 | priority-routed | same mixed faults plus mechanism-priority routing | 40/40 | 0.016 |
 
-For the teacher-facing evidence package, see
+For the supervisor-facing evidence package, see
 [reports/failure_aware_vppv_final_teacher_brief.md](reports/failure_aware_vppv_final_teacher_brief.md)
 and
 [reports/tables/failure_aware_vppv_final_evidence_matrix.csv](reports/tables/failure_aware_vppv_final_evidence_matrix.csv).
@@ -60,11 +63,11 @@ observable, controllable, and testable before moving to SurRoL/PyBullet.
 
 | Stage | What was found or built | Why it matters |
 | --- | --- | --- |
-| 1. VPPV/RL problem identification | The VPPV pipeline can estimate a visual target, move toward it with a policy, then rely on visual servoing or control near the target. The missing component is a mechanism layer that detects when the estimated target or approach movement has become unreliable. | This reframes the project from post-failure recovery to reliability-supervised VPPV. |
+| 1. Perception-policy reliability problem identification | A surgical embodied-AI pipeline can estimate a visual target, move toward it with a policy, then rely on servoing or controller execution near the target. The missing component is a mechanism layer that detects when the estimated target or approach movement has become unreliable. | This reframes the project from post-failure recovery to reliability-supervised surgical embodied AI. |
 | 2. Self-built proxy simulator | A constrained surgical-tool environment was built first. The tool learns or follows movement toward a target while avoiding a forbidden zone, safety budget, and biased target estimates. | This provides a controlled setting for target bias, movement drift, and unsafe continuation before using heavier SurRoL tasks. |
 | 3. Proxy recovery and routing | In the proxy, biased target estimates can move the tool toward an incorrect region; risk-gated and mechanism-routed logic detects the failure source and triggers recovery or re-estimation. | This validates the mechanism concept in a minimal RL setting without overclaiming surgical realism. |
-| 4. SurRoL/PyBullet migration | The same reliability idea was migrated into SurRoL-rendered tasks such as NeedleReach, NeedlePick, and GauzeRetrieve. SurRoL already provides task dynamics and motion primitives, so the project does not attempt to relearn every grasp or jaw action. | This connects the proxy mechanism to the teacher's surgical-simulation setting. |
-| 5. Policy/actor surrogate inside SurRoL | Because the teacher's original checkpoint and training data are not available, the project builds a policy-side surrogate over SurRoL traces: state, action, progress, target estimate, and rollout behavior are recorded step by step. | This surrogate provides the model-side evidence used for policy-side mechanism analysis. |
+| 4. SurRoL/PyBullet migration | The same reliability idea was migrated into SurRoL-rendered tasks such as NeedleReach, NeedlePick, and GauzeRetrieve. SurRoL already provides task dynamics and motion primitives, so the project does not attempt to relearn every grasp or jaw action. | This connects the proxy mechanism to a public surgical-simulation setting. |
+| 5. Policy/actor surrogate inside SurRoL | Because the reference policy checkpoint and training data are not available, the project builds a policy-side surrogate over SurRoL traces: state, action, progress, target estimate, and rollout behavior are recorded step by step. | This surrogate provides the model-side evidence used for policy-side mechanism analysis. |
 | 6. Mechanism perturbation dataset | Normal, visual-bias, policy-drift, and near-target/servo-failure style rollouts are generated by controlled perturbation, producing weak labels and route targets. | No manual action labels are needed; the weak labels come from known perturbation mechanisms. |
 | 7. Internal separability analysis | Actor/rollout embeddings, PCA, KNN/prototype conflict, action-outcome mismatch, visual uncertainty, and local-neighborhood evidence are used to test whether mechanisms separate before route assignment. | This is the ECG-style research core: failure mechanisms should be supported by model/trajectory evidence rather than only specified by rules. |
 | 8. Three-level routing | The project maps mechanism evidence to three route levels: re-observe/re-estimate for visual target bias, low-gain correction/replan for policy approach drift, and pause/review/abort for near-target occlusion or unsafe servoing. | The intervention is mechanism-specific rather than a uniform retry policy. |
@@ -73,7 +76,7 @@ observable, controllable, and testable before moving to SurRoL/PyBullet.
 Research sequence:
 
 ```text
-VPPV/RL reliability problem
+perception-policy reliability problem
   -> proxy simulator to isolate the failure mechanism
   -> proxy recovery/routing validation
   -> SurRoL migration
@@ -91,9 +94,10 @@ The final research question is:
 > why it is unreliable, and which response is appropriate before unsafe
 > continuation becomes the default?
 
-The project focuses on the part of VPPV that is closest to the teacher's paper:
-visual estimation, high-level approach movement, and near-target visual
-servoing or handoff reliability.
+The project focuses on a common surgical embodied-AI control chain: visual
+estimation, high-level approach movement, and near-target visual servoing or
+controller handoff reliability. VPPV-style pipelines are used as one concrete
+case study for this broader problem.
 
 The final claim is not "we trained a better gripper." The final claim is:
 
@@ -103,11 +107,12 @@ The final claim is not "we trained a better gripper." The final claim is:
 
 ## The Three Mechanisms
 
-The current framework intentionally keeps only three VPPV-aligned mechanisms.
+The current framework intentionally keeps only three mechanisms aligned with
+perception-policy-servo surgical pipelines.
 Older jaw-stuck, object-drop, and generic grasp-retry tests are preserved as
 historical migration evidence, not as the main contribution.
 
-| Mechanism | What is simulated | Why it matters for VPPV | Route |
+| Mechanism | What is simulated | Why it matters for surgical embodied AI | Route |
 | --- | --- | --- | --- |
 | `visual_estimation_bias` | segmentation, depth, or regressor bias shifts the estimated target | the policy may move correctly toward the wrong target estimate | re-observe / re-estimate |
 | `policy_approach_drift` | the approach policy moves the tool into a wrong near-target region | the learned/high-level policy may be locally plausible but globally wrong | low-gain corrective movement / replan |
@@ -148,18 +153,18 @@ Each trajectory records the evidence needed for mechanism analysis:
 | weak label | injected mechanism and expected route |
 
 The labels are weak simulator labels. They are not surgeon annotations and not
-hidden labels from the teacher's original model.
+hidden labels from an upstream private model.
 
 ## ECG-Style Analysis Transfer
 
 The ECG project is important because it does not stop at embedding plots. It
 uses model/data evidence to identify error mechanisms and then routes them.
 This repository transfers that style into robot rollouts with an explicit
-boundary: the teacher's original VPPV checkpoint, training set, and hidden
+boundary: the upstream reference checkpoint, training set, and hidden
 activations are not available here.
 
 So the current project uses behavior-derived evidence instead of claiming full
-teacher-model internal analysis:
+private-model internal analysis:
 
 | Analysis family | Surgical rollout version | What it asks |
 | --- | --- | --- |
@@ -186,14 +191,14 @@ Figure:
 One important model-side test is already present and should be read as part of
 the main contribution.
 
-It is not the same as a full internal audit of the teacher's original VPPV/RL
+It is not the same as a full internal audit of an upstream surgical policy
 model, because that checkpoint, training data, hidden activations, and
 confidence outputs are not available in this repository. But the project does
 test whether the policy/rollout representation contains separable failure
 structure:
 
 ```text
-SurRoL/VPPV step traces
+SurRoL step traces from a VPPV-style case study
   -> policy-proxy evidence and rollout behavior features
   -> PCA / behavior embedding
   -> KNN, prototype, and local-neighborhood conflict evidence
@@ -350,20 +355,20 @@ mechanism separability
 | --- | --- | --- |
 | proxy problem definition | define runtime reliability in a controllable RL setting | [docs/TEACHER_EXPERIMENT_PROCESS.md](docs/TEACHER_EXPERIMENT_PROCESS.md) |
 | ECG-style analysis transfer | move from embedding-only to multi-signal mechanism analysis | [docs/ECG_STYLE_RL_UPGRADE.md](docs/ECG_STYLE_RL_UPGRADE.md) |
-| VPPV reframing | focus on visual estimation, approach drift, and near-target failure | [docs/FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md](docs/FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md) |
+| perception-policy reframing | focus on visual estimation, approach drift, and near-target failure | [docs/FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md](docs/FAILURE_AWARE_VPPV_MULTIEVIDENCE_FRAMEWORK.md) |
 | step evidence | test mechanism evidence at timestep level | [reports/failure_aware_vppv_step_evidence.md](reports/failure_aware_vppv_step_evidence.md) |
 | cross-task and severity checks | test frozen thresholds and held-out high severity | [reports/failure_aware_vppv_cross_task_generalization.md](reports/failure_aware_vppv_cross_task_generalization.md), [reports/failure_aware_vppv_severity_holdout.md](reports/failure_aware_vppv_severity_holdout.md) |
 | mixed-priority audit | test compound evidence priority instead of generic retry | [reports/failure_aware_vppv_mixed_perturbation_priority.md](reports/failure_aware_vppv_mixed_perturbation_priority.md) |
 | behavior-derived routing | derive routes from rollout behavior regions | [reports/failure_aware_vppv_model_derived_routing.md](reports/failure_aware_vppv_model_derived_routing.md) |
 | true mixed rollouts | execute mixed fault proxies in PyBullet | [reports/failure_aware_vppv_true_mixed_rollouts.md](reports/failure_aware_vppv_true_mixed_rollouts.md) |
-| final package | teacher-facing summary and machine-readable evidence | [reports/failure_aware_vppv_final_teacher_brief.md](reports/failure_aware_vppv_final_teacher_brief.md) |
+| final package | supervisor-facing summary and machine-readable evidence | [reports/failure_aware_vppv_final_teacher_brief.md](reports/failure_aware_vppv_final_teacher_brief.md) |
 
 ## Visual Evidence
 
 | Question | Evidence | Boundary |
 | --- | --- | --- |
-| What is the final VPPV reliability story? | ![Failure-aware VPPV supervisor pack](reports/figures/failure_aware_vppv/failure_aware_vppv_supervisor_pack.png) | SurRoL rendered frames plus evidence curves and routes |
-| Do behavior regions separate routes? | ![Behavior-derived PCA](reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png) | rollout-behavior representation, not teacher hidden layers |
+| What is the final reliability story? | ![Failure-aware surgical reliability supervisor pack](reports/figures/failure_aware_vppv/failure_aware_vppv_supervisor_pack.png) | SurRoL rendered frames plus evidence curves and routes |
+| Do behavior regions separate routes? | ![Behavior-derived PCA](reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png) | rollout-behavior representation, not unavailable upstream hidden layers |
 | Do mechanisms survive severity shift? | ![Severity holdout](reports/figures/failure_aware_vppv/failure_aware_vppv_severity_holdout.png) | low/medium calibration, high severity held out |
 | What if evidence co-activates? | ![Mixed priority](reports/figures/failure_aware_vppv/failure_aware_vppv_mixed_priority_evidence.png) | compositional priority audit |
 | Do mixed faults execute in SurRoL dynamics? | ![True mixed success](reports/figures/failure_aware_vppv/failure_aware_vppv_true_mixed_success.png) | scripted-oracle PyBullet smoke run |
@@ -378,7 +383,7 @@ claim:
 | --- | --- |
 | CircleRL / constrained proxy | problem-definition sandbox for risk gating and mechanism routing |
 | tangent backup and risk-gated tangent | controller-level evidence that runtime supervision can reduce unnecessary intervention |
-| jaw-stuck / object-drop / grasp recovery | historical SurRoL migration stress tests, not the VPPV-centered contribution |
+| jaw-stuck / object-drop / grasp recovery | historical SurRoL migration stress tests, not the final reliability-supervision contribution |
 | embedding-risk PPO retraining | preliminary test that analysis signals can influence learning, but not the final claim |
 | generic recovery videos | supporting visual evidence only |
 
@@ -400,8 +405,8 @@ yes "the route depends on the mechanism"
 - This is not real-robot deployment.
 - This is not a complete end-to-end learned surgical autonomy system.
 - The route labels are weak labels from controlled simulator perturbations.
-- The current behavior-derived analysis is not hidden-layer analysis of the
-  teacher's original VPPV model.
+- The current behavior-derived analysis is not hidden-layer analysis of an
+  upstream private surgical policy model.
 - The true mixed rollout uses scripted-oracle PyBullet recovery logic.
 - The results support a simulator research prototype, not surgical autonomy.
 
@@ -413,7 +418,7 @@ scripts/                     experiment, analysis, plotting, and report scripts
 tests/                       unit and regression tests
 docs/                        method docs and project framing
 reports/                     detailed reports, figures, media, and tables
-reports/figures/             VPPV evidence figures
+reports/figures/             reliability evidence figures
 reports/media/               rendered SurRoL rollout evidence
 reports/tables/              machine-readable summaries
 outputs/                     selected lightweight aggregate summaries
@@ -429,7 +434,7 @@ python -m pytest -q
 # Behavior-derived route assignment
 python scripts\build_failure_aware_vppv_model_derived_routing.py
 
-# Final VPPV evidence package
+# Final evidence package
 python scripts\build_failure_aware_vppv_final_package.py
 
 # Step-level mechanism evidence
