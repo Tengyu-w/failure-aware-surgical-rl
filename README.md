@@ -1,12 +1,12 @@
-# Reliability-Supervised Surgical Embodied AI
+# Mechanism-Aware Reliability Routing for Surgical Robot Learning
 
-Mechanism-aware failure detection and routing for simulator-only surgical
-robot-learning pipelines.
+Simulator evidence for diagnosing target-estimation, approach-policy, and
+near-target handoff failures.
 
-This repository studies a missing reliability layer in surgical embodied AI:
+This repository studies a reliability problem in surgical robot learning:
 
-> A surgical embodied-AI system may estimate a visual target, move toward it
-> with a learned or high-level policy, and then rely on local servoing or
+> A surgical robot-learning pipeline may estimate a visual target, move toward
+> it with a learned or high-level policy, and then rely on local servoing or
 > controller execution. The missing question is whether the system can detect
 > why it is becoming unreliable and choose the right response before unsafe
 > continuation becomes the default.
@@ -15,22 +15,22 @@ The project is a research prototype. It is not a deployed surgical robot safety
 system, does not claim hardware or clinical validation, and must not be read as
 evidence for autonomous surgical deployment.
 
-## For Supervisors: Read These 3 Files First
+## Suggested Reading
 
 This repository preserves a long research trail, including proxy RL, SurRoL
 migration, weak-label mechanism analysis, and routed recovery. For a fast
 review, start here:
 
-1. [Reliability-supervised surgical embodied AI framework](docs/RELIABILITY_SUPERVISED_VPPV_FRAMEWORK.md): the clean final spine, including the three mechanisms, weak-label rollout data, policy-side separability, composite routing, and metrics.
+1. [Framework document](docs/RELIABILITY_SUPERVISED_VPPV_FRAMEWORK.md): the clean final spine, including the three mechanisms, weak-label rollout data, policy-side separability, composite routing, and metrics.
 2. [Final supervisor brief](reports/failure_aware_vppv_final_teacher_brief.md): the shortest evidence ladder and the safest current claim.
 3. [Project index](docs/PROJECT_INDEX.md): a map from each claim to the detailed reports, figures, tables, and rebuild commands.
 
 Current status: the simulator evidence package is complete enough to describe
-the project as **mechanism-aware reliability supervision for surgical embodied
-AI**, with a VPPV-style perception-policy-servoing loop used as one motivating
-case study rather than the only intended audience.
+the project as **mechanism-aware reliability routing for surgical robot
+learning**, with a VPPV-style perception-policy-servoing loop used as one
+motivating case study rather than the only intended audience.
 
-## One-Sentence Contribution
+## What This Adds
 
 The project adds an ECG-inspired reliability supervisor around surgical
 simulation rollouts: it separates visual target-estimation bias, policy
@@ -45,7 +45,7 @@ observed rollout behavior
   -> re-observe, re-estimate, low-gain correction, pause/review, or abort
 ```
 
-## Protocol Guard: Avoiding Circular Evidence
+## How To Read The Evidence
 
 The project uses controlled perturbations to create weak mechanism labels, so
 the evidence must be handled carefully. The README and reports separate
@@ -61,14 +61,14 @@ mechanism discovery, route assignment, and outcome validation:
 - Behavior-derived routing holds mechanism labels out during clustering. Labels
   are used afterward to evaluate whether discovered rollout regions align with
   expected routes.
-- The claim is not full hidden-layer discovery inside a private VPPV or
-  teacher-provided model. The claim is simulator-side mechanism evidence,
+- The claim is not full hidden-layer discovery inside a private or unavailable
+  upstream model. The claim is simulator-side mechanism evidence,
   policy/trajectory separability, and route-specific recovery validation.
 - Recovery success is reported together with evidence boundaries. The strongest
   current result is still smoke-scale scripted-oracle simulation, not a learned
   surgical-policy deployment.
 
-## Research Story
+## How The Work Developed
 
 The work should be read as a sequence of controlled hypotheses, not as a pile
 of recovery demos:
@@ -114,10 +114,10 @@ CircleRL is the first controlled sandbox in that chain. It demonstrates the
 problem in a small environment where the target estimate can be biased, the
 tool can drift toward the wrong region, and a monitor can trigger re-estimation
 or recovery. The final repository claim, however, is broader than the CircleRL
-video: it is about mechanism-aware reliability routing for surgical embodied-AI
-simulation.
+video: it is about mechanism-aware reliability routing for surgical
+robot-learning simulation.
 
-## 1. Defining The Problem
+## Problem Setting
 
 The project is not mainly about learning every surgical motion primitive. In
 SurRoL-style simulation, task dynamics and controller primitives already exist
@@ -130,7 +130,7 @@ for many movements. The reliability problem is different:
 
 The research question is:
 
-> Can a surgical embodied-intelligence pipeline know when it is unreliable,
+> Can a surgical robot-learning pipeline know when it is unreliable,
 > why it is unreliable, and which response is appropriate before unsafe
 > continuation becomes the default?
 
@@ -140,7 +140,7 @@ The final claim is not "we trained a better gripper." The final claim is:
 > visual estimation bias, policy approach drift, and near-target
 > occlusion/servo failure, then maps them to different interventions.
 
-## 2. Mechanism Diagnosis
+## Failure Mechanisms
 
 The current framework intentionally keeps three main mechanisms. Older
 jaw-stuck, object-drop, and generic grasp-retry tests remain in the repository
@@ -165,7 +165,7 @@ near-target occlusion / servo-failure rollout
 Each trajectory records state transitions, distance/progress, estimated and
 observed target evidence, action behavior, outcome, and expected route.
 
-## 3. From ECG-Style Analysis To Surgical Rollouts
+## Borrowing The ECG Logic
 
 The ECG project matters here because it does not stop at an embedding plot. It
 uses model/data evidence to identify error mechanisms, then maps those
@@ -187,7 +187,7 @@ So the current implementation uses behavior-derived rollout evidence:
 This is the closest available analogue to ECG-style model-derived evidence in
 the absence of a private upstream model audit.
 
-## 4. Policy-Side Mechanism Separability
+## Policy-Side Separability
 
 One core test asks whether simulator rollout evidence separates mechanisms
 before route assignment:
@@ -220,7 +220,7 @@ Evidence:
 - [Behavior-derived PCA figure](reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png)
 - [Cluster fingerprint table](reports/tables/failure_aware_vppv_model_derived_clusters.csv)
 
-## 5. Composite Routing
+## Routing Rules
 
 The router is not a uniform retry rule. Different mechanisms imply different
 interventions:
@@ -253,7 +253,7 @@ This route design is the surgical-RL counterpart of the ECG recover logic:
 analysis identifies the failure source, and the response is matched to that
 source.
 
-## 6. Route Validation And Current Results
+## Current Evidence
 
 The project is evaluated with reliability metrics, not only success rate:
 
@@ -289,7 +289,7 @@ In the 5-seed true mixed-fault SurRoL smoke run:
 This is the strongest current simulation result, but it remains scripted-oracle
 PyBullet evidence rather than learned-policy or hardware validation.
 
-## Claim-To-Evidence Index
+## Evidence Map
 
 | Claim | Evidence | Source |
 | --- | --- | --- |
@@ -304,7 +304,7 @@ PyBullet evidence rather than learned-policy or hardware validation.
 | Route-specific recovery helps inside SurRoL dynamics. | True mixed rollouts: perturbed 0/40, priority-routed 40/40. | [True mixed rollout report](reports/failure_aware_vppv_true_mixed_rollouts.md) |
 | The final claim is bounded. | Final brief and evidence matrix separate current evidence from deployment claims. | [Final supervisor brief](reports/failure_aware_vppv_final_teacher_brief.md), [Evidence matrix](reports/tables/failure_aware_vppv_final_evidence_matrix.csv) |
 
-## Visual Evidence
+## Media And Visual Checks
 
 | Question | Evidence | Boundary |
 | --- | --- | --- |
@@ -317,7 +317,7 @@ PyBullet evidence rather than learned-policy or hardware validation.
 | Does the recovery route visibly restore a failed mixed-fault rollout? | [Slowed routed recovery video](reports/media/failure_aware_vppv_true_mixed_recovery/surrol_true_mixed_priority_routed_recovery_slow.mp4), [perturbed-vs-routed comparison](reports/media/failure_aware_vppv_true_mixed_recovery/surrol_true_mixed_perturbed_vs_routed_slow.mp4), ![final routed recovery frame](reports/media/failure_aware_vppv_true_mixed_recovery/surrol_true_mixed_priority_routed_recovery_final.png) | functional SurRoL/PyBullet recovery evidence; base controller is the scripted oracle, not a VPPV checkpoint |
 | Was SurRoL/PyBullet actually rendered? | [NeedleReach GIF](reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif), [NeedlePick GIF](reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.gif), [GauzeRetrieve GIF](reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.gif) | visual migration evidence |
 
-## Historical / Earlier Experiments
+## Earlier Work Kept For Context
 
 These components remain in the repository because they explain how the final
 research question developed:
@@ -342,7 +342,7 @@ yes "the system explains which mechanism is failing"
 yes "the route depends on the mechanism"
 ```
 
-## Public Evidence Boundary
+## Scope
 
 - This is simulator research, not clinical validation.
 - This is not real-robot deployment.
@@ -354,7 +354,7 @@ yes "the route depends on the mechanism"
 - Several results are strong as internal consistency or smoke-scale evidence,
   but they are not external validation.
 
-## Repository Map
+## Files
 
 ```text
 src/                         custom constrained surgical RL environments
@@ -369,7 +369,7 @@ outputs/                     selected lightweight aggregate summaries
 runs/                        local checkpoints and training outputs, not committed
 ```
 
-## Reproduce Key Experiments
+## Run The Main Checks
 
 ```powershell
 # Lightweight regression tests
