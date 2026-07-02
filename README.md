@@ -308,6 +308,7 @@ PyBullet evidence rather than learned-policy or hardware validation.
 
 | Question | Evidence | Boundary |
 | --- | --- | --- |
+| What recovery route should a supervisor see first? | [Teacher recovery demo MP4](reports/media/teacher_recovery_route_evidence/teacher_recovery_route_demo.mp4), [storyboard](reports/media/teacher_recovery_route_evidence/teacher_recovery_route_storyboard.png), [GIF version](reports/media/teacher_recovery_route_evidence/teacher_recovery_route_storyboard.gif) | teacher-facing video and evidence map: visual/depth bias, policy drift, near-target handoff failure, and mixed-fault routed recovery; includes actual simulator clips but is not a new learned-policy video |
 | What does the CircleRL proxy recovery look like? | [CircleRL recovery MP4](reports/media/circlerl_recovery_demo/circlerl_bias_recovery.mp4), [GIF](reports/media/circlerl_recovery_demo/circlerl_bias_recovery.gif) | proxy visualization, not final SurRoL evidence |
 | What is the final reliability story? | ![Failure-aware surgical reliability supervisor pack](reports/figures/failure_aware_vppv/failure_aware_vppv_supervisor_pack.png) | SurRoL frames plus evidence curves and routes |
 | Do behavior regions separate routes? | ![Behavior-derived PCA](reports/figures/failure_aware_vppv/failure_aware_vppv_model_derived_pca.png) | rollout-behavior representation, not unavailable upstream hidden layers |
