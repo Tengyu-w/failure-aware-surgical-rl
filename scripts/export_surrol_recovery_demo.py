@@ -24,7 +24,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=43123)
     parser.add_argument("--fault-steps", type=int, default=16)
     parser.add_argument("--max-steps", type=int, default=90)
-    parser.add_argument("--fps", type=int, default=8)
+    parser.add_argument("--fps", type=int, default=4)
+    parser.add_argument("--post-success-hold-sec", type=float, default=4.0)
     return parser.parse_args()
 
 
@@ -120,7 +121,7 @@ def write_gif(path: Path, frames: list[np.ndarray], fps: int) -> None:
         append_images=rest,
         duration=duration_ms,
         loop=0,
-        optimize=True,
+        optimize=False,
     )
 
 
@@ -148,6 +149,7 @@ def write_readme(
         "| MP4 video | [surrol_needlepick_action_freeze_monitor_recovery.mp4](surrol_needlepick_action_freeze_monitor_recovery.mp4) |",
         "| GIF preview | [surrol_needlepick_action_freeze_monitor_recovery.gif](surrol_needlepick_action_freeze_monitor_recovery.gif) |",
         "| Trace CSV | [surrol_needlepick_action_freeze_monitor_recovery_trace.csv](surrol_needlepick_action_freeze_monitor_recovery_trace.csv) |",
+        "| Final preview frame | [surrol_needlepick_action_freeze_monitor_recovery_preview.png](surrol_needlepick_action_freeze_monitor_recovery_preview.png) |",
         "| Fault start frame | [step_000_fault_start.png](frames/step_000_fault_start.png) |",
         "| Monitor trigger frame | [step_016_monitor_trigger.png](frames/step_016_monitor_trigger.png) |",
         "| Recovery completion frame | [step_final_recovered.png](frames/step_final_recovered.png) |",
@@ -155,6 +157,11 @@ def write_readme(
         (
             f"Result: success={success:.1f}, final_distance={final_distance:.4f}, "
             f"trigger_step={trigger_step}, total_steps={total_steps}."
+        ),
+        (
+            "The MP4/GIF are slowed and hold the recovered final frame so the "
+            "monitor-recovery segment and completion are visible rather than "
+            "cutting off immediately at success."
         ),
         "",
         (
@@ -287,8 +294,12 @@ def main() -> None:
     gif_path = out_dir / "surrol_needlepick_action_freeze_monitor_recovery.gif"
     trace_path = out_dir / "surrol_needlepick_action_freeze_monitor_recovery_trace.csv"
 
+    if frames and args.post_success_hold_sec > 0:
+        frames = frames + [frames[-1]] * int(round(args.fps * args.post_success_hold_sec))
+
     write_mp4_with_ffmpeg(mp4_path, frames, args.fps)
     write_gif(gif_path, frames, args.fps)
+    imageio.imwrite(out_dir / "surrol_needlepick_action_freeze_monitor_recovery_preview.png", frames[-1])
     write_trace(trace_path, rows)
 
     for name, frame in keyframes.items():
