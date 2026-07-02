@@ -1,6 +1,8 @@
 # SurRoL Recovery Demo
 
-This directory contains a SurRoL/PyBullet NeedlePick recovery video. It is separate from the CircleRL proxy media.
+This directory contains a real SurRoL/PyBullet NeedlePick recovery rollout
+exported from simulator frames. It is separate from the CircleRL proxy media
+and is not a storyboard or introduction video.
 
 | Asset | File |
 | --- | --- |
@@ -14,5 +16,12 @@ This directory contains a SurRoL/PyBullet NeedlePick recovery video. It is separ
 Result: success=1.0, final_distance=0.0169, trigger_step=16, total_steps=59.
 
 Fault protocol: the first segment freezes the executed action, causing no meaningful progress. The monitor then routes execution to a bounded recovery override using the SurRoL scripted task action.
+
+What to look for in the video:
+
+1. `fault_action_freeze`: the controller action is frozen and progress stalls.
+2. `monitor_trigger`: the monitor detects lack of useful progress at step 16.
+3. `monitor_recovery_oracle_override`: the recovery route switches to the SurRoL scripted task action.
+4. `recovery_complete`: the rollout reaches success=1.0 with final_distance=0.0169.
 
 Scope note: this is SurRoL/PyBullet simulator footage with a scripted monitor recovery override; it is not real-robot or clinical validation.

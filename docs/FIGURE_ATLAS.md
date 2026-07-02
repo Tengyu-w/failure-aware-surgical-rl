@@ -8,7 +8,7 @@ loose folder of PNG files.
 
 | Stage | Folder | What The Reader Should Look For |
 | --- | --- | --- |
-| Teacher recovery route evidence | `reports/media/teacher_recovery_route_evidence/` | Supervisor-facing storyboard linking each failure mechanism to evidence, route, result, and current evidence boundary. |
+| SurRoL recovery demo | `reports/media/surrol_recovery_demo/` | Actual SurRoL/PyBullet NeedlePick rollout with injected action-freeze failure, monitor trigger, scripted recovery override, and trace CSV. |
 | SurRoL rendered evidence | `reports/media/surrol_render_evidence/` | Baseline SurRoL/PyBullet oracle-render sanity checks for NeedleReach, NeedlePick, and GauzeRetrieve. |
 | Risk-gated tangent visuals | `reports/figures/risk_gated_tangent_visuals/` | Proxy controller architecture, budget/intervention result, trajectories, and snapshots. |
 | Mechanism-routed tangent visuals | `reports/figures/mechanism_routed_tangent_v5d/` | ECG-inspired mechanism router metrics and Stage 1/Stage 2 activation split. |
@@ -24,7 +24,7 @@ loose folder of PNG files.
 
 | Question | Representative figure or media | What it supports | Scope boundary |
 | --- | --- | --- | --- |
-| What recovery route should a supervisor see first? | [Teacher recovery demo MP4](../reports/media/teacher_recovery_route_evidence/teacher_recovery_route_demo.mp4), [storyboard](../reports/media/teacher_recovery_route_evidence/teacher_recovery_route_storyboard.png), [GIF version](../reports/media/teacher_recovery_route_evidence/teacher_recovery_route_storyboard.gif) | Visual/depth bias, approach-policy drift, near-target handoff failure, and mixed-fault routed recovery are mapped to evidence signals and routes. | Teacher-facing video assembled from simulator outputs; includes actual CircleRL and SurRoL clips, but is not a new end-to-end learned-policy video. |
+| Can the recovery route be seen in a real SurRoL rollout? | [SurRoL NeedlePick recovery MP4](../reports/media/surrol_recovery_demo/surrol_needlepick_action_freeze_monitor_recovery.mp4), [GIF preview](../reports/media/surrol_recovery_demo/surrol_needlepick_action_freeze_monitor_recovery.gif), [trace CSV](../reports/media/surrol_recovery_demo/surrol_needlepick_action_freeze_monitor_recovery_trace.csv) | The video shows action-freeze failure, monitor trigger, scripted recovery override, and successful completion inside SurRoL/PyBullet. | Actual simulator footage, but recovery is scripted/oracle override rather than a private learned-policy checkpoint. |
 | What does proxy recovery look like in motion? | [CircleRL recovery MP4](../reports/media/circlerl_recovery_demo/circlerl_bias_recovery.mp4), [GIF preview](../reports/media/circlerl_recovery_demo/circlerl_bias_recovery.gif), [trace CSV](../reports/media/circlerl_recovery_demo/circlerl_bias_recovery_trace.csv) | A biased target estimate first causes drift; monitor recovery re-estimates the target and routes control back toward completion. | Custom proxy media, not SurRoL/PyBullet and not real-robot footage. |
 | Is there rendered surgical simulation evidence? | [NeedleReach frame](../reports/media/surrol_render_evidence/needlereach/frames/needlereach_step_020.png), [NeedlePick frame](../reports/media/surrol_render_evidence/needlepick/frames/needlepick_step_040.png), [GauzeRetrieve frame](../reports/media/surrol_render_evidence/gauzeretrieve/frames/gauzeretrieve_step_034.png) | The work was migrated from the custom proxy environment into SurRoL/PyBullet tasks. | Rendered simulator frames only. |
 | Did the project enter rendered SurRoL tasks? | [NeedleReach GIF](../reports/media/surrol_render_evidence/needlereach/needlereach_oracle_rollout.gif), [NeedlePick MP4](../reports/media/surrol_render_evidence/needlepick/needlepick_oracle_rollout.mp4), [GauzeRetrieve MP4](../reports/media/surrol_render_evidence/gauzeretrieve/gauzeretrieve_oracle_rollout.mp4) | The repository contains baseline rendered oracle rollouts, not only static plots. | Sanity-check media for SurRoL integration; not the main recovery-route evidence. |
@@ -42,8 +42,8 @@ loose folder of PNG files.
 
 ## Recommended Reading Order
 
-1. Start with `reports/media/teacher_recovery_route_evidence/` to understand
-   which failure mechanism routes to which recovery response.
+1. Start with `reports/media/surrol_recovery_demo/` to see an actual
+   SurRoL/PyBullet fault-to-recovery rollout with a trace CSV.
 2. Open `reports/media/surrol_render_evidence/` to see that the project
    includes SurRoL/PyBullet rendered surgical simulation, not only proxy plots.
 3. Open `reports/figures/risk_gated_tangent_visuals/aggregate_budget_intervention.png`
